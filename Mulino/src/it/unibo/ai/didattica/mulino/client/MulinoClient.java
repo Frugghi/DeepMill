@@ -78,7 +78,7 @@ public class MulinoClient {
 
 		State.Checker playerColor = "White".equalsIgnoreCase(args[0]) ? State.Checker.WHITE : State.Checker.BLACK;
 		Player player = Player.IA;
-		if (args.length > 0) {
+		if (args.length > 1) {
 			player = "Human".equalsIgnoreCase(args[1]) ? Player.HUMAN : Player.IA;
 		}
 
@@ -134,8 +134,12 @@ public class MulinoClient {
 				case IA:
 					move = ia.getBestMove(depth);
                     System.out.println("DEEPMILL DEBUG: " + move.toString());
-                    ia.makeMove(move);
-					actionString = move.toStandardMove();
+					if (move == null) {
+						actionString = "GGWP";
+					} else {
+						ia.makeMove(move);
+						actionString = move.toStandardMove();
+					}
 
                     System.out.println(actionString);
                     System.out.println("DEEPMILL DEBUG: \n" + ia.toString());
