@@ -83,15 +83,33 @@ public class MulinoClient {
             player = "Human".equalsIgnoreCase(args[1]) ? Player.HUMAN : Player.IA;
         }
 
+        Minimax.Algorithm algorithm = Minimax.Algorithm.NEGASCOUT;
+        if (args.length > 2) {
+            switch (args[2].toLowerCase()) {
+                case "minimax":
+                    algorithm = Minimax.Algorithm.MINIMAX;
+                    break;
+                case "alpha_beta":
+                    algorithm = Minimax.Algorithm.ALPHA_BETA;
+                    break;
+                case "negamax":
+                    algorithm = Minimax.Algorithm.NEGAMAX;
+                    break;
+                case "negascout":
+                    algorithm = Minimax.Algorithm.NEGASCOUT;
+                    break;
+            }
+        }
+
         boolean myTurn = playerColor == State.Checker.WHITE;
         String actionString = "";
         Action action = null;
         State currentState = null;
         BufferedReader in = new BufferedReader( new InputStreamReader(System.in));
 
-        MillMinimax ia = new GridMinimax(Minimax.Algorithm.MINIMAX);
+        MillMinimax ia = new GridMinimax(algorithm);
         MillMove move;
-        int depth = 8;
+        int depth = 10;
 
         MulinoClient client = new MulinoClient(playerColor);
         System.out.println("Hello " + player.toString() + "!");
