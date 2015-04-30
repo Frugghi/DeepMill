@@ -31,7 +31,7 @@ public class MillMinimax extends Minimax<MillMove> {
          * i metodi di questa classe accettano una X incrementata di 2
          * decrementare la X quando si crea una mossa
          */
-        this.grid = new int[Z_SIZE][X_SIZE + 4];
+        this.grid = new int[Z_SIZE][X_SIZE];
         this.played = new int[3];
         this.count = new int[3];
 
@@ -40,7 +40,7 @@ public class MillMinimax extends Minimax<MillMove> {
 
     public void newGame() {
         for (int z = 0; z < Z_SIZE; z++) {
-            for (int x = 0; x < X_SIZE + 4; x++) {
+            for (int x = 0; x < X_SIZE; x++) {
                 grid[z][x] = FREE;
             }
         }
@@ -87,12 +87,7 @@ public class MillMinimax extends Minimax<MillMove> {
     }
 
     public void setGridPosition(int player, int x, int z) {
-        grid[z][x + 2] = player;
-        if (x < 2) {
-            grid[z][x + 2] = player;
-        } else if (x > X_SIZE - 2) {
-            grid[z][x + 2] = player;
-        }
+        grid[z][x] = player;
     }
 
     @Override
@@ -148,16 +143,16 @@ public class MillMinimax extends Minimax<MillMove> {
         List<MillMove> moves = new ArrayList<MillMove>(3 * count[FREE]);
         if (played[currentPlayer] < PIECES) { // Fase 1
             for (int toZ = 0; toZ < Z_SIZE; toZ++) {
-                for (int toX = 2; toX < X_SIZE + 2; toX++) {
+                for (int toX = 0; toX < X_SIZE; toX++) {
                     this.addMoves(moves, Integer.MAX_VALUE, Integer.MAX_VALUE, toX, toZ);
                 }
             }
         } else if (count[currentPlayer] == 3) { // Fase 3
             for (int fromZ = 0; fromZ < Z_SIZE; fromZ++) {
-                for (int fromX = 2; fromX < X_SIZE + 2; fromX++) {
+                for (int fromX = 0; fromX < X_SIZE; fromX++) {
                     if (grid[fromZ][fromX] == currentPlayer) {
                         for (int toZ = 0; toZ < Z_SIZE; toZ++) {
-                            for (int toX = 2; toX < X_SIZE + 2; toX++) {
+                            for (int toX = 0; toX < X_SIZE; toX++) {
                                 this.addMoves(moves, fromX, fromZ, toX, toZ);
                             }
                         }
@@ -166,7 +161,7 @@ public class MillMinimax extends Minimax<MillMove> {
             }
         } else { // Fase 2
             for (int fromZ = 0; fromZ < Z_SIZE; fromZ++) {
-                for (int fromX = 2; fromX < X_SIZE + 2; fromX++) {
+                for (int fromX = 0; fromX < X_SIZE; fromX++) {
                     if (grid[fromZ][fromX] == currentPlayer) {
                         if (fromX % 2 == 1) {
                             switch (fromZ) {
@@ -181,17 +176,20 @@ public class MillMinimax extends Minimax<MillMove> {
                                     this.addMoves(moves, fromX, fromZ, fromX, fromZ - 1);
                                     break;
                             }
-                            this.addMoves(moves, fromX, fromZ, fromX + 1, fromZ);
+                            switch (fromX) {
+                                case X_SIZE - 1:
+                                    this.addMoves(moves, fromX, fromZ, 0, fromZ);
+                                    break;
+                                default:
+                                    this.addMoves(moves, fromX, fromZ, fromX + 1, fromZ);
+                                    break;
+                            }
                             this.addMoves(moves, fromX, fromZ, fromX - 1, fromZ);
                         } else {
                             switch (fromX) {
-                                case 2: // 0 + delta
+                                case 0:
                                     this.addMoves(moves, fromX, fromZ, fromX + 1, fromZ);
-                                    this.addMoves(moves, fromX, fromZ, X_SIZE + 1, fromZ); // X_SIZE - 1 + delta
-                                    break;
-                                case X_SIZE + 1: // X_SIZE - 1 + delta
-                                    this.addMoves(moves, fromX, fromZ, 2, fromZ); // 0 + delta
-                                    this.addMoves(moves, fromX, fromZ, fromX - 1, fromZ);
+                                    this.addMoves(moves, fromX, fromZ, X_SIZE - 1, fromZ);
                                     break;
                                 default:
                                     this.addMoves(moves, fromX, fromZ, fromX + 1, fromZ);
@@ -209,12 +207,26 @@ public class MillMinimax extends Minimax<MillMove> {
 
     private boolean isMill(int player, int x, int z) {
         if (x % 2 == 1) {
-            return (grid[z][x - 1] == player && grid[z][x] == player && grid[z][x + 1] == player) ||
-                    (grid[0][x] == player && grid[1][x] == player && grid[2][x] == player);
+            switch (x) {
+                case X_SIZE - 1:
+                    return (grid[z][x - 1] == player && grid[z][x] == player && grid[z][0] == player) ||
+                            (grid[0][x] == player && grid[1][x] == player && grid[2][x] == player);
+                default:
+                    return (grid[z][x - 1] == player && grid[z][x] == player && grid[z][x + 1] == player) ||
+                            (grid[0][x] == player && grid[1][x] == player && grid[2][x] == player);
+            }
         } else {
-            return grid[z][x] == player && (
-                    (grid[z][x - 2] == player && grid[z][x - 1] == player) ||
-                    (grid[z][x + 1] == player && grid[z][x + 2] == player));
+            switch (x) {
+                case 0:
+                    return grid[z][x] == player && (
+                            (grid[z][X_SIZE - 2] == player && grid[z][X_SIZE - 1] == player) || (grid[z][x + 1] == player && grid[z][x + 2] == player));
+                case X_SIZE - 2:
+                    return grid[z][x] == player && (
+                            (grid[z][x - 2] == player && grid[z][x - 1] == player) || (grid[z][x + 1] == player && grid[z][0] == player));
+                default:
+                    return grid[z][x] == player && (
+                            (grid[z][x - 2] == player && grid[z][x - 1] == player) || (grid[z][x + 1] == player && grid[z][x + 2] == player));
+            }
         }
     }
 
@@ -231,20 +243,31 @@ public class MillMinimax extends Minimax<MillMove> {
                 if (willMill) {
                     return true;
                 } else {
-                    return grid[toZ][toX - 1] == player && grid[toZ][toX + 1] == player;
+                    switch (toX) {
+                        case X_SIZE - 1:
+                            return grid[toZ][toX - 1] == player && grid[toZ][0] == player;
+                        default:
+                            return grid[toZ][toX - 1] == player && grid[toZ][toX + 1] == player;
+                    }
                 }
             } else {
-               return (grid[toZ][toX - 2] == player && grid[toZ][toX - 1] == player) ||
-                       (grid[toZ][toX + 1] == player && grid[toZ][toX + 2] == player);
+                switch (toX) {
+                    case 0:
+                        return (grid[toZ][X_SIZE - 2] == player && grid[toZ][X_SIZE - 1] == player) || (grid[toZ][toX + 1] == player && grid[toZ][toX + 2] == player);
+                    case X_SIZE - 2:
+                        return (grid[toZ][toX - 2] == player && grid[toZ][toX - 1] == player) || (grid[toZ][toX + 1] == player && grid[toZ][0] == player);
+                    default:
+                        return (grid[toZ][toX - 2] == player && grid[toZ][toX - 1] == player) || (grid[toZ][toX + 1] == player && grid[toZ][toX + 2] == player);
+                }
             }
         } else { // Modifichiamo la board per questo calcolo... non penso sia una grande idea!!
             boolean willMill = false;
 
-            setGridPosition(FREE, fromX - 2, fromZ);
+            setGridPosition(FREE, fromX, fromZ);
 
             willMill = willMill(player, Integer.MAX_VALUE, Integer.MAX_VALUE, toX, toZ);
 
-            setGridPosition(player, fromX - 2, fromZ);
+            setGridPosition(player, fromX, fromZ);
 
             return willMill;
         }
@@ -254,14 +277,14 @@ public class MillMinimax extends Minimax<MillMove> {
         if (grid[toZ][toX] == FREE) {
             if (this.willMill(currentPlayer, fromX, fromZ, toX, toZ)) {
                 for (int removeZ = 0; removeZ < Z_SIZE; removeZ++) {
-                    for (int removeX = 2; removeX < X_SIZE + 2; removeX++) {
+                    for (int removeX = 0; removeX < X_SIZE; removeX++) {
                         if (grid[removeZ][removeX] == opponentPlayer && !this.isMill(opponentPlayer, removeX, removeZ)) {
-                            moves.add(0, new MillMove(currentPlayer, fromX - 2, fromZ, toX - 2, toZ, removeX - 2, removeZ));
+                            moves.add(0, new MillMove(currentPlayer, fromX, fromZ, toX, toZ, removeX, removeZ));
                         }
                     }
                 }
             } else {
-                moves.add(new MillMove(currentPlayer, fromX - 2, fromZ, toX - 2, toZ));
+                moves.add(new MillMove(currentPlayer, fromX, fromZ, toX, toZ));
             }
         }
     }
@@ -291,13 +314,13 @@ public class MillMinimax extends Minimax<MillMove> {
     @Override
     public String toString() {
         StringBuffer result = new StringBuffer();
-        result.append("7 " + grid[0][8] + "--------" + grid[0][7] + "--------" + grid[0][6] + "\n");
-        result.append("6 |--" + grid[1][8] + "-----" + grid[1][7] + "-----" + grid[1][6] + "--|\n");
-        result.append("5 |--|--" + grid[2][8] + "--" + grid[2][7] + "--" + grid[2][6] + "--|--|\n");
-        result.append("4 " + grid[0][9] + "--" + grid[1][9] + "--" + grid[2][9] + "     " + grid[2][5] + "--" + grid[1][5] + "--" + grid[0][5] +"\n");
-        result.append("3 |--|--" + grid[1][2] + "--" + grid[2][3] + "--" + grid[2][4] + "--|--|\n");
-        result.append("2 |--" + grid[1][2] + "-----" + grid[1][3] + "-----" + grid[1][4] + "--|\n");
-        result.append("1 " + grid[0][2] + "--------" + grid[0][3] + "--------" + grid[0][4] + "\n");
+        result.append("7 " + grid[0][6] + "--------" + grid[0][5] + "--------" + grid[0][4] + "\n");
+        result.append("6 |--" + grid[1][6] + "-----" + grid[1][5] + "-----" + grid[1][4] + "--|\n");
+        result.append("5 |--|--" + grid[2][6] + "--" + grid[2][5] + "--" + grid[2][4] + "--|--|\n");
+        result.append("4 " + grid[0][7] + "--" + grid[1][7] + "--" + grid[2][7] + "     " + grid[2][3] + "--" + grid[1][3] + "--" + grid[0][3] +"\n");
+        result.append("3 |--|--" + grid[1][0] + "--" + grid[2][1] + "--" + grid[2][2] + "--|--|\n");
+        result.append("2 |--" + grid[1][0] + "-----" + grid[1][1] + "-----" + grid[1][2] + "--|\n");
+        result.append("1 " + grid[0][0] + "--------" + grid[0][1] + "--------" + grid[0][2] + "\n");
         result.append("  a  b  c  d  e  f  g\n");
         result.append("White Played Checkers: " + played[PLAYER_W] + ";\n");
         result.append("Black Played Checkers: " + played[PLAYER_B] + ";\n");
