@@ -110,14 +110,14 @@ public class MillMove implements Move {
 
     private static String coordinates2String(int x, int z) {
         switch (x) {
-            case 0: return ('a' + z) + "" + (z + 1);
-            case 1: return 'd' + "" + (z + 1);
-            case 2: return ('g' - z) + "" + (z + 1);
-            case 3: return ('g' - z) + "4";
-            case 4: return ('g' - z) + "" + (7 - z);
-            case 5: return 'd' + "" + (7 - z);
-            case 6: return ('a' + z) + "" + (7 - z);
-            case 7: return ('a' + z) + "4";
+            case 0: return Character.toString((char) ('a' + z)) + Integer.toString(z + 1);
+            case 1: return Character.toString((char) ('d')) + Integer.toString(z + 1);
+            case 2: return Character.toString((char) ('g' - z)) + Integer.toString(z + 1);
+            case 3: return Character.toString((char) ('g' - z)) + "4";
+            case 4: return Character.toString((char) ('g' - z)) + Integer.toString(7 - z);
+            case 5: return Character.toString((char) ('d')) + Integer.toString(7 - z);
+            case 6: return Character.toString((char) ('a' + z)) + Integer.toString(7 - z);
+            case 7: return Character.toString((char) ('a' + z)) + "4";
             default: return "";
         }
     }
