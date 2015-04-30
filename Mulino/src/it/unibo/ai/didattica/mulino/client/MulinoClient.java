@@ -15,9 +15,10 @@ import it.unibo.ai.didattica.mulino.actions.Phase2Action;
 import it.unibo.ai.didattica.mulino.actions.PhaseFinalAction;
 import it.unibo.ai.didattica.mulino.domain.MillMinimax;
 import it.unibo.ai.didattica.mulino.domain.MillMove;
+import it.unibo.ai.didattica.mulino.implementation.GridMinimax;
+import it.unibo.ai.didattica.mulino.implementation.GridMove;
 import it.unibo.ai.didattica.mulino.domain.State;
 import it.unibo.ai.didattica.mulino.engine.TCPMulino;
-
 
 public class MulinoClient {
 
@@ -88,7 +89,7 @@ public class MulinoClient {
         State currentState = null;
         BufferedReader in = new BufferedReader( new InputStreamReader(System.in));
 
-        Minimax<MillMove> ia = new MillMinimax(Minimax.Algorithm.MINIMAX);
+        MillMinimax ia = new GridMinimax(Minimax.Algorithm.MINIMAX);
         MillMove move;
         int depth = 8;
 
@@ -108,21 +109,11 @@ public class MulinoClient {
 
                 if (player == Player.IA) {
                     for (String position : currentState.getPositions()) {
-                        int checker = MillMinimax.FREE;
-                        switch (currentState.getBoard().get(position)) {
-                            case WHITE:
-                                checker = MillMinimax.PLAYER_W;
-                                break;
-                            case BLACK:
-                                checker = MillMinimax.PLAYER_B;
-                                break;
-                        }
-                        int[] coordinates = MillMove.string2Coordinates(position);
-                        ((MillMinimax) ia).setGridPosition(checker, coordinates[0], coordinates[1]);
+                        ia.setGridPosition(currentState.getBoard().get(position), position);
                     }
 
-                    ((MillMinimax) ia).setCount(currentState.getWhiteCheckersOnBoard(), currentState.getBlackCheckersOnBoard());
-                    ((MillMinimax) ia).setPlayed(MillMinimax.PIECES - currentState.getWhiteCheckers(), MillMinimax.PIECES - currentState.getBlackCheckers());
+                    ia.setCount(currentState.getWhiteCheckersOnBoard(), currentState.getBlackCheckersOnBoard());
+                    ia.setPlayed(MillMinimax.PIECES - currentState.getWhiteCheckers(), MillMinimax.PIECES - currentState.getBlackCheckers());
 
                     ia.next();
 
@@ -132,13 +123,13 @@ public class MulinoClient {
             System.out.println("Player " + client.getPlayer().toString() + ", do your move: ");
             switch (player) {
                 case IA:
-                    move = ia.getBestMove(depth);
+                    move = (MillMove)ia.getBestMove(depth);
                     System.out.println("DEEPMILL DEBUG: " + move.toString());
                     if (move == null) {
                         actionString = "GGWP";
                     } else {
                         ia.makeMove(move);
-                        actionString = move.toStandardMove();
+                        actionString = move.toStringMove();
                     }
 
                     System.out.println(actionString);
@@ -190,7 +181,5 @@ public class MulinoClient {
             myTurn = false;
         }
     }
-
-
 
 }
