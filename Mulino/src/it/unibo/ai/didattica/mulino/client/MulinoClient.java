@@ -22,15 +22,6 @@ import it.unibo.ai.didattica.mulino.engine.TCPMulino;
 
 public class MulinoClient {
 
-    public enum Player {
-        HUMAN ("Human"),
-        IA ("DeepMill");
-        private final String name;
-        private Player(String s) { name = s; }
-        public boolean equalsName(String otherName){ return (otherName == null)? false:name.equals(otherName); }
-        public String toString(){ return name; }
-    }
-
     private State.Checker player;
     private Socket playerSocket;
     private ObjectInputStream in;
@@ -58,6 +49,45 @@ public class MulinoClient {
         out.writeObject(action);
     }
 
+    public void write(String actionString, State.Phase phase) throws IOException, ClassNotFoundException {
+        Action action = null;
+        switch (phase) {
+            case FIRST:
+                Phase1Action phase1Action = new Phase1Action();
+                phase1Action.setPutPosition(actionString.substring(0, 2));
+                if (actionString.length() == 4) {
+                    phase1Action.setRemoveOpponentChecker(actionString.substring(2, 4));
+                } else {
+                    phase1Action.setRemoveOpponentChecker(null);
+                }
+                action = phase1Action;
+                break;
+            case SECOND:
+                Phase2Action phase2Action = new Phase2Action();
+                phase2Action.setFrom(actionString.substring(0, 2));
+                phase2Action.setTo(actionString.substring(2, 4));
+                if (actionString.length() == 6) {
+                    phase2Action.setRemoveOpponentChecker(actionString.substring(4, 6));
+                } else {
+                    phase2Action.setRemoveOpponentChecker(null);
+                }
+                action = phase2Action;
+                break;
+            case FINAL:
+                PhaseFinalAction phaseFinalAction = new PhaseFinalAction();
+                phaseFinalAction.setFrom(actionString.substring(0, 2));
+                phaseFinalAction.setTo(actionString.substring(2, 4));
+                if (actionString.length() == 6) {
+                    phaseFinalAction.setRemoveOpponentChecker(actionString.substring(4, 6));
+                } else {
+                    phaseFinalAction.setRemoveOpponentChecker(null);
+                }
+                action = phaseFinalAction;
+                break;
+        }
+        this.write(action);
+    }
+
     public State read() throws ClassNotFoundException, IOException {
         return (State) in.readObject();
     }
@@ -78,7 +108,7 @@ public class MulinoClient {
             System.exit(-1);
         }
 
-        Player player = Player.IA;
+        Player.Behaviour behaviour = Player.Behaviour.IA;
         State.Checker playerColor = State.Checker.WHITE;
         Minimax.Algorithm algorithm = Minimax.Algorithm.NEGASCOUT;
         int depth = 8;
@@ -93,10 +123,10 @@ public class MulinoClient {
                     playerColor = State.Checker.BLACK;
                     break;
                 case "--human":
-                    player = Player.HUMAN;
+                    behaviour = Player.Behaviour.HUMAN;
                     break;
                 case "--ia":
-                    player = Player.IA;
+                    behaviour = Player.Behaviour.IA;
                     break;
                 case "-a":
                     switch (args[++i].toLowerCase()) {
@@ -120,105 +150,8 @@ public class MulinoClient {
             }
         }
 
-        boolean myTurn = playerColor == State.Checker.WHITE;
-        String actionString = "";
-        Action action = null;
-        State currentState = null;
-        BufferedReader in = new BufferedReader( new InputStreamReader(System.in));
-
-        MillMinimax ia = new GridMinimax(algorithm);
-        MillMove move;
-
-        MulinoClient client = new MulinoClient(playerColor);
-        System.out.println("Hello " + player.toString() + "!");
-        if (player == Player.IA) {
-            System.out.println("Algorithm: " + algorithm + ", Depth: " + depth);
-        }
-        System.out.println("You are player " + client.getPlayer().toString() + "!");
-        System.out.println("Current state:");
-        currentState = client.read();
-        System.out.println(currentState.toString());
-
-        while (true) {
-            if (!myTurn) {
-                System.out.println("Waiting for your opponent move...");
-                currentState = client.read();
-                System.out.println("Your Opponent did his move, and the result is: ");
-                System.out.println(currentState.toString());
-
-                if (player == Player.IA) {
-                    for (String position : currentState.getPositions()) {
-                        ia.setGridPosition(currentState.getBoard().get(position), position);
-                    }
-
-                    ia.setCount(currentState.getWhiteCheckersOnBoard(), currentState.getBlackCheckersOnBoard());
-                    ia.setPlayed(MillMinimax.PIECES - currentState.getWhiteCheckers(), MillMinimax.PIECES - currentState.getBlackCheckers());
-
-                    ia.next();
-
-                    System.out.println("DEEPMILL DEBUG: \n" + ia.toString());
-                }
-            }
-            System.out.println("Player " + client.getPlayer().toString() + ", do your move: ");
-            switch (player) {
-                case IA:
-                    move = (MillMove)ia.getBestMove(depth);
-                    System.out.println("DEEPMILL DEBUG: " + move.toString());
-                    if (move == null) {
-                        actionString = "GGWP";
-                    } else {
-                        ia.makeMove(move);
-                        actionString = move.toStringMove();
-                    }
-
-                    System.out.println(actionString);
-                    System.out.println("DEEPMILL DEBUG: \n" + ia.toString());
-                    break;
-                case HUMAN:
-                    actionString = in.readLine();
-                    break;
-            }
-
-            switch (currentState.getCurrentPhase()) {
-                case FIRST:
-                    Phase1Action phase1Action = new Phase1Action();
-                    phase1Action.setPutPosition(actionString.substring(0, 2));
-                    if (actionString.length() == 4) {
-                        phase1Action.setRemoveOpponentChecker(actionString.substring(2, 4));
-                    } else {
-                        phase1Action.setRemoveOpponentChecker(null);
-                    }
-                    action = phase1Action;
-                    break;
-                case SECOND:
-                    Phase2Action phase2Action = new Phase2Action();
-                    phase2Action.setFrom(actionString.substring(0, 2));
-                    phase2Action.setTo(actionString.substring(2, 4));
-                    if (actionString.length() == 6) {
-                        phase2Action.setRemoveOpponentChecker(actionString.substring(4, 6));
-                    } else {
-                        phase2Action.setRemoveOpponentChecker(null);
-                    }
-                    action = phase2Action;
-                    break;
-                case FINAL:
-                    PhaseFinalAction phaseFinalAction = new PhaseFinalAction();
-                    phaseFinalAction.setFrom(actionString.substring(0, 2));
-                    phaseFinalAction.setTo(actionString.substring(2, 4));
-                    if (actionString.length() == 6) {
-                        phaseFinalAction.setRemoveOpponentChecker(actionString.substring(4, 6));
-                    } else {
-                        phaseFinalAction.setRemoveOpponentChecker(null);
-                    }
-                    action = phaseFinalAction;
-                    break;
-            }
-            client.write(action);
-            currentState = client.read();
-            System.out.println("Effect of your move: ");
-            System.out.println(currentState.toString());
-            myTurn = false;
-        }
+        Player player = new Player(behaviour, playerColor, algorithm, depth);
+        player.start();
     }
 
 }

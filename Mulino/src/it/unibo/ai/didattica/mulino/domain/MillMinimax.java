@@ -14,4 +14,14 @@ public abstract class MillMinimax<T extends MillMove> extends Minimax<T> {
         super(algo);
     }
 
+    public void updateState(State state) {
+        for (String position : state.getPositions()) {
+            this.setGridPosition(state.getBoard().get(position), position);
+        }
+
+        this.setCount(state.getWhiteCheckersOnBoard(), state.getBlackCheckersOnBoard());
+        this.setPlayed(MillMinimax.PIECES - state.getWhiteCheckers(), MillMinimax.PIECES - state.getBlackCheckers());
+    }
+
+
 }
