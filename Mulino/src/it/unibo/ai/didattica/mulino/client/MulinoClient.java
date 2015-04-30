@@ -68,35 +68,54 @@ public class MulinoClient {
     public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
 
         if (args.length == 0) {
-            System.out.println("You must specify which player you are (Wthie or Black)!");
+            System.out.println("Usage:");
+            System.out.println("-w --white     Set the player to White");
+            System.out.println("-b --black     Set the player to Black");
+            System.out.println("--human        Set the player as Human");
+            System.out.println("--ia           Set the player as IA");
+            System.out.println("-a <algorithm> Set the IA algorithm: minimax, alpha_beta, negamax, negascout");
+            System.out.println("-d <depth>     Set the algorithm's search depth");
             System.exit(-1);
         }
-        System.out.print("Selected client:");
-        for (String arg : args) {
-            System.out.print(" " + arg);
-        }
-        System.out.println();
 
-        State.Checker playerColor = "White".equalsIgnoreCase(args[0]) ? State.Checker.WHITE : State.Checker.BLACK;
         Player player = Player.IA;
-        if (args.length > 1) {
-            player = "Human".equalsIgnoreCase(args[1]) ? Player.HUMAN : Player.IA;
-        }
-
+        State.Checker playerColor = State.Checker.WHITE;
         Minimax.Algorithm algorithm = Minimax.Algorithm.NEGASCOUT;
-        if (args.length > 2) {
-            switch (args[2].toLowerCase()) {
-                case "minimax":
-                    algorithm = Minimax.Algorithm.MINIMAX;
+        int depth = 8;
+        for (int i = 0; i < args.length; i++) {
+            switch (args[i].toLowerCase()) {
+                case "-w":
+                case "--white":
+                    playerColor = State.Checker.WHITE;
                     break;
-                case "alpha_beta":
-                    algorithm = Minimax.Algorithm.ALPHA_BETA;
+                case "-b":
+                case "--black":
+                    playerColor = State.Checker.BLACK;
                     break;
-                case "negamax":
-                    algorithm = Minimax.Algorithm.NEGAMAX;
+                case "--human":
+                    player = Player.HUMAN;
                     break;
-                case "negascout":
-                    algorithm = Minimax.Algorithm.NEGASCOUT;
+                case "--ia":
+                    player = Player.IA;
+                    break;
+                case "-a":
+                    switch (args[++i].toLowerCase()) {
+                        case "minimax":
+                            algorithm = Minimax.Algorithm.MINIMAX;
+                            break;
+                        case "alpha_beta":
+                            algorithm = Minimax.Algorithm.ALPHA_BETA;
+                            break;
+                        case "negamax":
+                            algorithm = Minimax.Algorithm.NEGAMAX;
+                            break;
+                        case "negascout":
+                            algorithm = Minimax.Algorithm.NEGASCOUT;
+                            break;
+                    }
+                    break;
+                case "-d":
+                    depth = Integer.parseInt(args[++i]);
                     break;
             }
         }
@@ -109,10 +128,12 @@ public class MulinoClient {
 
         MillMinimax ia = new GridMinimax(algorithm);
         MillMove move;
-        int depth = 10;
 
         MulinoClient client = new MulinoClient(playerColor);
         System.out.println("Hello " + player.toString() + "!");
+        if (player == Player.IA) {
+            System.out.println("Algorithm: " + algorithm + ", Depth: " + depth);
+        }
         System.out.println("You are player " + client.getPlayer().toString() + "!");
         System.out.println("Current state:");
         currentState = client.read();
