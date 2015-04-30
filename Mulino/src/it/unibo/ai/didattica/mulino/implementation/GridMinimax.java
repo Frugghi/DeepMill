@@ -302,12 +302,36 @@ public class GridMinimax extends MillMinimax<GridMove> {
 
     @Override
     public double evaluate() {
-        return count[currentPlayer] - count[opponentPlayer];
+        if (this.hasWon(currentPlayer)) { // Se vinco è la mossa migliore
+            return this.maxEvaluateValue();
+        } else if (this.hasWon(opponentPlayer)) { // Se perdo è la mossa peggiore
+            return -this.maxEvaluateValue();
+        }
+
+        // Il numero di spostamenti di un pezzo potrebbe essere un buon indicatore per discriminare quando si è in parità
+        int[] availableMoves = new int[]{0, 0, 0};
+        for (int z = 0; z < Z_SIZE; z++) {
+            for (int x = 0; x < X_SIZE; x++) {
+                if (x < X_SIZE - 1) {
+                    if (grid[z][x] !=  grid[z][x + 1] && (grid[z][x] == FREE || grid[z][x + 1] == FREE)) {
+                        availableMoves[Math.max(grid[z][x], grid[z][x + 1])]++;
+                    }
+                } else if (grid[z][x] !=  grid[z][0] && (grid[z][x] == FREE || grid[z][0] == FREE)) {
+                    availableMoves[Math.max(grid[z][x], grid[z][0])]++;
+                }
+
+                if (x % 2 == 1 && z < Z_SIZE - 1 && grid[z][x] !=  grid[z + 1][x] && (grid[z][x] == FREE || grid[z + 1][x] == FREE)) {
+                    availableMoves[Math.max(grid[z][x], grid[z + 1][x])]++;
+                }
+            }
+        }
+
+        return 5 * (count[currentPlayer] - count[opponentPlayer]) + (availableMoves[currentPlayer] - availableMoves[opponentPlayer]);
     }
 
     @Override
     public double maxEvaluateValue() {
-        return PIECES - 2;
+        return 100;
     }
 
     @Override
