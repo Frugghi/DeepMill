@@ -7,11 +7,11 @@ import java.util.List;
 
 public class MillMinimax extends Minimax<MillMove> {
 
-    private static final int FREE     = 0;
-    private static final int PLAYER_W = 1;
-    private static final int PLAYER_B = 2;
+    public static final int FREE     = 0;
+    public static final int PLAYER_W = 1;
+    public static final int PLAYER_B = 2;
 
-    private static final int PIECES = 9;
+    public static final int PIECES = 9;
 
     private static final int Z_SIZE = 3;
     private static final int X_SIZE = 8;
@@ -57,21 +57,41 @@ public class MillMinimax extends Minimax<MillMove> {
         opponentPlayer = PLAYER_B;
     }
 
+    public void setPlayed(int white, int black) {
+        played[FREE] = PIECES * 2 - (white + black);
+        played[PLAYER_W] = white;
+        played[PLAYER_B] = black;
+    }
+
+    public int[] getPlayed() {
+        return played;
+    }
+
+    public void setCount(int white, int black) {
+        count[FREE] = Z_SIZE * X_SIZE - (white + black);
+        count[PLAYER_W] = white;
+        count[PLAYER_B] = black;
+    }
+
+    public int[] getCount() {
+        return count;
+    }
+
     @Override
     public boolean isOver() {
         return hasWon(PLAYER_W) || hasWon(PLAYER_B);
     }
 
     private boolean hasWon(int player) {
-        return played[PLAYER_W] == PIECES && played[PLAYER_B] == PIECES && count[3 - player] <= 2;
+        return played[FREE] == 0 && count[3 - player] <= 2; // Manca la possibilità di non muoversi
     }
 
-    private void setGridPosition(int player, int x, int z) {
+    public void setGridPosition(int player, int x, int z) {
         grid[z][x + 2] = player;
         if (x < 2) {
-            grid[z][X_SIZE + x + 2] = FREE;
+            grid[z][x + 2] = player;
         } else if (x > X_SIZE - 2) {
-            grid[z][X_SIZE + x + 2] = FREE;
+            grid[z][x + 2] = player;
         }
     }
 
@@ -126,13 +146,13 @@ public class MillMinimax extends Minimax<MillMove> {
     @Override
     public List<MillMove> getPossibleMoves() {
         List<MillMove> moves = new ArrayList<MillMove>(3 * count[FREE]);
-        if (played[currentPlayer] < PIECES) {
+        if (played[currentPlayer] < PIECES) { // Fase 1
             for (int toZ = 0; toZ < Z_SIZE; toZ++) {
                 for (int toX = 2; toX < X_SIZE + 2; toX++) {
                     this.addMoves(moves, Integer.MAX_VALUE, Integer.MAX_VALUE, toX, toZ);
                 }
             }
-        } else if (count[currentPlayer] == 3) {
+        } else if (count[currentPlayer] == 3) { // Fase 3
             for (int fromZ = 0; fromZ < Z_SIZE; fromZ++) {
                 for (int fromX = 2; fromX < X_SIZE + 2; fromX++) {
                     if (grid[fromZ][fromX] == currentPlayer) {
@@ -144,7 +164,7 @@ public class MillMinimax extends Minimax<MillMove> {
                     }
                 }
             }
-        } else {
+        } else { // Fase 2
             for (int fromZ = 0; fromZ < Z_SIZE; fromZ++) {
                 for (int fromX = 2; fromX < X_SIZE + 2; fromX++) {
                     if (grid[fromZ][fromX] == currentPlayer) {
@@ -248,24 +268,12 @@ public class MillMinimax extends Minimax<MillMove> {
 
     @Override
     public double evaluate() {
-        //TODO: implementare evaluate()
-
-        /* Idee:
-         * - il top per noi è fare un tris
-         * - vogliamo molto evitare i tris avversari
-         * - ci piacciono posizioni in cui con la mossa successiva
-         *   potremmo arrivare ad una situazione in cui nella mossa
-         *   dopo avremo un tris
-         * - se cerchiamo di fare sempre tris l'avversario ci blocca subito
-         */
-
-        return 0;
+        return count[currentPlayer] - count[opponentPlayer];
     }
 
     @Override
     public double maxEvaluateValue() {
-        //TODO: Mettere il massimo restituito da evaluate()
-        return 0;
+        return PIECES - 2;
     }
 
     @Override
@@ -278,6 +286,27 @@ public class MillMinimax extends Minimax<MillMove> {
     public void previous() {
         currentPlayer = 3 - currentPlayer;
         opponentPlayer = 3 - opponentPlayer;
+    }
+
+    @Override
+    public String toString() {
+        StringBuffer result = new StringBuffer();
+        result.append("7 " + grid[0][8] + "--------" + grid[0][7] + "--------" + grid[0][6] + "\n");
+        result.append("6 |--" + grid[1][8] + "-----" + grid[1][7] + "-----" + grid[1][6] + "--|\n");
+        result.append("5 |--|--" + grid[2][8] + "--" + grid[2][7] + "--" + grid[2][6] + "--|--|\n");
+        result.append("4 " + grid[0][9] + "--" + grid[1][9] + "--" + grid[2][9] + "     " + grid[2][5] + "--" + grid[1][5] + "--" + grid[0][5] +"\n");
+        result.append("3 |--|--" + grid[1][2] + "--" + grid[2][3] + "--" + grid[2][4] + "--|--|\n");
+        result.append("2 |--" + grid[1][2] + "-----" + grid[1][3] + "-----" + grid[1][4] + "--|\n");
+        result.append("1 " + grid[0][2] + "--------" + grid[0][3] + "--------" + grid[0][4] + "\n");
+        result.append("  a  b  c  d  e  f  g\n");
+        result.append("White Played Checkers: " + played[PLAYER_W] + ";\n");
+        result.append("Black Played Checkers: " + played[PLAYER_B] + ";\n");
+        result.append("White Checkers On Board: " + count[PLAYER_W] + ";\n");
+        result.append("Black Checkers On Board: " + count[PLAYER_B] + ";\n");
+        result.append("Current player: " + currentPlayer + ";\n");
+        result.append("Opponent player: " + opponentPlayer + ";\n");
+
+        return result.toString();
     }
 
 }

@@ -101,7 +101,119 @@ public class MillMove implements Move {
     }
 
     public String toString() {
-        return (this.player == MillMove.PLAYER_W ? "W" : "B") + " from (" + fromX + "" + fromZ + ") to (" + toX + "" + toZ + ") and remove (" + removeX + "" + removeZ + ")";
+        return (this.player == MillMove.PLAYER_W ? "W" : "B") + " from (" + fromX + ", " + fromZ + ") to (" + toX + ", " + toZ + ") and remove (" + removeX + ", " + removeZ + ")";
+    }
+
+    public String toStandardMove() {
+        return coordinates2String(fromX, fromZ) + coordinates2String(toX, toZ) + coordinates2String(removeX, removeZ);
+    }
+
+    private static String coordinates2String(int x, int z) {
+        switch (x) {
+            case 0: return ('a' + z) + "" + (z + 1);
+            case 1: return 'd' + "" + (z + 1);
+            case 2: return ('g' - z) + "" + (z + 1);
+            case 3: return ('g' - z) + "4";
+            case 4: return ('g' - z) + "" + (7 - z);
+            case 5: return 'd' + "" + (7 - z);
+            case 6: return ('a' + z) + "" + (7 - z);
+            case 7: return ('a' + z) + "4";
+            default: return "";
+        }
+    }
+
+    public static int[] string2Coordinates(String _coordinates) {
+        String coordinates = _coordinates.toLowerCase();
+        int z = Integer.MAX_VALUE;
+        int x = Integer.MAX_VALUE;
+
+        switch (coordinates.charAt(1)) {
+            case '1':
+            case '7':
+                z = 0;
+                break;
+            case '2':
+            case '6':
+                z = 1;
+                break;
+            case '3':
+            case '5':
+                z = 2;
+                break;
+            default:
+                switch (coordinates.charAt(0)) {
+                    case 'a':
+                    case 'g':
+                        z = 0;
+                        break;
+                    case 'b':
+                    case 'f':
+                        z = 1;
+                        break;
+                    case 'c':
+                    case 'e':
+                        z = 2;
+                        break;
+                }
+                break;
+        }
+
+        switch (coordinates.charAt(1)) {
+            case '1':
+            case '2':
+            case '3':
+                switch (coordinates.charAt(0)) {
+                    case 'a':
+                    case 'b':
+                    case 'c':
+                        x = 0;
+                        break;
+                    case 'd':
+                        x = 1;
+                        break;
+                    case 'e':
+                    case 'f':
+                    case 'g':
+                        x = 2;
+                        break;
+                }
+                break;
+            case '4':
+                switch (coordinates.charAt(0)) {
+                    case 'a':
+                    case 'b':
+                    case 'c':
+                        x = 7;
+                        break;
+                    case 'e':
+                    case 'f':
+                    case 'g':
+                        x = 3;
+                        break;
+                }
+                break;
+            case '5':
+            case '6':
+            case '7':
+                switch (coordinates.charAt(0)) {
+                    case 'a':
+                    case 'b':
+                    case 'c':
+                        x = 6;
+                        break;
+                    case 'd':
+                        x = 5;
+                        break;
+                    case 'e':
+                    case 'f':
+                    case 'g':
+                        x = 4;
+                        break;
+                }
+                break;
+        }
+
+        return new int[]{x, z};
     }
 
 }
