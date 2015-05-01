@@ -98,14 +98,16 @@ public class MulinoClient {
             System.out.println("-h --human     Set the player as Human");
             System.out.println("-i --ia        Set the player as IA");
             System.out.println("-a <algorithm> Set the IA algorithm: minimax, alpha_beta, negamax, negascout");
-            System.out.println("-d <depth>     Set the IA algorithm's search depth");
+            System.out.println("-d <depth>     Set the IA algorithm's search depth (override iterative deepening)");
+            System.out.println("-t <time>      Search w/ iterative deepening for <time> seconds");
             System.exit(-1);
         }
 
         Player.Behaviour behaviour = Player.Behaviour.IA;
         State.Checker playerColor = State.Checker.WHITE;
         Minimax.Algorithm algorithm = Minimax.Algorithm.NEGASCOUT;
-        int depth = 8;
+        int depth = 0;
+        int maxTime = 58;
         for (int i = 0; i < args.length; i++) {
             switch (args[i].toLowerCase()) {
                 case "-w":
@@ -143,10 +145,13 @@ public class MulinoClient {
                 case "-d":
                     depth = Integer.parseInt(args[++i]);
                     break;
+                case "-t":
+                    maxTime = Integer.parseInt(args[++i]);
+                    break;
             }
         }
 
-        Player player = new Player(behaviour, playerColor, algorithm, depth);
+        Player player = new Player(behaviour, playerColor, algorithm, depth, maxTime);
         player.start();
     }
 

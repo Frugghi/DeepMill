@@ -25,13 +25,15 @@ public class Player extends Thread {
     private it.unibo.ai.didattica.mulino.domain.State.Checker color;
     private Minimax.Algorithm algorithm;
     private int depth;
+    private int maxTime;
     private MulinoClient client;
 
-    public Player(Behaviour behaviour, it.unibo.ai.didattica.mulino.domain.State.Checker color, Minimax.Algorithm algorithm, int depth) {
+    public Player(Behaviour behaviour, it.unibo.ai.didattica.mulino.domain.State.Checker color, Minimax.Algorithm algorithm, int depth, int maxTime) {
         this.behaviour = behaviour;
         this.color = color;
         this.algorithm = algorithm;
         this.depth = depth;
+        this.maxTime = maxTime;
     }
 
     public void run() {
@@ -86,20 +88,24 @@ public class Player extends Thread {
             System.out.println("Player " + client.getPlayer().toString() + ", do your move: ");
             switch (behaviour) {
                 case IA:
-                	
-                	IterativeDeepening iterativeDeepening = new IterativeDeepening(ia);
-                	iterativeDeepening.start();
-                	
-					try {
-						Thread.sleep(55000);
-					} catch (InterruptedException ie) {						
-						ie.printStackTrace();
-					}
-					
-					iterativeDeepening.terminate();
-					
-					move = iterativeDeepening.getBestMove();
-                   
+
+                    if (depth == 0) {
+                        IterativeDeepening iterativeDeepening = new IterativeDeepening(ia);
+                        iterativeDeepening.start();
+
+                        try {
+                            Thread.sleep(this.maxTime);
+                        } catch (InterruptedException ie) {
+                            ie.printStackTrace();
+                        }
+
+                        iterativeDeepening.terminate();
+
+                        move = iterativeDeepening.getBestMove();
+                    } else {
+                        move = (MillMove)ia.getBestMove(depth);
+                    }
+
                     System.out.println("DEEPMILL DEBUG: " + move.toString());
                     if (move == null) {
                         actionString = "GGWP";
