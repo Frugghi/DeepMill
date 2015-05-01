@@ -366,4 +366,27 @@ public class GridMinimax extends MillMinimax<GridMove> {
         return result.toString();
     }
 
+    public GridMinimax cloneState() {
+        GridMinimax clone = new GridMinimax(this.getAlgo());
+
+        for (int z = 0; z < Z_SIZE; z++) {
+            for (int x = 0; x < X_SIZE; x++) {
+                clone.grid[z][x] = this.grid[z][x];
+            }
+        }
+
+        clone.currentPlayer = this.currentPlayer;
+        clone.opponentPlayer = this.opponentPlayer;
+
+        clone.count[FREE] = this.count[FREE];
+        clone.count[PLAYER_W] = this.count[PLAYER_W];
+        clone.count[PLAYER_B] = this.count[PLAYER_B];
+
+        clone.played[FREE] = this.played[FREE];
+        clone.played[PLAYER_W] = this.played[PLAYER_W];
+        clone.played[PLAYER_B] = this.played[PLAYER_B];
+
+        return clone;
+    }
+
 }
