@@ -107,7 +107,7 @@ public class MulinoClient {
         State.Checker playerColor = State.Checker.WHITE;
         Minimax.Algorithm algorithm = Minimax.Algorithm.NEGASCOUT;
         int depth = 0;
-        int maxTime = 58000;
+        int maxTime = 58;
         for (int i = 0; i < args.length; i++) {
             switch (args[i].toLowerCase()) {
                 case "-w":

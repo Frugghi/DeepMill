@@ -94,7 +94,7 @@ public class Player extends Thread {
                         iterativeDeepening.start();
 
                         try {
-                            Thread.sleep(this.maxTime);
+                            Thread.sleep(this.maxTime * 1000);
                         } catch (InterruptedException ie) {
                             ie.printStackTrace();
                         }
