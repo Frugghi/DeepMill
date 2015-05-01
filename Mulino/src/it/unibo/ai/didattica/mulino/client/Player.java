@@ -4,6 +4,7 @@ import fr.avianey.minimax4j.Minimax;
 import it.unibo.ai.didattica.mulino.domain.MillMinimax;
 import it.unibo.ai.didattica.mulino.domain.MillMove;
 import it.unibo.ai.didattica.mulino.implementation.GridMinimax;
+import it.unibo.ai.didattica.mulino.implementation.IterativeDeepening;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -85,7 +86,20 @@ public class Player extends Thread {
             System.out.println("Player " + client.getPlayer().toString() + ", do your move: ");
             switch (behaviour) {
                 case IA:
-                    move = (MillMove)ia.getBestMove(depth);
+                	
+                	IterativeDeepening iterativeDeepening = new IterativeDeepening(ia);
+                	iterativeDeepening.start();
+                	
+					try {
+						Thread.sleep(55000);
+					} catch (InterruptedException ie) {						
+						ie.printStackTrace();
+					}
+					
+					iterativeDeepening.terminate();
+					
+					move = iterativeDeepening.getBestMove();
+                   
                     System.out.println("DEEPMILL DEBUG: " + move.toString());
                     if (move == null) {
                         actionString = "GGWP";
