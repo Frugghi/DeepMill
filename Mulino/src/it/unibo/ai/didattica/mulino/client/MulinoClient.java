@@ -1,8 +1,6 @@
 package it.unibo.ai.didattica.mulino.client;
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -13,10 +11,6 @@ import it.unibo.ai.didattica.mulino.actions.Action;
 import it.unibo.ai.didattica.mulino.actions.Phase1Action;
 import it.unibo.ai.didattica.mulino.actions.Phase2Action;
 import it.unibo.ai.didattica.mulino.actions.PhaseFinalAction;
-import it.unibo.ai.didattica.mulino.domain.MillMinimax;
-import it.unibo.ai.didattica.mulino.domain.MillMove;
-import it.unibo.ai.didattica.mulino.implementation.GridMinimax;
-import it.unibo.ai.didattica.mulino.implementation.GridMove;
 import it.unibo.ai.didattica.mulino.domain.State;
 import it.unibo.ai.didattica.mulino.engine.TCPMulino;
 
@@ -95,16 +89,16 @@ public class MulinoClient {
     public State.Checker getPlayer() { return player; }
     public void setPlayer(State.Checker player) { this.player = player; }
 
-    public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
+    public static void main(String[] args) {
 
         if (args.length == 0) {
             System.out.println("Usage:");
             System.out.println("-w --white     Set the player to White");
             System.out.println("-b --black     Set the player to Black");
-            System.out.println("--human        Set the player as Human");
-            System.out.println("--ia           Set the player as IA");
+            System.out.println("-h --human     Set the player as Human");
+            System.out.println("-i --ia        Set the player as IA");
             System.out.println("-a <algorithm> Set the IA algorithm: minimax, alpha_beta, negamax, negascout");
-            System.out.println("-d <depth>     Set the algorithm's search depth");
+            System.out.println("-d <depth>     Set the IA algorithm's search depth");
             System.exit(-1);
         }
 
@@ -122,9 +116,11 @@ public class MulinoClient {
                 case "--black":
                     playerColor = State.Checker.BLACK;
                     break;
+                case "-h":
                 case "--human":
                     behaviour = Player.Behaviour.HUMAN;
                     break;
+                case "-i":
                 case "--ia":
                     behaviour = Player.Behaviour.IA;
                     break;

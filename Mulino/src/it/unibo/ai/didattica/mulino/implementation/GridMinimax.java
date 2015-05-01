@@ -1,6 +1,5 @@
 package it.unibo.ai.didattica.mulino.implementation;
 
-import fr.avianey.minimax4j.Minimax;
 import it.unibo.ai.didattica.mulino.domain.MillMinimax;
 import it.unibo.ai.didattica.mulino.domain.State;
 

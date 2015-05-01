@@ -23,5 +23,4 @@ public abstract class MillMinimax<T extends MillMove> extends Minimax<T> {
         this.setPlayed(MillMinimax.PIECES - state.getWhiteCheckers(), MillMinimax.PIECES - state.getBlackCheckers());
     }
 
-
 }

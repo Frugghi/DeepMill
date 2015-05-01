@@ -3,7 +3,6 @@ package it.unibo.ai.didattica.mulino.client;
 import fr.avianey.minimax4j.Minimax;
 import it.unibo.ai.didattica.mulino.domain.MillMinimax;
 import it.unibo.ai.didattica.mulino.domain.MillMove;
-import it.unibo.ai.didattica.mulino.domain.State;
 import it.unibo.ai.didattica.mulino.implementation.GridMinimax;
 
 import java.io.BufferedReader;
