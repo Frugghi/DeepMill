@@ -6,6 +6,8 @@ import it.unibo.ai.didattica.mulino.domain.State;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sun.org.apache.xerces.internal.impl.dv.dtd.NMTOKENDatatypeValidator;
+
 public class GridMinimax extends MillMinimax<GridMove> {
 
     public static final int FREE     = 0;
@@ -77,7 +79,9 @@ public class GridMinimax extends MillMinimax<GridMove> {
     }
 
     private boolean hasWon(int player) {
-        return played[FREE] == 0 && count[3 - player] <= 2; // Manca la possibilità di non muoversi
+        return played[FREE] == 0 && 
+                (count[3 - player] <= 2 ||                                  // L'avversario ha meno di 3 pezzi
+                numberOfPiecesBlocked(3 - player) == count[3 - player]);    // L'avversario non puÃ² muoversi
     }
 
     private void setGridPosition(int player, int x, int z) {
@@ -301,13 +305,13 @@ public class GridMinimax extends MillMinimax<GridMove> {
 
     @Override
     public double evaluate() {
-        if (this.hasWon(currentPlayer)) { // Se vinco è la mossa migliore
+        if (this.hasWon(currentPlayer)) { // Se vinco ï¿½ la mossa migliore
             return this.maxEvaluateValue();
-        } else if (this.hasWon(opponentPlayer)) { // Se perdo è la mossa peggiore
+        } else if (this.hasWon(opponentPlayer)) { // Se perdo ï¿½ la mossa peggiore
             return -this.maxEvaluateValue();
         }
 
-        // Il numero di spostamenti di un pezzo potrebbe essere un buon indicatore per discriminare quando si è in parità
+        // Il numero di spostamenti di un pezzo potrebbe essere un buon indicatore per discriminare quando si ï¿½ in paritï¿½
         int[] availableMoves = new int[]{0, 0, 0};
         for (int z = 0; z < Z_SIZE; z++) {
             for (int x = 0; x < X_SIZE; x++) {
