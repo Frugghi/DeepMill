@@ -100,8 +100,11 @@ public class Player extends Thread {
                         }
 
                         iterativeDeepening.terminate();
+                        
 
                         move = iterativeDeepening.getBestMove();
+                        
+                        
                     } else {
                         move = (MillMove)ia.getBestMove(depth);
                     }
