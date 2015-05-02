@@ -6,8 +6,6 @@ import it.unibo.ai.didattica.mulino.domain.State;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.sun.org.apache.xerces.internal.impl.dv.dtd.NMTOKENDatatypeValidator;
-
 public class GridMinimax extends MillMinimax<GridMove> {
 
     public static final int FREE     = 0;
