@@ -29,7 +29,7 @@ public class IterativeDeepening extends Thread {
     {
         int depth =  minDepth;
         while (!Thread.interrupted()) {
-            move = (MillMove)state.getBestMove(depth);
+            move = state.getBestMove(depth);
             state.makeMove(move);
 
             System.out.println(this.getName() + " - DEBUGMILL: Depth " + depth + ", Best move " + move.toString() + "\n" + state.toString());

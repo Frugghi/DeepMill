@@ -124,7 +124,7 @@ public class BitboardMove extends MillMove {
             case "g4": return BitboardMinimax.G4;
             case "g7": return BitboardMinimax.G7;
             default:
-                return 1 << 24;
+                return 0;
         }
     }
 
