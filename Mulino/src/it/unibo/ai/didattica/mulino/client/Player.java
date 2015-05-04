@@ -3,6 +3,7 @@ package it.unibo.ai.didattica.mulino.client;
 import fr.avianey.minimax4j.Minimax;
 import it.unibo.ai.didattica.mulino.domain.MillMinimax;
 import it.unibo.ai.didattica.mulino.domain.MillMove;
+import it.unibo.ai.didattica.mulino.implementation.BitboardMinimax;
 import it.unibo.ai.didattica.mulino.implementation.GridMinimax;
 import it.unibo.ai.didattica.mulino.implementation.IterativeDeepening;
 
@@ -41,7 +42,7 @@ public class Player extends Thread {
         it.unibo.ai.didattica.mulino.domain.State currentState = null;
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
-        MillMinimax ia = new GridMinimax(algorithm);
+        MillMinimax ia = new BitboardMinimax(algorithm);
         MillMove move;
 
         MulinoClient client = null;
@@ -98,8 +99,8 @@ public class Player extends Thread {
                             ie.printStackTrace();
                         }
 
-                        iterativeDeepening.interrupt();
-                        
+                        iterativeDeepening.terminate();
+
                         move = iterativeDeepening.getBestMove();
                         
                     } else {

@@ -4,6 +4,8 @@ import fr.avianey.minimax4j.Minimax;
 
 public abstract class MillMinimax<T extends MillMove> extends Minimax<T> {
 
+    public boolean abort = false;
+
     public static final int PIECES = 9;
 
     public abstract void setPlayed(int white, int black);
@@ -24,4 +26,19 @@ public abstract class MillMinimax<T extends MillMove> extends Minimax<T> {
         this.setPlayed(MillMinimax.PIECES - state.getWhiteCheckers(), MillMinimax.PIECES - state.getBlackCheckers());
     }
 
+    @Override
+    public boolean isOver() {
+        return this.abort;
+    }
+
+    @Override
+    public T getBestMove(int depth) {
+        T move = super.getBestMove(depth);
+        if (this.abort) {
+            this.abort = false;
+            return null;
+        } else {
+            return move;
+        }
+    }
 }

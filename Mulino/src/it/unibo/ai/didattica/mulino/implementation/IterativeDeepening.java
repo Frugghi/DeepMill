@@ -29,17 +29,27 @@ public class IterativeDeepening extends Thread {
     {
         int depth =  minDepth;
         while (!Thread.interrupted()) {
-            move = state.getBestMove(depth);
-            state.makeMove(move);
+            MillMove bestMove = state.getBestMove(depth);
 
-            System.out.println(this.getName() + " - DEBUGMILL: Depth " + depth + ", Best move " + move.toString() + "\n" + state.toString());
+			if (bestMove != null) {
+                move = bestMove;
 
-            state.unmakeMove(move);
+                state.makeMove(bestMove);
 
-            depth++;
+                System.out.println(this.getName() + " - DEBUGMILL: Depth " + depth + ", Best move " + bestMove.toString() + "\n" + state.toString());
+
+                state.unmakeMove(bestMove);
+
+                depth++;
+            }
         }
 
         System.out.println(this.getName() + " terminating...");
+    }
+
+    public void terminate() {
+        this.interrupt();
+        state.abort = true;
     }
 
 }

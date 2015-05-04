@@ -226,7 +226,7 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
 
     @Override
     public boolean isOver() {
-        return this.hasWon(PLAYER_W) || this.hasWon(PLAYER_B);
+        return super.isOver() || this.hasWon(PLAYER_W) || this.hasWon(PLAYER_B);
     }
 
     private boolean hasWon(int player) {
@@ -252,12 +252,12 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
             this.setGridPosition(FREE, move.getRemove());
         }
 
-        next();
+        this.next();
     }
 
     @Override
     public void unmakeMove(BitboardMove move) {
-        previous();
+        this.previous();
 
         this.setGridPosition(FREE, move.getTo());
 
@@ -277,7 +277,7 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
 
     @Override
     public List<BitboardMove> getPossibleMoves() {
-        List<BitboardMove> moves = new ArrayList<BitboardMove>(3 * (24 - count[PLAYER_W] - count[PLAYER_B]));
+        List<BitboardMove> moves = new ArrayList<>(3 * (24 - count[PLAYER_W] - count[PLAYER_B]));
 
         if (this.played[this.currentPlayer] < PIECES) { // Fase 1
             for (int to = 0; to < 24; to++) {

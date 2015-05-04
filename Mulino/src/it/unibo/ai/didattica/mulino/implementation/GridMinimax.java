@@ -73,7 +73,7 @@ public class GridMinimax extends MillMinimax<GridMove> {
 
     @Override
     public boolean isOver() {
-        return hasWon(PLAYER_W) || hasWon(PLAYER_B);
+        return super.isOver() || hasWon(PLAYER_W) || hasWon(PLAYER_B);
     }
 
     private boolean hasWon(int player) {
