@@ -7,46 +7,39 @@ public class IterativeDeepening extends Thread {
 
     private static int turn = 0;
 
-	private MillMove move;
-	private MillMinimax state;
-	private int minDepth;
-	private boolean terminate = false;
-	
-	public IterativeDeepening(MillMinimax state) {
-		this(state, 1);
-	}
-	
-	public IterativeDeepening(MillMinimax state, int minDepth) {
+    private MillMove move;
+    private MillMinimax<MillMove> state;
+    private int minDepth;
+
+    public IterativeDeepening(MillMinimax<MillMove> state) {
+        this(state, 1);
+    }
+
+    public IterativeDeepening(MillMinimax<MillMove> state, int minDepth) {
         super("Thread turn " + (++turn));
-		this.state = state.cloneState();
-		this.minDepth = minDepth;
-	}
+        this.state = state.cloneState();
+        this.minDepth = minDepth;
+    }
 
-	public MillMove getBestMove() {
-		return move;
-	}
-	
-	public void run()
-	{
-		int depth =  minDepth;
-		while( !terminate )
-		{
-			move = (MillMove)state.getBestMove(depth);
-			state.makeMove(move);
+    public MillMove getBestMove() {
+        return move;
+    }
 
-			System.out.println(this.getName() + " - DEBUGMILL: Depth " + depth + ", Best move " + move.toString() + "\n" + state.toString());
+    public void run()
+    {
+        int depth =  minDepth;
+        while (!Thread.interrupted()) {
+            move = (MillMove)state.getBestMove(depth);
+            state.makeMove(move);
 
-			state.unmakeMove(move);
+            System.out.println(this.getName() + " - DEBUGMILL: Depth " + depth + ", Best move " + move.toString() + "\n" + state.toString());
 
-			depth++;
-		}
+            state.unmakeMove(move);
+
+            depth++;
+        }
 
         System.out.println(this.getName() + " terminating...");
-	}
-	
-	public void terminate()
-	{
-		terminate = true;
-	}
+    }
 
 }

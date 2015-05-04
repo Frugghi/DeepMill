@@ -26,7 +26,6 @@ public class Player extends Thread {
     private Minimax.Algorithm algorithm;
     private int depth;
     private int maxTime;
-    private MulinoClient client;
 
     public Player(Behaviour behaviour, it.unibo.ai.didattica.mulino.domain.State.Checker color, Minimax.Algorithm algorithm, int depth, int maxTime) {
         this.behaviour = behaviour;
@@ -99,11 +98,9 @@ public class Player extends Thread {
                             ie.printStackTrace();
                         }
 
-                        iterativeDeepening.terminate();
+                        iterativeDeepening.interrupt();
                         
-
                         move = iterativeDeepening.getBestMove();
-                        
                         
                     } else {
                         move = (MillMove)ia.getBestMove(depth);

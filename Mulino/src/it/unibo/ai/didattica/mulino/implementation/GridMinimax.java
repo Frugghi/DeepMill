@@ -97,6 +97,9 @@ public class GridMinimax extends MillMinimax<GridMove> {
             case BLACK:
                 checker = GridMinimax.PLAYER_B;
                 break;
+            case EMPTY:
+                checker = GridMinimax.FREE;
+                break;
         }
 
         this.setGridPosition(checker, coordinates[0], coordinates[1]);
@@ -328,9 +331,9 @@ public class GridMinimax extends MillMinimax<GridMove> {
         }
         
         return 5 * (count[currentPlayer] - count[opponentPlayer]) //diff numero pezzi
-        		+ (availableMoves[currentPlayer] - availableMoves[opponentPlayer])
-        		+ (this.numberOfMorrises(currentPlayer) - this.numberOfMorrises(opponentPlayer))  //diff numero di morris 
-        		+ (this.numberOfPiecesBlocked(currentPlayer) - this.numberOfPiecesBlocked(opponentPlayer)); //diff pezzi bloccati
+                + (availableMoves[currentPlayer] - availableMoves[opponentPlayer])
+                + (this.numberOfMorrises(currentPlayer) - this.numberOfMorrises(opponentPlayer))  //diff numero di morris
+                + (this.numberOfPiecesBlocked(currentPlayer) - this.numberOfPiecesBlocked(opponentPlayer)); //diff pezzi bloccati
     }
 
     @Override
@@ -340,74 +343,74 @@ public class GridMinimax extends MillMinimax<GridMove> {
     
 
     private int numberOfMorrises(int player){
-    	int numberOfMorrises = 0;
-    	for (int z = 0; z < Z_SIZE; z++) {
+        int numberOfMorrises = 0;
+        for (int z = 0; z < Z_SIZE; z++) {
             for (int x = 1; x < X_SIZE; x+=2) {
-            	
-            	if(z==0 || z==2){ //quadrati piu esterno e quello piu interno
-            		if(this.isMill(player, x, z))
-            			numberOfMorrises++; //basta guardare la cella a meta di ogni lato
-            	}
-            	else{
-            		//quadrato intermedio
-            		if(this.isMill(player, x, z)){
-            			if(this.isMill(player, x, z+1) && this.isMill(player, x, z-1)) //mill verticale
-            				numberOfMorrises++;
-            			if(this.isMill(player, x+1, z) && this.isMill(player, x-1, z)) //mill orizzontale
-            				numberOfMorrises++;
-            			
-            		}	
-            	}	
+
+                if(z==0 || z==2){ //quadrati piu esterno e quello piu interno
+                    if(this.isMill(player, x, z))
+                        numberOfMorrises++; //basta guardare la cella a meta di ogni lato
+                }
+                else{
+                    //quadrato intermedio
+                    if(this.isMill(player, x, z)){
+                        if(this.isMill(player, x, z+1) && this.isMill(player, x, z-1)) //mill verticale
+                            numberOfMorrises++;
+                        if(this.isMill(player, x+1, z) && this.isMill(player, x-1, z)) //mill orizzontale
+                            numberOfMorrises++;
+
+                    }
+                }
             }
-    	}
-    	System.out.println("Number of morrises player ("+ player+ ") : "+ numberOfMorrises);
-    	return numberOfMorrises;
+        }
+        System.out.println("Number of morrises player ("+ player+ ") : "+ numberOfMorrises);
+        return numberOfMorrises;
     }
     
     private boolean pieceIsBlocked(int player, int z, int x){
-    	if(x % 2 == 0){ //siamo negli angoli
-    			if(grid[z][x == 0 ? 7 : x-1] != FREE && grid[z][x+1] != FREE)
-    				return true;
-    	}
-    	else{//siamo al centro del lato
-    		if(grid[z][x == 7 ? 0 : x+1] != FREE && grid[z][x-1] != FREE){ //controllo gli angoli adiacenti
-    			
-    			switch(z){
-        		case 0: //esterno
-        			if(grid[z+1][x] != FREE)
-        				return true;
-        			break;
-        		case 1: //intermedio
-        			if(grid[z+1][x] != FREE && grid[z-1][x] != FREE)
-        				return true;
-        			break;
-        		case 2: //interno
-        			if(grid[z-1][x] != FREE)
-        				return true;
-        			break;
-        		default:
-        				return false;
-    			
-    			}
-    			
-    		}
-    	}
-    	return false;
+        if(x % 2 == 0){ //siamo negli angoli
+                if(grid[z][x == 0 ? 7 : x-1] != FREE && grid[z][x+1] != FREE)
+                    return true;
+        }
+        else{//siamo al centro del lato
+            if(grid[z][x == 7 ? 0 : x+1] != FREE && grid[z][x-1] != FREE){ //controllo gli angoli adiacenti
+
+                switch(z){
+                case 0: //esterno
+                    if(grid[z+1][x] != FREE)
+                        return true;
+                    break;
+                case 1: //intermedio
+                    if(grid[z+1][x] != FREE && grid[z-1][x] != FREE)
+                        return true;
+                    break;
+                case 2: //interno
+                    if(grid[z-1][x] != FREE)
+                        return true;
+                    break;
+                default:
+                        return false;
+
+                }
+
+            }
+        }
+        return false;
     }
     
     private int numberOfPiecesBlocked(int player){
-    	int totBlocked = 0;
-    	
-    	for (int z = 0; z < Z_SIZE; z++) {
+        int totBlocked = 0;
+
+        for (int z = 0; z < Z_SIZE; z++) {
             for (int x = 1; x < X_SIZE; x+=1) {
-            	if(grid[z][x] == player) //ciclo sulle pedine del giocatore
-            		if(this.pieceIsBlocked(player, z, x))
-            			totBlocked++;
+                if(grid[z][x] == player) //ciclo sulle pedine del giocatore
+                    if(this.pieceIsBlocked(player, z, x))
+                        totBlocked++;
             }
-    	}
-    	
-    	System.out.println("Number of pieces blocked player ("+ player+ ") : "+ totBlocked);
-    	return totBlocked;
+        }
+
+        System.out.println("Number of pieces blocked player ("+ player+ ") : "+ totBlocked);
+        return totBlocked;
     }
     
     
