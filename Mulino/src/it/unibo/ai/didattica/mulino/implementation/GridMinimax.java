@@ -412,9 +412,6 @@ public class GridMinimax extends MillMinimax<GridMove> {
         System.out.println("Number of pieces blocked player ("+ player+ ") : "+ totBlocked);
         return totBlocked;
     }
-    
-    
-    
 
     @Override
     public void next() {
