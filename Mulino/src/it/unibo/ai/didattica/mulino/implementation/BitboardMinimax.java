@@ -39,6 +39,23 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
     protected static final int A4 = 1 << 21;
     protected static final int B4 = 1 << 22;
     protected static final int C4 = 1 << 23;
+    
+    private static final int MILL_1 = A1 | D1 | G1;
+    private static final int MILL_2 = B2 | D2 | F2;
+    private static final int MILL_3 = C3 | D3 | E3;
+    private static final int MILL_4_1 = A4 | B4 | C4;
+    private static final int MILL_4_2 = E4 | F4 | G4;
+    private static final int MILL_5 = C5 | D5 | E5;
+    private static final int MILL_6 = B6 | D6 | F6;
+    private static final int MILL_7 = A7 | D7 | G7;
+    private static final int MILL_A = A1 | A4 | A7;
+    private static final int MILL_B = B2 | B4 | B6;
+    private static final int MILL_C = C3 | C4 | C5;
+    private static final int MILL_D_1 = D1 | D2 | D3;
+    private static final int MILL_D_2 = D4 | D5 | D6;
+    private static final int MILL_E = E3 | E4 | E5;
+    private static final int MILL_F = F2 | F4 | F6;
+    private static final int MILL_G = G1 | G4 | G7;
 
     private final int[] board;
     private final int[] played;
