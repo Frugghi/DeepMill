@@ -42,7 +42,8 @@ public class Player extends Thread {
         it.unibo.ai.didattica.mulino.domain.State currentState = null;
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
-        MillMinimax ia = new BitboardMinimax(algorithm);
+        //MillMinimax ia = new BitboardMinimax(algorithm);
+        MillMinimax ia= new GridMinimax(algorithm);
         MillMove move;
 
         MulinoClient client = null;

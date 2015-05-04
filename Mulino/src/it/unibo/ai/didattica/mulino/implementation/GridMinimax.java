@@ -356,14 +356,14 @@ public class GridMinimax extends MillMinimax<GridMove> {
                     if(this.isMill(player, x, z)){
                         if(this.isMill(player, x, z+1) && this.isMill(player, x, z-1)) //mill verticale
                             numberOfMorrises++;
-                        if(this.isMill(player, x+1, z) && this.isMill(player, x-1, z)) //mill orizzontale
+                        if(this.isMill(player,(x == 7 ? 0 : x+1), z) && this.isMill(player, x-1, z)) //mill orizzontale
                             numberOfMorrises++;
 
                     }
                 }
             }
         }
-        System.out.println("Number of morrises player ("+ player+ ") : "+ numberOfMorrises);
+        //System.out.println("Number of morrises player ("+ player+ ") : "+ numberOfMorrises);
         return numberOfMorrises;
     }
     
@@ -409,7 +409,7 @@ public class GridMinimax extends MillMinimax<GridMove> {
             }
         }
 
-        System.out.println("Number of pieces blocked player ("+ player+ ") : "+ totBlocked);
+        //System.out.println("Number of pieces blocked player ("+ player+ ") : "+ totBlocked);
         return totBlocked;
     }
 
@@ -442,6 +442,12 @@ public class GridMinimax extends MillMinimax<GridMove> {
         result.append("Black Checkers On Board: " + count[PLAYER_B] + ";\n");
         result.append("Current player: " + currentPlayer + ";\n");
         result.append("Opponent player: " + opponentPlayer + ";\n");
+        result.append("\n\n");
+        
+        result.append("Number of morrises player ("+ PLAYER_W+ ") : "+ this.numberOfMorrises(PLAYER_W)+ "\n");
+        result.append("Number of morrises player ("+ PLAYER_B+ ") : "+ this.numberOfMorrises(PLAYER_B)+ "\n");
+        result.append("Number of pieces blocked player ("+ PLAYER_W+ ") : "+ this.numberOfPiecesBlocked(PLAYER_W)+ "\n");
+        result.append("Number of pieces blocked player ("+ PLAYER_B+ ") : "+ this.numberOfPiecesBlocked(PLAYER_B)+ "\n");
 
         return result.toString();
     }
@@ -468,5 +474,8 @@ public class GridMinimax extends MillMinimax<GridMove> {
 
         return clone;
     }
+    
+
+    
 
 }
