@@ -442,7 +442,7 @@ public class GridMinimax extends MillMinimax<GridMove> {
         result.append("Black Checkers On Board: " + count[PLAYER_B] + ";\n");
         result.append("Current player: " + currentPlayer + ";\n");
         result.append("Opponent player: " + opponentPlayer + ";\n");
-        result.append("\n\n");
+        result.append("\n");
         
         result.append("Number of morrises player ("+ PLAYER_W+ ") : "+ this.numberOfMorrises(PLAYER_W)+ "\n");
         result.append("Number of morrises player ("+ PLAYER_B+ ") : "+ this.numberOfMorrises(PLAYER_B)+ "\n");
