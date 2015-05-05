@@ -54,7 +54,7 @@ public class BitboardMove extends MillMove {
     }
 
     public boolean isRemoveMove() {
-        return this.from != Integer.MAX_VALUE;
+        return this.remove != Integer.MAX_VALUE;
     }
 
     public String toString() {
