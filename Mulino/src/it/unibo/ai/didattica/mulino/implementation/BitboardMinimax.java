@@ -375,7 +375,7 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
             return 18 * lastMove +
                     26 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer]) +
                      1 * (this.numberOfPiecesBlocked(this.opponentPlayer) - this.numberOfPiecesBlocked(this.currentPlayer)) +
-                     9 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer]) +
+                     9 * (this.numberOfMorrises(this.currentPlayer) - this.numberOfMorrises(this.opponentPlayer)) +
                     10 * (this.numberOf2PiecesConfiguration(this.currentPlayer) - this.numberOf2PiecesConfiguration(this.opponentPlayer)) +
                      7 * (this.numberOf3PiecesConfiguration(this.currentPlayer) - this.numberOf3PiecesConfiguration(this.opponentPlayer));
         } else if (this.count[PLAYER_B] == 3 || this.count[PLAYER_W] == 3) { // Fase 3
@@ -386,7 +386,7 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
             return 14 * lastMove +
                     43 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer]) +
                     10 * (this.numberOfPiecesBlocked(this.opponentPlayer) - this.numberOfPiecesBlocked(this.currentPlayer)) +
-                    11 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer]) +
+                    11 * (this.numberOfMorrises(this.currentPlayer) - this.numberOfMorrises(this.opponentPlayer)) +
                      8 * (this.numberOfDoubleMorrises(this.currentPlayer) - this.numberOfDoubleMorrises(this.opponentPlayer));
         }
     }
