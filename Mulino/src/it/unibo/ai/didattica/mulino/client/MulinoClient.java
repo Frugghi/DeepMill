@@ -11,8 +11,11 @@ import it.unibo.ai.didattica.mulino.actions.Action;
 import it.unibo.ai.didattica.mulino.actions.Phase1Action;
 import it.unibo.ai.didattica.mulino.actions.Phase2Action;
 import it.unibo.ai.didattica.mulino.actions.PhaseFinalAction;
+import it.unibo.ai.didattica.mulino.domain.MillMinimax;
 import it.unibo.ai.didattica.mulino.domain.State;
 import it.unibo.ai.didattica.mulino.engine.TCPMulino;
+import it.unibo.ai.didattica.mulino.implementation.BitboardMinimax;
+import it.unibo.ai.didattica.mulino.implementation.GridMinimax;
 
 public class MulinoClient {
 
@@ -101,6 +104,8 @@ public class MulinoClient {
             System.out.println("-d <depth>     Set the IA algorithm's search depth (override iterative deepening)");
             System.out.println("-t <time>      Search w/ iterative deepening for <time> seconds");
             System.out.println("--debug        Print the debug output to standard output");
+            System.out.println("--grid         Use grid state");
+            System.out.println("--bit          Use bit state");
             System.exit(-1);
         }
 
@@ -110,6 +115,7 @@ public class MulinoClient {
         int depth = 0;
         int maxTime = 58;
         boolean debug = false;
+        boolean bitState = true;
         for (int i = 0; i < args.length; i++) {
             switch (args[i].toLowerCase()) {
                 case "-w":
@@ -153,10 +159,23 @@ public class MulinoClient {
                 case "--debug":
                     debug = true;
                     break;
+                case "--grid":
+                    bitState = false;
+                    break;
+                case "--bit":
+                    bitState = true;
+                    break;
             }
         }
 
-        Player player = new Player(behaviour, playerColor, algorithm, depth, maxTime, debug);
+        MillMinimax ia = null;
+        if (bitState) {
+            ia = new BitboardMinimax(algorithm);
+        } else {
+            ia = new GridMinimax(algorithm);
+        }
+
+        Player player = new Player(behaviour, playerColor, ia, depth, maxTime, debug);
         player.start();
     }
 

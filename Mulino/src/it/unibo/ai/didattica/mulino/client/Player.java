@@ -24,15 +24,15 @@ public class Player extends Thread {
 
     private Behaviour behaviour;
     private it.unibo.ai.didattica.mulino.domain.State.Checker color;
-    private Minimax.Algorithm algorithm;
+    private MillMinimax ia;
     private int depth;
     private int maxTime;
     private boolean debug;
 
-    public Player(Behaviour behaviour, it.unibo.ai.didattica.mulino.domain.State.Checker color, Minimax.Algorithm algorithm, int depth, int maxTime, boolean debug) {
+    public Player(Behaviour behaviour, it.unibo.ai.didattica.mulino.domain.State.Checker color, MillMinimax ia, int depth, int maxTime, boolean debug) {
         this.behaviour = behaviour;
         this.color = color;
-        this.algorithm = algorithm;
+        this.ia = ia;
         this.depth = depth;
         this.maxTime = maxTime;
         this.debug = debug;
@@ -44,8 +44,6 @@ public class Player extends Thread {
         it.unibo.ai.didattica.mulino.domain.State currentState = null;
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
-        //MillMinimax ia = new BitboardMinimax(algorithm);
-        MillMinimax ia= new GridMinimax(algorithm);
         MillMove move;
 
         MulinoClient client = null;
@@ -57,7 +55,7 @@ public class Player extends Thread {
         }
         System.out.println("Hello " + behaviour.toString() + "!");
         if (behaviour == Behaviour.IA && debug) {
-            System.out.println("Algorithm: " + algorithm + ", Depth: " + depth);
+            System.out.println("Algorithm: " + ia.getAlgo() + ", Depth: " + depth);
         }
         System.out.println("You are player " + client.getPlayer().toString() + "!");
         System.out.println("Current state:");
