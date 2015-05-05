@@ -107,6 +107,8 @@ public class GridMinimax extends MillMinimax<GridMove> {
 
     @Override
     public void makeMove(GridMove move) {
+        super.makeMove(move);
+
         setGridPosition(currentPlayer, move.getToX(), move.getToZ());
 
         if (move.isPutMove()) {
@@ -131,6 +133,8 @@ public class GridMinimax extends MillMinimax<GridMove> {
 
     @Override
     public void unmakeMove(GridMove move) {
+        super.unmakeMove(move);
+
         previous();
 
         setGridPosition(FREE, move.getToX(), move.getToZ());

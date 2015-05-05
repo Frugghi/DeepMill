@@ -238,6 +238,8 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
 
     @Override
     public void makeMove(BitboardMove move) {
+        super.makeMove(move);
+
         this.setGridPosition(this.currentPlayer, move.getTo());
 
         if (move.isPutMove()) {
@@ -258,6 +260,8 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
 
     @Override
     public void unmakeMove(BitboardMove move) {
+        super.unmakeMove(move);
+
         this.previous();
 
         this.setGridPosition(FREE, move.getTo());
@@ -365,9 +369,21 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
             return -this.maxEvaluateValue();
         }
 
-        return 5 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer]) //diff numero pezzi
-                 + (this.numberOfMorrises(currentPlayer) - this.numberOfMorrises(opponentPlayer))  //diff numero di morris
-                 + (this.numberOfPiecesBlocked(currentPlayer) - this.numberOfPiecesBlocked(opponentPlayer)); //diff pezzi bloccati
+        int lastMove = (this.lastMove != null && this.lastMove.isRemoveMove() ? 1 : 0);
+
+        if (this.played[PLAYER_B] < PIECES && this.played[PLAYER_W] < PIECES) { // Fase 1
+            return 18 * lastMove +
+                    26 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer]) +
+                     1 * (this.numberOfPiecesBlocked(this.opponentPlayer) - this.numberOfPiecesBlocked(this.currentPlayer)) +
+                     7 * (this.numberOf3PiecesConfiguration(this.currentPlayer) - this.numberOf3PiecesConfiguration(this.opponentPlayer)) +
+                     9 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer]);
+        } else { // Fase 2 + 3
+            return 14 * lastMove +
+                    43 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer]) +
+                    10 * (this.numberOfPiecesBlocked(this.opponentPlayer) - this.numberOfPiecesBlocked(this.currentPlayer)) +
+                    11 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer]) +
+                     8 * (this.numberOfDoubleMorrises(this.currentPlayer) - this.numberOfDoubleMorrises(this.opponentPlayer));
+        }
     }
 
     private int numberOfMorrises(int player) {
@@ -405,9 +421,49 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
         return totBlocked;
     }
 
+    private int numberOfDoubleMorrises(int player) {
+        int board = this.board[player];
+        int totDoubleMorris = 0;
+        for (int pos = 0; pos < 24; pos++) {
+            int mill = 0;
+            for (int i = 0; i < MILLS[pos].length; i++) {
+                mill |= MILLS[pos][i];
+            }
+            if ((board & mill) == mill) {
+                totDoubleMorris++;
+            }
+        }
+
+        return totDoubleMorris;
+    }
+
+    private int numberOf3PiecesConfiguration(int player) {
+        int board = this.board[player];
+        int opponentBoard = this.board[1 - player];
+        int tot3piecesConfiguration = 0;
+        for (int pos = 0; pos < 24; pos++) {
+            if (((board >>> pos) & 1) == 1) {
+                boolean possibileConfiguration = true;
+                for (int i = 0; i < MILLS[pos].length; i++) {
+                    int pieces = board & MILLS[pos][i];
+                    int opponentPieces = opponentBoard & MILLS[pos][i];
+                    if (opponentPieces != 0 || pieces == MILLS[pos][i] || pieces == (1 << pos)) {
+                        possibileConfiguration = false;
+                        break;
+                    }
+                }
+                if (possibileConfiguration) {
+                    tot3piecesConfiguration++;
+                }
+            }
+        }
+
+        return tot3piecesConfiguration;
+    }
+
     @Override
     public double maxEvaluateValue() {
-        return 100;
+        return Integer.MAX_VALUE;
     }
 
     @Override
@@ -443,8 +499,12 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
 
         result.append("Number of morrises player (W) : " + this.numberOfMorrises(PLAYER_W) + "\n");
         result.append("Number of morrises player (B) : " + this.numberOfMorrises(PLAYER_B) + "\n");
+        result.append("Number of double morrises player (W) : " + this.numberOfDoubleMorrises(PLAYER_W) + "\n");
+        result.append("Number of double morrises player (B) : " + this.numberOfDoubleMorrises(PLAYER_B) + "\n");
         result.append("Number of pieces blocked player (W) : " + this.numberOfPiecesBlocked(PLAYER_W) + "\n");
         result.append("Number of pieces blocked player (B) : " + this.numberOfPiecesBlocked(PLAYER_B )+ "\n");
+        result.append("Number of 3 pieces configurations player (W) : " + this.numberOf3PiecesConfiguration(PLAYER_W) + "\n");
+        result.append("Number of 3 pieces configurations player (B) : " + this.numberOf3PiecesConfiguration(PLAYER_B )+ "\n");
 
         return result.toString();
     }

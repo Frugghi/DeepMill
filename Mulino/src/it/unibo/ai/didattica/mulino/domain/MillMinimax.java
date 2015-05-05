@@ -6,6 +6,8 @@ public abstract class MillMinimax<T extends MillMove> extends Minimax<T> {
 
     public boolean abort = false;
 
+    protected T lastMove;
+
     public static final int PIECES = 9;
 
     public abstract void setPlayed(int white, int black);
@@ -24,6 +26,16 @@ public abstract class MillMinimax<T extends MillMove> extends Minimax<T> {
 
         this.setCount(state.getWhiteCheckersOnBoard(), state.getBlackCheckersOnBoard());
         this.setPlayed(MillMinimax.PIECES - state.getWhiteCheckers(), MillMinimax.PIECES - state.getBlackCheckers());
+    }
+
+    @Override
+    public void makeMove(T move) {
+        this.lastMove = move;
+    }
+
+    @Override
+    public void unmakeMove(T move) {
+        this.lastMove = null;
     }
 
     @Override
