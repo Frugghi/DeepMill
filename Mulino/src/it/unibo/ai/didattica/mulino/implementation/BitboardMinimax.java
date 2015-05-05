@@ -375,9 +375,14 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
             return 18 * lastMove +
                     26 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer]) +
                      1 * (this.numberOfPiecesBlocked(this.opponentPlayer) - this.numberOfPiecesBlocked(this.currentPlayer)) +
-                     7 * (this.numberOf3PiecesConfiguration(this.currentPlayer) - this.numberOf3PiecesConfiguration(this.opponentPlayer)) +
-                     9 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer]);
-        } else { // Fase 2 + 3
+                     9 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer]) +
+                    10 * (this.numberOf2PiecesConfiguration(this.currentPlayer) - this.numberOf2PiecesConfiguration(this.opponentPlayer)) +
+                     7 * (this.numberOf3PiecesConfiguration(this.currentPlayer) - this.numberOf3PiecesConfiguration(this.opponentPlayer));
+        } else if (this.count[PLAYER_B] == 3 || this.count[PLAYER_W] == 3) { // Fase 3
+            return 16 * lastMove +
+                    10 * (this.numberOf2PiecesConfiguration(this.currentPlayer) - this.numberOf2PiecesConfiguration(this.opponentPlayer)) +
+                     1 * (this.numberOf3PiecesConfiguration(this.currentPlayer) - this.numberOf3PiecesConfiguration(this.opponentPlayer));
+        } else { // Fase 2
             return 14 * lastMove +
                     43 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer]) +
                     10 * (this.numberOfPiecesBlocked(this.opponentPlayer) - this.numberOfPiecesBlocked(this.currentPlayer)) +
@@ -461,6 +466,20 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
         return tot3piecesConfiguration;
     }
 
+    private int numberOf2PiecesConfiguration(int player) {
+        int board = this.board[player];
+        int opponentBoard = this.board[1 - player];
+        int tot2piecesConfiguration = 0;
+        for (int i = 0; i < ALL_MILLS.length; i++) {
+            int mill = ALL_MILLS[i];
+            if ((opponentBoard & mill) == 0 && Integer.bitCount((board & mill)) == 2) {
+                tot2piecesConfiguration++;
+            }
+        }
+
+        return tot2piecesConfiguration;
+    }
+
     @Override
     public double maxEvaluateValue() {
         return Integer.MAX_VALUE;
@@ -503,8 +522,10 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
         result.append("Number of double morrises player (B) : " + this.numberOfDoubleMorrises(PLAYER_B) + "\n");
         result.append("Number of pieces blocked player (W) : " + this.numberOfPiecesBlocked(PLAYER_W) + "\n");
         result.append("Number of pieces blocked player (B) : " + this.numberOfPiecesBlocked(PLAYER_B )+ "\n");
+        result.append("Number of 2 pieces configurations player (W) : " + this.numberOf2PiecesConfiguration(PLAYER_W) + "\n");
+        result.append("Number of 2 pieces configurations player (B) : " + this.numberOf2PiecesConfiguration(PLAYER_B) + "\n");
         result.append("Number of 3 pieces configurations player (W) : " + this.numberOf3PiecesConfiguration(PLAYER_W) + "\n");
-        result.append("Number of 3 pieces configurations player (B) : " + this.numberOf3PiecesConfiguration(PLAYER_B )+ "\n");
+        result.append("Number of 3 pieces configurations player (B) : " + this.numberOf3PiecesConfiguration(PLAYER_B) + "\n");
 
         return result.toString();
     }
