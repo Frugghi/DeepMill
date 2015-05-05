@@ -39,11 +39,11 @@ public class IterativeDeepening extends Thread {
 			if (bestMove != null) {
                 move = bestMove;
 
-                /*state.makeMove(bestMove);
+                state.makeMove(bestMove);
 
                 if (debug) System.out.println(this.getName() + " - DEBUGMILL: Depth " + depth + ", Best move " + bestMove.toString() + "\n" + state.toString());
 
-                state.unmakeMove(bestMove);*/
+                state.unmakeMove(bestMove);
 
                 depth++;
             }

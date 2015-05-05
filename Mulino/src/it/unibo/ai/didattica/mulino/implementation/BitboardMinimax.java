@@ -325,6 +325,14 @@ public class BitBoardMinimax extends TranspositionMinimax<BitBoardMove, Long, In
     @Override
     public BitBoardMove getBestMove(int depth) {
         BitBoardMove move = super.getBestMove(depth);
+
+        /*System.out.println("TTMap Size: " + this.getTranspositionTableMap().size());
+        for (Integer key : this.getTranspositionTableMap().keySet()) {
+            System.out.println("TTMap [" + key + "] Size: " + this.getTranspositionTableMap().get(key).size());
+        }*/
+
+        //this.clearTranspositionTable();
+
         if (this.abort) {
             this.abort = false;
             return null;
@@ -523,7 +531,7 @@ public class BitBoardMinimax extends TranspositionMinimax<BitBoardMove, Long, In
 
     @Override
     protected boolean useTranspositionTable() {
-        return true;
+        return false;
     }
 
     @Override
