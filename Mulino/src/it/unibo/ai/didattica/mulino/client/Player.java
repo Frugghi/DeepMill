@@ -27,13 +27,15 @@ public class Player extends Thread {
     private Minimax.Algorithm algorithm;
     private int depth;
     private int maxTime;
+    private boolean debug;
 
-    public Player(Behaviour behaviour, it.unibo.ai.didattica.mulino.domain.State.Checker color, Minimax.Algorithm algorithm, int depth, int maxTime) {
+    public Player(Behaviour behaviour, it.unibo.ai.didattica.mulino.domain.State.Checker color, Minimax.Algorithm algorithm, int depth, int maxTime, boolean debug) {
         this.behaviour = behaviour;
         this.color = color;
         this.algorithm = algorithm;
         this.depth = depth;
         this.maxTime = maxTime;
+        this.debug = debug;
     }
 
     public void run() {
@@ -54,7 +56,7 @@ public class Player extends Thread {
             return;
         }
         System.out.println("Hello " + behaviour.toString() + "!");
-        if (behaviour == Behaviour.IA) {
+        if (behaviour == Behaviour.IA && debug) {
             System.out.println("Algorithm: " + algorithm + ", Depth: " + depth);
         }
         System.out.println("You are player " + client.getPlayer().toString() + "!");
@@ -82,7 +84,7 @@ public class Player extends Thread {
                     ia.updateState(currentState);
                     ia.next();
 
-                    System.out.println("DEEPMILL DEBUG: \n" + ia.toString());
+                    if (debug) System.out.println("DEEPMILL DEBUG: \n" + ia.toString());
                 }
             }
 
@@ -92,6 +94,7 @@ public class Player extends Thread {
 
                     if (depth == 0) {
                         IterativeDeepening iterativeDeepening = new IterativeDeepening(ia);
+                        iterativeDeepening.setDebug(debug);
                         iterativeDeepening.start();
 
                         try {
@@ -103,12 +106,12 @@ public class Player extends Thread {
                         iterativeDeepening.terminate();
 
                         move = iterativeDeepening.getBestMove();
-                        
+
                     } else {
                         move = (MillMove)ia.getBestMove(depth);
                     }
 
-                    System.out.println("DEEPMILL DEBUG: " + move.toString());
+                    if (debug) System.out.println("DEEPMILL DEBUG: " + move.toString());
                     if (move == null) {
                         actionString = "GGWP";
                     } else {
@@ -117,7 +120,7 @@ public class Player extends Thread {
                     }
 
                     System.out.println(actionString);
-                    System.out.println("DEEPMILL DEBUG: \n" + ia.toString());
+                    if (debug) System.out.println("DEEPMILL DEBUG: \n" + ia.toString());
                     break;
                 case HUMAN:
                     try {

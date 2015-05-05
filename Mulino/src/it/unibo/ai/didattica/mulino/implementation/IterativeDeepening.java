@@ -10,6 +10,7 @@ public class IterativeDeepening extends Thread {
     private MillMove move;
     private MillMinimax<MillMove> state;
     private int minDepth;
+    private boolean debug;
 
     public IterativeDeepening(MillMinimax<MillMove> state) {
         this(state, 1);
@@ -25,6 +26,10 @@ public class IterativeDeepening extends Thread {
         return move;
     }
 
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }
+
     public void run()
     {
         int depth =  minDepth;
@@ -36,7 +41,7 @@ public class IterativeDeepening extends Thread {
 
                 state.makeMove(bestMove);
 
-                //System.out.println(this.getName() + " - DEBUGMILL: Depth " + depth + ", Best move " + bestMove.toString() + "\n" + state.toString());
+                if (debug) System.out.println(this.getName() + " - DEBUGMILL: Depth " + depth + ", Best move " + bestMove.toString() + "\n" + state.toString());
 
                 state.unmakeMove(bestMove);
 
@@ -44,7 +49,7 @@ public class IterativeDeepening extends Thread {
             }
         }
 
-        System.out.println(this.getName() + " terminating...");
+        if (debug) System.out.println(this.getName() + " terminating...");
     }
 
     public void terminate() {

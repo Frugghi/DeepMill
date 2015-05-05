@@ -426,11 +426,11 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
     public String toString() {
         StringBuffer result = new StringBuffer();
         result.append("7 " + this.playerString(A7) + "--------" + this.playerString(D7) + "--------" + this.playerString(G7) + "\n");
-        result.append("6 |--" + this.playerString(B6) + "-----" + this.playerString(D6) + "-----" + this.playerString(F6) + "--|\n");
-        result.append("5 |--|--" + this.playerString(C5) + "--" + this.playerString(D5) + "--" + this.playerString(E5) + "--|--|\n");
+        result.append("6 |  " + this.playerString(B6) + "-----" + this.playerString(D6) + "-----" + this.playerString(F6) + "  |\n");
+        result.append("5 |  |  " + this.playerString(C5) + "--" + this.playerString(D5) + "--" + this.playerString(E5) + "  |  |\n");
         result.append("4 " + this.playerString(A4) + "--" + this.playerString(B4) + "--" + this.playerString(C4) + "     " + this.playerString(E4) + "--" + this.playerString(F4) + "--" + this.playerString(G4) +"\n");
-        result.append("3 |--|--" + this.playerString(C3) + "--" + this.playerString(D3) + "--" + this.playerString(E3) + "--|--|\n");
-        result.append("2 |--" + this.playerString(B2) + "-----" + this.playerString(D2) + "-----" + this.playerString(F2) + "--|\n");
+        result.append("3 |  |  " + this.playerString(C3) + "--" + this.playerString(D3) + "--" + this.playerString(E3) + "  |  |\n");
+        result.append("2 |  " + this.playerString(B2) + "-----" + this.playerString(D2) + "-----" + this.playerString(F2) + "  |\n");
         result.append("1 " + this.playerString(A1) + "--------" + this.playerString(D1) + "--------" + this.playerString(G1) + "\n");
         result.append("  a  b  c  d  e  f  g\n");
         result.append("White Played Checkers: " + this.played[PLAYER_W] + ";\n");
