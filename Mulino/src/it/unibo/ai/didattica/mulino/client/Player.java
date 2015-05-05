@@ -7,15 +7,14 @@ import it.unibo.ai.didattica.mulino.implementation.BitboardMinimax;
 import it.unibo.ai.didattica.mulino.implementation.GridMinimax;
 import it.unibo.ai.didattica.mulino.implementation.IterativeDeepening;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 
 public class Player extends Thread {
 
     public enum Behaviour {
         HUMAN ("Human"),
-        IA ("DeepMill");
+        IA ("DeepMill"),
+        REPLAY ("Replay");
         private final String name;
         private Behaviour(String s) { name = s; }
         public boolean equalsName(String otherName){ return (otherName == null)? false:name.equals(otherName); }
@@ -28,13 +27,29 @@ public class Player extends Thread {
     private int depth;
     private int maxTime;
     private boolean debug;
+    private String replay;
 
-    public Player(Behaviour behaviour, it.unibo.ai.didattica.mulino.domain.State.Checker color, MillMinimax ia, int depth, int maxTime, boolean debug) {
-        this.behaviour = behaviour;
+    public Player(it.unibo.ai.didattica.mulino.domain.State.Checker color) {
+        this.behaviour = Behaviour.HUMAN;
+        this.color = color;
+    }
+
+    public Player(it.unibo.ai.didattica.mulino.domain.State.Checker color, MillMinimax ia, int depth, int maxTime) {
+        this.behaviour = Behaviour.IA;
         this.color = color;
         this.ia = ia;
         this.depth = depth;
         this.maxTime = maxTime;
+    }
+
+    public Player(it.unibo.ai.didattica.mulino.domain.State.Checker color, String replay, int maxTime) {
+        this.behaviour = Behaviour.REPLAY;
+        this.color = color;
+        this.replay = replay;
+        this.maxTime = maxTime;
+    }
+
+    public void setDebug(boolean debug) {
         this.debug = debug;
     }
 
@@ -42,7 +57,23 @@ public class Player extends Thread {
         boolean myTurn = (color == it.unibo.ai.didattica.mulino.domain.State.Checker.WHITE);
         String actionString = "";
         it.unibo.ai.didattica.mulino.domain.State currentState = null;
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader in = null;
+        switch (behaviour) {
+            case HUMAN:
+                in = new BufferedReader(new InputStreamReader(System.in));
+                break;
+            case REPLAY:
+                try {
+                    in = new BufferedReader(new FileReader(replay));
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    return;
+                }
+                break;
+            default:
+                in = null;
+                break;
+        }
 
         MillMove move;
 
@@ -89,7 +120,6 @@ public class Player extends Thread {
             System.out.println("Player " + client.getPlayer().toString() + ", do your move: ");
             switch (behaviour) {
                 case IA:
-
                     if (depth == 0) {
                         IterativeDeepening iterativeDeepening = new IterativeDeepening(ia);
                         iterativeDeepening.setDebug(debug);
@@ -106,7 +136,7 @@ public class Player extends Thread {
                         move = iterativeDeepening.getBestMove();
 
                     } else {
-                        move = (MillMove)ia.getBestMove(depth);
+                        move = ia.getBestMove(depth);
                     }
 
                     if (debug) System.out.println("DEEPMILL DEBUG: " + move.toString());
@@ -123,6 +153,23 @@ public class Player extends Thread {
                 case HUMAN:
                     try {
                         actionString = in.readLine();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return;
+                    }
+                    break;
+                case REPLAY:
+                    try {
+                        try {
+                            Thread.sleep(this.maxTime * 1000);
+                        } catch (InterruptedException ie) {
+                            ie.printStackTrace();
+                        }
+
+                        while (!(actionString = in.readLine()).startsWith("Player " + client.getPlayer().toString() + " move: ")) {
+
+                        }
+                        actionString = actionString.substring(("Player " + client.getPlayer().toString() + " move: ").length());
                     } catch (IOException e) {
                         e.printStackTrace();
                         return;

@@ -106,6 +106,7 @@ public class MulinoClient {
             System.out.println("--debug        Print the debug output to standard output");
             System.out.println("--grid         Use grid state");
             System.out.println("--bit          Use bit state");
+            System.out.println("-r <filename>  Replay a recorded game");
             System.exit(-1);
         }
 
@@ -116,6 +117,7 @@ public class MulinoClient {
         int maxTime = 58;
         boolean debug = false;
         boolean bitState = true;
+        String replay = null;
         for (int i = 0; i < args.length; i++) {
             switch (args[i].toLowerCase()) {
                 case "-w":
@@ -165,6 +167,10 @@ public class MulinoClient {
                 case "--bit":
                     bitState = true;
                     break;
+                case "-r":
+                    behaviour = Player.Behaviour.REPLAY;
+                    replay = args[++i];
+                    break;
             }
         }
 
@@ -175,8 +181,26 @@ public class MulinoClient {
             ia = new GridMinimax(algorithm);
         }
 
-        Player player = new Player(behaviour, playerColor, ia, depth, maxTime, debug);
-        player.start();
+        switch (behaviour) {
+            case HUMAN:
+                Player humanPlayer = new Player(playerColor);
+                humanPlayer.setDebug(debug);
+                humanPlayer.start();
+                break;
+            case IA:
+                Player iaPlayer = new Player(playerColor, ia, depth, maxTime);
+                iaPlayer.setDebug(debug);
+                iaPlayer.start();
+                break;
+            case REPLAY:
+                Player whitePlayer = new Player(State.Checker.WHITE, replay, maxTime);
+                whitePlayer.start();
+
+                Player blackPlayer = new Player(State.Checker.BLACK, replay, maxTime);
+                blackPlayer.start();
+                break;
+        }
+
     }
 
 }
