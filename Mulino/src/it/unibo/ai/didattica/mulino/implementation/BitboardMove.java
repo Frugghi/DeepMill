@@ -91,8 +91,9 @@ public class BitboardMove extends MillMove {
             case BitboardMinimax.F6: return "f6";
             case BitboardMinimax.G1: return "g1";
             case BitboardMinimax.G4: return "g4";
-            case BitboardMinimax.G7: return "g5";
+            case BitboardMinimax.G7: return "g7";
             default:
+                System.err.println("Unknown move: " + bitPattern);
                 return "";
         }
     }
@@ -124,6 +125,7 @@ public class BitboardMove extends MillMove {
             case "g4": return BitboardMinimax.G4;
             case "g7": return BitboardMinimax.G7;
             default:
+                System.err.println("Unknown move: " + position);
                 return 0;
         }
     }
