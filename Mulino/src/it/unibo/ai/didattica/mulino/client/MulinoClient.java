@@ -14,7 +14,7 @@ import it.unibo.ai.didattica.mulino.actions.PhaseFinalAction;
 import it.unibo.ai.didattica.mulino.domain.MillMinimax;
 import it.unibo.ai.didattica.mulino.domain.State;
 import it.unibo.ai.didattica.mulino.engine.TCPMulino;
-import it.unibo.ai.didattica.mulino.implementation.BitboardMinimax;
+import it.unibo.ai.didattica.mulino.implementation.BitBoardMinimax;
 import it.unibo.ai.didattica.mulino.implementation.GridMinimax;
 
 public class MulinoClient {
@@ -174,13 +174,6 @@ public class MulinoClient {
             }
         }
 
-        MillMinimax ia = null;
-        if (bitState) {
-            ia = new BitboardMinimax(algorithm);
-        } else {
-            ia = new GridMinimax(algorithm);
-        }
-
         switch (behaviour) {
             case HUMAN:
                 Player humanPlayer = new Player(playerColor);
@@ -188,6 +181,13 @@ public class MulinoClient {
                 humanPlayer.start();
                 break;
             case IA:
+                MillMinimax ia = null;
+                if (bitState) {
+                    ia = new BitBoardMinimax(algorithm);
+                } else {
+                    ia = new GridMinimax(algorithm);
+                }
+
                 Player iaPlayer = new Player(playerColor, ia, depth, maxTime);
                 iaPlayer.setDebug(debug);
                 iaPlayer.start();

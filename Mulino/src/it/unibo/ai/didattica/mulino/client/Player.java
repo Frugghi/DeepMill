@@ -3,8 +3,6 @@ package it.unibo.ai.didattica.mulino.client;
 import fr.avianey.minimax4j.Minimax;
 import it.unibo.ai.didattica.mulino.domain.MillMinimax;
 import it.unibo.ai.didattica.mulino.domain.MillMove;
-import it.unibo.ai.didattica.mulino.implementation.BitboardMinimax;
-import it.unibo.ai.didattica.mulino.implementation.GridMinimax;
 import it.unibo.ai.didattica.mulino.implementation.IterativeDeepening;
 
 import java.io.*;
@@ -86,7 +84,7 @@ public class Player extends Thread {
         }
         System.out.println("Hello " + behaviour.toString() + "!");
         if (behaviour == Behaviour.IA && debug) {
-            System.out.println("Algorithm: " + ia.getAlgo() + ", Depth: " + depth);
+            System.out.println("Algorithm: " + ((Minimax)ia).getAlgo() + ", Depth: " + depth);
         }
         System.out.println("You are player " + client.getPlayer().toString() + "!");
         System.out.println("Current state:");
@@ -110,7 +108,12 @@ public class Player extends Thread {
                 System.out.println("Your Opponent did his move, and the result is:\n" + currentState.toString());
 
                 if (behaviour == Behaviour.IA) {
-                    ia.updateState(currentState);
+                    for (String position : currentState.getPositions()) {
+                        ia.setGridPosition(currentState.getBoard().get(position), position);
+                    }
+
+                    ia.setCount(currentState.getWhiteCheckersOnBoard(), currentState.getBlackCheckersOnBoard());
+                    ia.setPlayed(ia.maxPlayedPieces() - currentState.getWhiteCheckers(), ia.maxPlayedPieces() - currentState.getBlackCheckers());
                     ia.next();
 
                     if (debug) System.out.println("DEEPMILL DEBUG: \n" + ia.toString());

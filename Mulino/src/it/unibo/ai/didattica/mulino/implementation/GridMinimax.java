@@ -1,12 +1,15 @@
 package it.unibo.ai.didattica.mulino.implementation;
 
+import fr.avianey.minimax4j.Minimax;
 import it.unibo.ai.didattica.mulino.domain.MillMinimax;
 import it.unibo.ai.didattica.mulino.domain.State;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class GridMinimax extends MillMinimax<GridMove> {
+public class GridMinimax extends Minimax<GridMove> implements MillMinimax<GridMove> {
+
+    public static final int PIECES = 9;
 
     public static final int FREE     = 0;
     public static final int PLAYER_W = 1;
@@ -22,6 +25,9 @@ public class GridMinimax extends MillMinimax<GridMove> {
     private int currentPlayer;
     private int opponentPlayer;
 
+    private boolean abort;
+    private GridMove lastMove;
+
     public GridMinimax(Algorithm algo) {
         super(algo);
 
@@ -29,26 +35,25 @@ public class GridMinimax extends MillMinimax<GridMove> {
         this.played = new int[3];
         this.count = new int[3];
 
-        newGame();
-    }
-
-    public void newGame() {
         for (int z = 0; z < Z_SIZE; z++) {
             for (int x = 0; x < X_SIZE; x++) {
-                grid[z][x] = FREE;
+                this.grid[z][x] = FREE;
             }
         }
 
-        played[FREE] = PIECES * 2;
-        played[PLAYER_W] = 0;
-        played[PLAYER_B] = 0;
+        this.played[FREE] = PIECES * 2;
+        this.played[PLAYER_W] = 0;
+        this.played[PLAYER_B] = 0;
 
-        count[FREE] = Z_SIZE * X_SIZE;
-        count[PLAYER_W] = 0;
-        count[PLAYER_B] = 0;
+        this.count[FREE] = Z_SIZE * X_SIZE;
+        this.count[PLAYER_W] = 0;
+        this.count[PLAYER_B] = 0;
 
-        currentPlayer = PLAYER_W;
-        opponentPlayer = PLAYER_B;
+        this.currentPlayer = PLAYER_W;
+        this.opponentPlayer = PLAYER_B;
+
+        this.abort = false;
+        this.lastMove = null;
     }
 
     public void setPlayed(int white, int black) {
@@ -57,23 +62,23 @@ public class GridMinimax extends MillMinimax<GridMove> {
         played[PLAYER_B] = black;
     }
 
-    public int[] getPlayed() {
-        return played;
-    }
-
     public void setCount(int white, int black) {
         count[FREE] = Z_SIZE * X_SIZE - (white + black);
         count[PLAYER_W] = white;
         count[PLAYER_B] = black;
     }
 
-    public int[] getCount() {
-        return count;
+    public int maxPlayedPieces() {
+        return BitBoardMinimax.PIECES;
+    }
+
+    public void setAbort(boolean abort) {
+        this.abort = abort;
     }
 
     @Override
     public boolean isOver() {
-        return super.isOver() || hasWon(PLAYER_W) || hasWon(PLAYER_B);
+        return this.abort || hasWon(PLAYER_W) || hasWon(PLAYER_B);
     }
 
     private boolean hasWon(int player) {
@@ -107,7 +112,7 @@ public class GridMinimax extends MillMinimax<GridMove> {
 
     @Override
     public void makeMove(GridMove move) {
-        super.makeMove(move);
+        this.lastMove = move;
 
         setGridPosition(currentPlayer, move.getToX(), move.getToZ());
 
@@ -133,7 +138,7 @@ public class GridMinimax extends MillMinimax<GridMove> {
 
     @Override
     public void unmakeMove(GridMove move) {
-        super.unmakeMove(move);
+        this.lastMove = null;
 
         previous();
 
@@ -310,13 +315,13 @@ public class GridMinimax extends MillMinimax<GridMove> {
 
     @Override
     public double evaluate() {
-        if (this.hasWon(currentPlayer)) { // Se vinco � la mossa migliore
+        if (this.hasWon(currentPlayer)) { // Se vinco e' la mossa migliore
             return this.maxEvaluateValue();
-        } else if (this.hasWon(opponentPlayer)) { // Se perdo � la mossa peggiore
+        } else if (this.hasWon(opponentPlayer)) { // Se perdo e' la mossa peggiore
             return -this.maxEvaluateValue();
         }
 
-        // Il numero di spostamenti di un pezzo potrebbe essere un buon indicatore per discriminare quando si � in parit�
+        // Il numero di spostamenti di un pezzo potrebbe essere un buon indicatore per discriminare quando si e' in parita'
         int[] availableMoves = new int[]{0, 0, 0};
         for (int z = 0; z < Z_SIZE; z++) {
             for (int x = 0; x < X_SIZE; x++) {

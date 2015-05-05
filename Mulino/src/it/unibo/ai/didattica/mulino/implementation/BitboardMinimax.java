@@ -1,17 +1,21 @@
 package it.unibo.ai.didattica.mulino.implementation;
 
+import fr.avianey.minimax4j.TranspositionMinimax;
 import it.unibo.ai.didattica.mulino.domain.MillMinimax;
 import it.unibo.ai.didattica.mulino.domain.State;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
-public class BitboardMinimax extends MillMinimax<BitboardMove> {
+public class BitBoardMinimax extends TranspositionMinimax<BitBoardMove, Long, Integer> implements MillMinimax<BitBoardMove> {
+
+    public static final int PIECES = 9;
 
     public static final int PLAYER_W = 0;
     public static final int PLAYER_B = 1;
-    public static final int FREE = 2;
+    public static final int FREE     = 2;
 
     private static final int _A1 = 0;  protected static final int A1 = 1 << _A1;
     private static final int _B2 = 1;  protected static final int B2 = 1 << _B2;
@@ -146,7 +150,10 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
     private int currentPlayer;
     private int opponentPlayer;
 
-    public BitboardMinimax(Algorithm algo) {
+    private boolean abort;
+    private BitBoardMove lastMove;
+
+    public BitBoardMinimax(Algorithm algo) {
         super(algo);
 
         this.board = new int[2];
@@ -163,23 +170,30 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
 
         this.currentPlayer = PLAYER_W;
         this.opponentPlayer = PLAYER_B;
+
+        this.abort = false;
     }
 
-    @Override
+    public int maxPlayedPieces() {
+        return BitBoardMinimax.PIECES;
+    }
+
+    public void setAbort(boolean abort) {
+        this.abort = abort;
+    }
+
     public void setPlayed(int white, int black) {
         this.played[PLAYER_W] = white;
         this.played[PLAYER_B] = black;
     }
 
-    @Override
     public void setCount(int white, int black) {
         this.count[PLAYER_W] = white;
         this.count[PLAYER_B] = black;
     }
 
-    @Override
     public void setGridPosition(State.Checker player, String position) {
-        int i = BitboardMove.string2bitpattern(position);
+        int i = BitBoardMove.string2bitpattern(position);
 
         switch (player) {
             case WHITE:
@@ -206,9 +220,8 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
         }
     }
 
-    @Override
-    public BitboardMinimax cloneState() {
-        BitboardMinimax clone = new BitboardMinimax(this.getAlgo());
+    public Object cloneState() {
+        BitBoardMinimax clone = new BitBoardMinimax(this.getAlgo());
 
         clone.currentPlayer = this.currentPlayer;
         clone.opponentPlayer = this.opponentPlayer;
@@ -227,7 +240,7 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
 
     @Override
     public boolean isOver() {
-        return super.isOver() || this.hasWon(PLAYER_W) || this.hasWon(PLAYER_B);
+        return this.abort || this.hasWon(PLAYER_W) || this.hasWon(PLAYER_B);
     }
 
     private boolean hasWon(int player) {
@@ -237,8 +250,8 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
     }
 
     @Override
-    public void makeMove(BitboardMove move) {
-        super.makeMove(move);
+    public void makeMove(BitBoardMove move) {
+        this.lastMove = move;
 
         this.setGridPosition(this.currentPlayer, move.getTo());
 
@@ -259,8 +272,8 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
     }
 
     @Override
-    public void unmakeMove(BitboardMove move) {
-        super.unmakeMove(move);
+    public void unmakeMove(BitBoardMove move) {
+        this.lastMove = null;
 
         this.previous();
 
@@ -281,8 +294,8 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
     }
 
     @Override
-    public List<BitboardMove> getPossibleMoves() {
-        List<BitboardMove> moves = new ArrayList<>(3 * (24 - this.count[PLAYER_W] - this.count[PLAYER_B]));
+    public List<BitBoardMove> getPossibleMoves() {
+        List<BitBoardMove> moves = new ArrayList<>(3 * (24 - this.count[PLAYER_W] - this.count[PLAYER_B]));
 
         if (this.played[this.currentPlayer] < PIECES) { // Fase 1
             for (int to = 0; to < 24; to++) {
@@ -309,11 +322,22 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
         return moves;
     }
 
-    private void addMoves(List<BitboardMove> moves, int to) {
+    @Override
+    public BitBoardMove getBestMove(int depth) {
+        BitBoardMove move = super.getBestMove(depth);
+        if (this.abort) {
+            this.abort = false;
+            return null;
+        } else {
+            return move;
+        }
+    }
+
+    private void addMoves(List<BitBoardMove> moves, int to) {
         this.addMoves(moves, Integer.MAX_VALUE, to);
     }
 
-    private void addMoves(List<BitboardMove> moves, int from, int to) {
+    private void addMoves(List<BitBoardMove> moves, int from, int to) {
         int emptyBoard = this.board[PLAYER_W] | this.board[PLAYER_B];
         if (((emptyBoard >>> to) & 1) == 0) {
             if (this.willMill(this.currentPlayer, from, to)) {
@@ -321,11 +345,11 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
                 int opponentBoard = this.board[this.opponentPlayer];
                 for (int remove = 0; remove < 24; remove++) {
                     if (((opponentBoard >>> remove) & 1) == 1 && (onlyMills || !this.isMill(opponentBoard, remove))) {
-                        moves.add(0, new BitboardMove(this.currentPlayer, from == Integer.MAX_VALUE ? Integer.MAX_VALUE : (1 << from), (1 << to), (1 << remove)));
+                        moves.add(0, new BitBoardMove(this.currentPlayer, from == Integer.MAX_VALUE ? Integer.MAX_VALUE : (1 << from), (1 << to), (1 << remove)));
                     }
                 }
             } else {
-                moves.add(new BitboardMove(this.currentPlayer, from == Integer.MAX_VALUE ? Integer.MAX_VALUE : (1 << from), (1 << to)));
+                moves.add(new BitBoardMove(this.currentPlayer, from == Integer.MAX_VALUE ? Integer.MAX_VALUE : (1 << from), (1 << to)));
             }
         }
     }
@@ -498,6 +522,70 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
     }
 
     @Override
+    protected boolean useTranspositionTable() {
+        return true;
+    }
+
+    @Override
+    public Long getTransposition() {
+        long whiteBoard = this.board[PLAYER_W];
+        long blackBoard = this.board[PLAYER_B];
+
+        long hash = this.currentPlayer;
+        hash |= (whiteBoard <<  1); // [0..23]  white board
+        hash |= (blackBoard << 25); // [24..47] black board
+
+        return hash;
+    }
+
+    @Override
+    public Collection<Long> getSymetricTranspositions() {
+        List<Long> transpositions = new ArrayList<>();
+        long whiteBoard = this.board[PLAYER_W];
+        long blackBoard = this.board[PLAYER_B];
+
+        long hash = this.currentPlayer;
+        hash |= (whiteBoard <<  1); // [0..23]  white board
+        hash |= (blackBoard << 25); // [24..47] black board
+
+        transpositions.add(hash);
+
+        for (int i = 1; i < 4; i++) {
+            whiteBoard = this.rotateBoard(whiteBoard);
+            blackBoard = this.rotateBoard(blackBoard);
+
+            hash = this.currentPlayer;
+            hash |= (whiteBoard <<  1); // [0..23]  white board
+            hash |= (blackBoard << 25); // [24..47] black board
+
+            transpositions.add(hash);
+        }
+
+        return transpositions;
+    }
+
+    private int rotateBoard(int board) {
+        int first = (board & 0b00111111);
+        return ((board >>> 6) & (first << 18));
+    }
+
+    private long rotateBoard(long board) {
+        long first = (board & 0b00111111);
+        return ((board >>> 6) & (first << 18));
+    }
+
+    @Override
+    public Integer getGroup() {
+        if (this.played[PLAYER_B] < PIECES && this.played[PLAYER_W] < PIECES) { // Fase 1
+            return 1;
+        } else if (this.count[PLAYER_B] == 3 || this.count[PLAYER_W] == 3) { // Fase 3
+            return 3;
+        } else { // Fase 2
+            return 2;
+        }
+    }
+
+    @Override
     public String toString() {
         StringBuffer result = new StringBuffer();
         result.append("7 " + this.playerString(A7) + "--------" + this.playerString(D7) + "--------" + this.playerString(G7) + "\n");
@@ -545,7 +633,7 @@ public class BitboardMinimax extends MillMinimax<BitboardMove> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        BitboardMinimax that = (BitboardMinimax) o;
+        BitBoardMinimax that = (BitBoardMinimax) o;
 
         if (this.currentPlayer != that.currentPlayer) return false;
         if (this.opponentPlayer != that.opponentPlayer) return false;

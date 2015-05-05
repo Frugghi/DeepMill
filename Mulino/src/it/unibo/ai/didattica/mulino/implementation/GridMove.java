@@ -2,7 +2,7 @@ package it.unibo.ai.didattica.mulino.implementation;
 
 import it.unibo.ai.didattica.mulino.domain.MillMove;
 
-public class GridMove extends MillMove {
+public class GridMove implements MillMove {
 
     private int player;
 

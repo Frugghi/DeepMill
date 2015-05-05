@@ -8,17 +8,17 @@ public class IterativeDeepening extends Thread {
     private static int turn = 0;
 
     private MillMove move;
-    private MillMinimax<MillMove> state;
+    private MillMinimax state;
     private int minDepth;
     private boolean debug;
 
-    public IterativeDeepening(MillMinimax<MillMove> state) {
+    public IterativeDeepening(MillMinimax state) {
         this(state, 1);
     }
 
-    public IterativeDeepening(MillMinimax<MillMove> state, int minDepth) {
+    public IterativeDeepening(MillMinimax state, int minDepth) {
         super("Thread turn " + (++turn));
-        this.state = state.cloneState();
+        this.state = (MillMinimax)state.cloneState();
         this.minDepth = minDepth;
     }
 
@@ -39,22 +39,22 @@ public class IterativeDeepening extends Thread {
 			if (bestMove != null) {
                 move = bestMove;
 
-                state.makeMove(bestMove);
+                /*state.makeMove(bestMove);
 
                 if (debug) System.out.println(this.getName() + " - DEBUGMILL: Depth " + depth + ", Best move " + bestMove.toString() + "\n" + state.toString());
 
-                state.unmakeMove(bestMove);
+                state.unmakeMove(bestMove);*/
 
                 depth++;
             }
         }
 
-        if (debug) System.out.println(this.getName() + " terminating...");
+        if (debug) System.out.println(this.getName() + " terminating... Reached depth " + depth);
     }
 
     public void terminate() {
         this.interrupt();
-        state.abort = true;
+        state.setAbort(true);
     }
 
 }
