@@ -11,7 +11,7 @@ public abstract class IterativeDeepeningMinimax<M extends Move> extends Minimax<
 
     protected int depth;
     private boolean abort;
-    private Map<Integer,Double> hashMap = new HashMap<Integer, Double>();
+    private Map<Integer,Double> hashMap = new HashMap<>();
 
     public IterativeDeepeningMinimax(Algorithm algo) {
         super(algo);
@@ -20,7 +20,7 @@ public abstract class IterativeDeepeningMinimax<M extends Move> extends Minimax<
     }
 
     public Map<Integer,Double> getHashMap() {
-        return hashMap;
+        return this.hashMap;
     }
 
     public M getBestMove(final int maxDepth, final int maxTime) {
@@ -52,7 +52,7 @@ public abstract class IterativeDeepeningMinimax<M extends Move> extends Minimax<
 
         M bestMove = null;
         for (this.depth = 1; this.depth != maxDepth && !this.abort; this.depth++) {
-            System.out.print("Depth " + this.depth + "... done! " + this.abort);
+            System.out.print("Depth " + this.depth);
 
             M move = super.getBestMove(this.depth);
 
