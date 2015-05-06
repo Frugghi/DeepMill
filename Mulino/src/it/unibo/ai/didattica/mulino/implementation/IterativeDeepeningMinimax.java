@@ -3,12 +3,15 @@ package it.unibo.ai.didattica.mulino.implementation;
 import fr.avianey.minimax4j.Minimax;
 import fr.avianey.minimax4j.Move;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class IterativeDeepeningMinimax<M extends Move> extends Minimax<M> {
 
     protected int depth;
     private boolean abort;
+    private Map<Integer,Double> hashMap = new HashMap<Integer, Double>();
 
     public IterativeDeepeningMinimax(Algorithm algo) {
         super(algo);
@@ -16,13 +19,18 @@ public abstract class IterativeDeepeningMinimax<M extends Move> extends Minimax<
         this.abort = false;
     }
 
+    public Map<Integer,Double> getHashMap() {
+        return hashMap;
+    }
+
     public M getBestMove(final int maxDepth, final int maxTime) {
-        Thread timeout = new Thread(){
+        Thread timeout = new Thread() {
             public void run() {
                 try {
                     Thread.sleep(maxTime);
                     IterativeDeepeningMinimax.this.abort = true;
-                } catch (InterruptedException e) { }
+                } catch (InterruptedException e) {
+                }
             }
         };
         timeout.start();
@@ -59,6 +67,14 @@ public abstract class IterativeDeepeningMinimax<M extends Move> extends Minimax<
         this.abort = false;
         return bestMove;
     }
+    
+    private void updateHashMap(int depth, double score) {
+    	if(hashMap.containsKey(depth))
+        	if(score > (double)hashMap.get(depth))
+        		hashMap.put(depth, score);   //aggiornamento del valore con la stessa chiave
+
+		
+	}
 
     @Override
     protected double minimaxScore(int depth, int who) {
@@ -66,17 +82,27 @@ public abstract class IterativeDeepeningMinimax<M extends Move> extends Minimax<
             return this.maxEvaluateValue();
         } else {
             // salvare lo score + depth bla bla
-            return super.minimaxScore(depth, who);
+            double score = super.minimaxScore(depth, who);
+
+            updateHashMap(depth, score);
+
+            return score;
         }
     }
 
-    @Override
+    
+
+	@Override
     protected double alphabetaScore(int depth, int who, double alpha, double beta) {
         if (this.abort) {
             return this.maxEvaluateValue();
         } else {
             // salvare lo score + depth bla bla
-            return super.alphabetaScore(depth, who, alpha, beta);
+            double score = super.alphabetaScore(depth, who, alpha, beta);
+
+            updateHashMap(depth, score);
+
+            return score;
         }
     }
 
@@ -86,7 +112,11 @@ public abstract class IterativeDeepeningMinimax<M extends Move> extends Minimax<
             return this.maxEvaluateValue();
         } else {
             // salvare lo score + depth bla bla
-            return super.negamaxScore(depth, alpha, beta);
+            double score = super.negamaxScore(depth, alpha, beta);
+
+            updateHashMap(depth, score);
+
+            return score;
         }
     }
 
@@ -96,7 +126,11 @@ public abstract class IterativeDeepeningMinimax<M extends Move> extends Minimax<
             return this.maxEvaluateValue();
         } else {
             // salvare lo score + depth bla bla
-            return super.negascoutScore(first, depth, alpha, beta, b);
+            double score = super.negascoutScore(first, depth, alpha, beta, b);
+
+            updateHashMap(depth, score);
+
+            return score;
         }
     }
 
