@@ -93,7 +93,9 @@ public class BitBoardMove implements MillMove {
             case BitBoardMinimax.G4: return "g4";
             case BitBoardMinimax.G7: return "g7";
             default:
-                System.err.println("Unknown move: " + bitPattern);
+                if (bitPattern != Integer.MAX_VALUE) {
+                    System.err.println("Unknown move: " + bitPattern);
+                }
                 return "";
         }
     }
