@@ -3,12 +3,19 @@ package it.unibo.ai.didattica.mulino.implementation;
 import fr.avianey.minimax4j.Minimax;
 import fr.avianey.minimax4j.Move;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class IterativeDeepeningMinimax<M extends Move> extends Minimax<M> {
 
     protected int depth;
     private boolean abort = false;
+    private Map<Integer,Double> hashMap = new HashMap<Integer, Double>();
+    
+    public Map<Integer,Double> getHashMap(){
+    	return hashMap;
+    }
 
     @Override
     public M getBestMove(int maxDepth) {
@@ -24,22 +31,34 @@ public abstract class IterativeDeepeningMinimax<M extends Move> extends Minimax<
         this.abort = false;
         return bestMove;
     }
+    
+    private void updateHashMap(int depth, double score) {
+    	if(hashMap.containsKey(depth))
+        	if(score > (double)hashMap.get(depth))
+        		hashMap.put(depth, score);   //aggiornamento del valore con la stessa chiave
+
+		
+	}
 
     @Override
     protected double minimaxScore(int depth, int who) {
         double score = super.minimaxScore(this.abort ? 0 : depth, who);
 
         // salvare lo score + depth bla bla
-
+        updateHashMap(depth, score);
+        
         return score;
     }
 
-    @Override
+    
+
+	@Override
     protected double alphabetaScore(int depth, int who, double alpha, double beta) {
         double score = super.alphabetaScore(this.abort ? 0 : depth, who, alpha, beta);
 
         // salvare lo score + depth bla bla
-
+        updateHashMap(depth, score);
+        
         return score;
     }
 
@@ -48,6 +67,7 @@ public abstract class IterativeDeepeningMinimax<M extends Move> extends Minimax<
         double score = super.negamaxScore(this.abort ? 0 : depth, alpha, beta);
 
         // salvare lo score + depth bla bla
+        updateHashMap(depth, score);
 
         return score;
     }
@@ -57,6 +77,7 @@ public abstract class IterativeDeepeningMinimax<M extends Move> extends Minimax<
         double score = super.negascoutScore(first, this.abort ? 0 : depth, alpha, beta, b);
 
         // salvare lo score + depth bla bla
+        updateHashMap(depth, score);
 
         return score;
     }
