@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public class BitBoardMinimax extends TranspositionMinimax<BitBoardMove, Long, Integer> implements MillMinimax<BitBoardMove> {
+public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove> implements MillMinimax<BitBoardMove> {
 	
     public static final int PIECES = 9;
 
@@ -150,7 +150,6 @@ public class BitBoardMinimax extends TranspositionMinimax<BitBoardMove, Long, In
     private int currentPlayer;
     private int opponentPlayer;
 
-    private boolean abort;
     private BitBoardMove lastMove;
 
     public BitBoardMinimax(Algorithm algo) {
@@ -170,16 +169,10 @@ public class BitBoardMinimax extends TranspositionMinimax<BitBoardMove, Long, In
 
         this.currentPlayer = PLAYER_W;
         this.opponentPlayer = PLAYER_B;
-
-        this.abort = false;
     }
 
     public int maxPlayedPieces() {
         return BitBoardMinimax.PIECES;
-    }
-
-    public void setAbort(boolean abort) {
-        this.abort = abort;
     }
 
     public void setPlayed(int white, int black) {
@@ -240,7 +233,7 @@ public class BitBoardMinimax extends TranspositionMinimax<BitBoardMove, Long, In
 
     @Override
     public boolean isOver() {
-        return this.abort || this.hasWon(PLAYER_W) || this.hasWon(PLAYER_B);
+        return this.hasWon(PLAYER_W) || this.hasWon(PLAYER_B);
     }
 
     private boolean hasWon(int player) {
@@ -333,12 +326,7 @@ public class BitBoardMinimax extends TranspositionMinimax<BitBoardMove, Long, In
 
         //this.clearTranspositionTable();
 
-        if (this.abort) {
-            this.abort = false;
-            return null;
-        } else {
-            return move;
-        }
+        return move;
     }
 
     private void addMoves(List<BitBoardMove> moves, int to) {
@@ -529,12 +517,6 @@ public class BitBoardMinimax extends TranspositionMinimax<BitBoardMove, Long, In
         this.opponentPlayer = 1 - this.opponentPlayer;
     }
 
-    @Override
-    protected boolean useTranspositionTable() {
-        return false;
-    }
-
-    @Override
     public Long getTransposition() {
         long whiteBoard = this.board[PLAYER_W];
         long blackBoard = this.board[PLAYER_B];
@@ -546,7 +528,6 @@ public class BitBoardMinimax extends TranspositionMinimax<BitBoardMove, Long, In
         return hash;
     }
 
-    @Override
     public Collection<Long> getSymetricTranspositions() {
         List<Long> transpositions = new ArrayList<>();
         long whiteBoard = this.board[PLAYER_W];
@@ -582,7 +563,6 @@ public class BitBoardMinimax extends TranspositionMinimax<BitBoardMove, Long, In
         return ((board >>> 6) & (first << 18));
     }
 
-    @Override
     public Integer getGroup() {
         if (this.played[PLAYER_B] < PIECES && this.played[PLAYER_W] < PIECES) { // Fase 1
             return 1;

@@ -3,7 +3,6 @@ package it.unibo.ai.didattica.mulino.client;
 import fr.avianey.minimax4j.Minimax;
 import it.unibo.ai.didattica.mulino.domain.MillMinimax;
 import it.unibo.ai.didattica.mulino.domain.MillMove;
-import it.unibo.ai.didattica.mulino.implementation.IterativeDeepening;
 
 import java.io.*;
 
@@ -123,24 +122,9 @@ public class Player extends Thread {
             System.out.println("Player " + client.getPlayer().toString() + ", do your move: ");
             switch (behaviour) {
                 case IA:
-                    if (depth == 0) {
-                        IterativeDeepening iterativeDeepening = new IterativeDeepening(ia);
-                        iterativeDeepening.setDebug(debug);
-                        iterativeDeepening.start();
-
-                        try {
-                            Thread.sleep(this.maxTime * 1000);
-                        } catch (InterruptedException ie) {
-                            ie.printStackTrace();
-                        }
-
-                        iterativeDeepening.terminate();
-
-                        move = iterativeDeepening.getBestMove();
-
-                    } else {
-                        move = ia.getBestMove(depth);
-                    }
+                    long startTime = System.currentTimeMillis();
+                    move = ia.getBestMove(depth, 1000 * maxTime);
+                    System.out.println("Time elapsed: " + (System.currentTimeMillis() - startTime) + "ms");
 
                     if (debug) System.out.println("DEEPMILL DEBUG: " + move.toString());
                     if (move == null) {

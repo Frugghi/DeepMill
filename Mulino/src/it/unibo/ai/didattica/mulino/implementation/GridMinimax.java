@@ -7,7 +7,7 @@ import it.unibo.ai.didattica.mulino.domain.State;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GridMinimax extends Minimax<GridMove> implements MillMinimax<GridMove> {
+public class GridMinimax extends IterativeDeepeningMinimax<GridMove> implements MillMinimax<GridMove> {
 
     public static final int PIECES = 9;
 
@@ -25,7 +25,6 @@ public class GridMinimax extends Minimax<GridMove> implements MillMinimax<GridMo
     private int currentPlayer;
     private int opponentPlayer;
 
-    private boolean abort;
     private GridMove lastMove;
 
     public GridMinimax(Algorithm algo) {
@@ -52,7 +51,6 @@ public class GridMinimax extends Minimax<GridMove> implements MillMinimax<GridMo
         this.currentPlayer = PLAYER_W;
         this.opponentPlayer = PLAYER_B;
 
-        this.abort = false;
         this.lastMove = null;
     }
 
@@ -72,13 +70,9 @@ public class GridMinimax extends Minimax<GridMove> implements MillMinimax<GridMo
         return BitBoardMinimax.PIECES;
     }
 
-    public void setAbort(boolean abort) {
-        this.abort = abort;
-    }
-
     @Override
     public boolean isOver() {
-        return this.abort || hasWon(PLAYER_W) || hasWon(PLAYER_B);
+        return hasWon(PLAYER_W) || hasWon(PLAYER_B);
     }
 
     private boolean hasWon(int player) {
@@ -484,7 +478,4 @@ public class GridMinimax extends Minimax<GridMove> implements MillMinimax<GridMo
         return clone;
     }
     
-
-    
-
 }
