@@ -193,7 +193,7 @@ public class BitBoardMinimax extends TranspositionMinimax<BitBoardMove, Long, In
     }
 
     public void setGridPosition(State.Checker player, String position) {
-        int i = BitBoardMove.string2bitpattern(position);
+        int i = BitBoardMove.string2bitPattern(position);
 
         switch (player) {
             case WHITE:

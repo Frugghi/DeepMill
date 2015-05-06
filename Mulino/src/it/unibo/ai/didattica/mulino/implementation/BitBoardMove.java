@@ -100,7 +100,7 @@ public class BitBoardMove implements MillMove {
         }
     }
 
-    protected static int string2bitpattern(String position) {
+    protected static int string2bitPattern(String position) {
         switch (position.toLowerCase()) {
             case "a1": return BitBoardMinimax.A1;
             case "a4": return BitBoardMinimax.A4;
