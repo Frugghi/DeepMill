@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class BitBoardMinimax extends TranspositionMinimax<BitBoardMove, Long, Integer> implements MillMinimax<BitBoardMove> {
-
+	
     public static final int PIECES = 9;
 
     public static final int PLAYER_W = 0;
