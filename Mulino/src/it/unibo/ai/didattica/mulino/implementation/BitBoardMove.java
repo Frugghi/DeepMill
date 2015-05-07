@@ -57,8 +57,30 @@ public class BitBoardMove implements MillMove {
         return this.remove != Integer.MAX_VALUE;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BitBoardMove that = (BitBoardMove) o;
+
+        if (player != that.player) return false;
+        if (to != that.to) return false;
+        if (from != that.from) return false;
+        return remove == that.remove;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = player;
+        result = 31 * result + to;
+        result = 31 * result + from;
+        result = 31 * result + remove;
+        return result;
+    }
+
     public String toString() {
-        return (this.player == BitBoardMinimax.PLAYER_W ? "W" : "B") + " from (" + this.from + ") to (" + this.to + ") and remove (" + this.remove + ")";
+        return (this.player == BitBoardMinimax.PLAYER_W ? "W" : "B") + ":(" + this.from + ", " + this.to + ", " + this.remove + ")";
     }
 
     @Override

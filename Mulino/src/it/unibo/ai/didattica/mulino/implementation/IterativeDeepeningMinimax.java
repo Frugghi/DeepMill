@@ -58,7 +58,7 @@ public abstract class IterativeDeepeningMinimax<M extends Move> extends Minimax<
 
             if (!this.abort) {
                 bestMove = move;
-                System.out.println("... done!");
+                System.out.println("... done! " + this.nodesCount + " nodes evaluated.");
             } else {
                 System.out.println("... aborted!");
             }
@@ -69,11 +69,7 @@ public abstract class IterativeDeepeningMinimax<M extends Move> extends Minimax<
     }
     
     private void updateHashMap(int depth, double score) {
-    	if(hashMap.containsKey(depth))
-        	if(score > (double)hashMap.get(depth))
-        		hashMap.put(depth, score);   //aggiornamento del valore con la stessa chiave
 
-		
 	}
 
     @Override
@@ -127,6 +123,20 @@ public abstract class IterativeDeepeningMinimax<M extends Move> extends Minimax<
         } else {
             // salvare lo score + depth bla bla
             double score = super.negascoutScore(first, depth, alpha, beta, b);
+
+            updateHashMap(depth, score);
+
+            return score;
+        }
+    }
+
+    @Override
+    protected double killerNegascoutScore(boolean first, int depth, double alpha, double beta, double b) {
+        if (this.abort) {
+            return this.maxEvaluateValue();
+        } else {
+            // salvare lo score + depth bla bla
+            double score = super.killerNegascoutScore(first, depth, alpha, beta, b);
 
             updateHashMap(depth, score);
 

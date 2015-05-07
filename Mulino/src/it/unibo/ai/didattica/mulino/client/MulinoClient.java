@@ -112,7 +112,7 @@ public class MulinoClient {
 
         Player.Behaviour behaviour = Player.Behaviour.IA;
         State.Checker playerColor = State.Checker.WHITE;
-        Minimax.Algorithm algorithm = Minimax.Algorithm.NEGASCOUT;
+        Minimax.Algorithm algorithm = Minimax.Algorithm.KILLERNEGASCOUT;
         int depth = 0;
         int maxTime = 58;
         boolean debug = false;
@@ -149,6 +149,9 @@ public class MulinoClient {
                             break;
                         case "negascout":
                             algorithm = Minimax.Algorithm.NEGASCOUT;
+                            break;
+                        case "killer_negascout":
+                            algorithm = Minimax.Algorithm.KILLERNEGASCOUT;
                             break;
                     }
                     break;
