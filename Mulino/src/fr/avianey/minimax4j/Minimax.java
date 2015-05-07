@@ -499,8 +499,8 @@ public abstract class Minimax<M extends Move> {
 
                     List<Move> currentDepthKillerMoves = this.killerMoves.get(this.currentDepth);
                     if (!currentDepthKillerMoves.contains(move)) {
-                        if (currentDepthKillerMoves.size() >= 3) {
-                            currentDepthKillerMoves.remove(2);
+                        if (currentDepthKillerMoves.size() >= 2) {
+                            currentDepthKillerMoves.remove(1);
                         }
                         currentDepthKillerMoves.add(0, move);
                     }
