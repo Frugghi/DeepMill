@@ -1,6 +1,5 @@
 package it.unibo.ai.didattica.mulino.implementation;
 
-import fr.avianey.minimax4j.TranspositionMinimax;
 import it.unibo.ai.didattica.mulino.domain.MillMinimax;
 import it.unibo.ai.didattica.mulino.domain.State;
 
@@ -297,20 +296,6 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove> imp
         return moves;
     }
 
-    @Override
-    public BitBoardMove getBestMove(int depth) {
-        BitBoardMove move = super.getBestMove(depth);
-
-        /*System.out.println("TTMap Size: " + this.getTranspositionTableMap().size());
-        for (Integer key : this.getTranspositionTableMap().keySet()) {
-            System.out.println("TTMap [" + key + "] Size: " + this.getTranspositionTableMap().get(key).size());
-        }*/
-
-        //this.clearTranspositionTable();
-
-        return move;
-    }
-
     private void addMoves(List<BitBoardMove> moves, int to) {
         this.addMoves(moves, Integer.MAX_VALUE, to);
     }
@@ -472,8 +457,7 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove> imp
         int board = this.board[player];
         int opponentBoard = this.board[1 - player];
         int tot2piecesConfiguration = 0;
-        for (int i = 0; i < ALL_MILLS.length; i++) {
-            int mill = ALL_MILLS[i];
+        for (int mill : ALL_MILLS) {
             if ((opponentBoard & mill) == 0 && Integer.bitCount((board & mill)) == 2) {
                 tot2piecesConfiguration++;
             }
@@ -557,35 +541,35 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove> imp
 
     @Override
     public String toString() {
-        StringBuffer result = new StringBuffer();
-        result.append("7 " + this.playerString(A7) + "--------" + this.playerString(D7) + "--------" + this.playerString(G7) + "\n");
-        result.append("6 |  " + this.playerString(B6) + "-----" + this.playerString(D6) + "-----" + this.playerString(F6) + "  |\n");
-        result.append("5 |  |  " + this.playerString(C5) + "--" + this.playerString(D5) + "--" + this.playerString(E5) + "  |  |\n");
-        result.append("4 " + this.playerString(A4) + "--" + this.playerString(B4) + "--" + this.playerString(C4) + "     " + this.playerString(E4) + "--" + this.playerString(F4) + "--" + this.playerString(G4) +"\n");
-        result.append("3 |  |  " + this.playerString(C3) + "--" + this.playerString(D3) + "--" + this.playerString(E3) + "  |  |\n");
-        result.append("2 |  " + this.playerString(B2) + "-----" + this.playerString(D2) + "-----" + this.playerString(F2) + "  |\n");
-        result.append("1 " + this.playerString(A1) + "--------" + this.playerString(D1) + "--------" + this.playerString(G1) + "\n");
-        result.append("  a  b  c  d  e  f  g\n");
-        result.append("White Played Checkers: " + this.played[PLAYER_W] + ";\n");
-        result.append("Black Played Checkers: " + this.played[PLAYER_B] + ";\n");
-        result.append("White Checkers On Board: " + this.count[PLAYER_W] + ";\n");
-        result.append("Black Checkers On Board: " + this.count[PLAYER_B] + ";\n");
-        result.append("Current player: " + (this.currentPlayer == PLAYER_W ? "W" : "B") + ";\n");
-        result.append("Opponent player: " + (this.opponentPlayer == PLAYER_W ? "W" : "B") + ";\n");
-        result.append("\n");
+        String result = "";
+        result += "7 " + this.playerString(A7) + "--------" + this.playerString(D7) + "--------" + this.playerString(G7) + "\n";
+        result += "6 |  " + this.playerString(B6) + "-----" + this.playerString(D6) + "-----" + this.playerString(F6) + "  |\n";
+        result += "5 |  |  " + this.playerString(C5) + "--" + this.playerString(D5) + "--" + this.playerString(E5) + "  |  |\n";
+        result += "4 " + this.playerString(A4) + "--" + this.playerString(B4) + "--" + this.playerString(C4) + "     " + this.playerString(E4) + "--" + this.playerString(F4) + "--" + this.playerString(G4) +"\n";
+        result += "3 |  |  " + this.playerString(C3) + "--" + this.playerString(D3) + "--" + this.playerString(E3) + "  |  |\n";
+        result += "2 |  " + this.playerString(B2) + "-----" + this.playerString(D2) + "-----" + this.playerString(F2) + "  |\n";
+        result += "1 " + this.playerString(A1) + "--------" + this.playerString(D1) + "--------" + this.playerString(G1) + "\n";
+        result += "  a  b  c  d  e  f  g\n";
+        result += "White Played Checkers: " + this.played[PLAYER_W] + ";\n";
+        result += "Black Played Checkers: " + this.played[PLAYER_B] + ";\n";
+        result += "White Checkers On Board: " + this.count[PLAYER_W] + ";\n";
+        result += "Black Checkers On Board: " + this.count[PLAYER_B] + ";\n";
+        result += "Current player: " + (this.currentPlayer == PLAYER_W ? "W" : "B") + ";\n";
+        result += "Opponent player: " + (this.opponentPlayer == PLAYER_W ? "W" : "B") + ";\n";
+        result += "\n";
 
-        result.append("Number of morrises player (W) : " + this.numberOfMorrises(PLAYER_W) + "\n");
-        result.append("Number of morrises player (B) : " + this.numberOfMorrises(PLAYER_B) + "\n");
-        result.append("Number of double morrises player (W) : " + this.numberOfDoubleMorrises(PLAYER_W) + "\n");
-        result.append("Number of double morrises player (B) : " + this.numberOfDoubleMorrises(PLAYER_B) + "\n");
-        result.append("Number of pieces blocked player (W) : " + this.numberOfPiecesBlocked(PLAYER_W) + "\n");
-        result.append("Number of pieces blocked player (B) : " + this.numberOfPiecesBlocked(PLAYER_B )+ "\n");
-        result.append("Number of 2 pieces configurations player (W) : " + this.numberOf2PiecesConfiguration(PLAYER_W) + "\n");
-        result.append("Number of 2 pieces configurations player (B) : " + this.numberOf2PiecesConfiguration(PLAYER_B) + "\n");
-        result.append("Number of 3 pieces configurations player (W) : " + this.numberOf3PiecesConfiguration(PLAYER_W) + "\n");
-        result.append("Number of 3 pieces configurations player (B) : " + this.numberOf3PiecesConfiguration(PLAYER_B) + "\n");
+        result += "Number of morrises player (W) : " + this.numberOfMorrises(PLAYER_W) + "\n";
+        result += "Number of morrises player (B) : " + this.numberOfMorrises(PLAYER_B) + "\n";
+        result += "Number of double morrises player (W) : " + this.numberOfDoubleMorrises(PLAYER_W) + "\n";
+        result += "Number of double morrises player (B) : " + this.numberOfDoubleMorrises(PLAYER_B) + "\n";
+        result += "Number of pieces blocked player (W) : " + this.numberOfPiecesBlocked(PLAYER_W) + "\n";
+        result += "Number of pieces blocked player (B) : " + this.numberOfPiecesBlocked(PLAYER_B )+ "\n";
+        result += "Number of 2 pieces configurations player (W) : " + this.numberOf2PiecesConfiguration(PLAYER_W) + "\n";
+        result += "Number of 2 pieces configurations player (B) : " + this.numberOf2PiecesConfiguration(PLAYER_B) + "\n";
+        result += "Number of 3 pieces configurations player (W) : " + this.numberOf3PiecesConfiguration(PLAYER_W) + "\n";
+        result += "Number of 3 pieces configurations player (B) : " + this.numberOf3PiecesConfiguration(PLAYER_B) + "\n";
 
-        return result.toString();
+        return result;
     }
 
     private String playerString(int i) {
@@ -607,9 +591,7 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove> imp
 
         if (this.currentPlayer != that.currentPlayer) return false;
         if (this.opponentPlayer != that.opponentPlayer) return false;
-        if (!Arrays.equals(this.board, that.board)) return false;
-        if (!Arrays.equals(this.played, that.played)) return false;
-        return Arrays.equals(this.count, that.count);
+        return Arrays.equals(this.board, that.board) && Arrays.equals(this.played, that.played) && Arrays.equals(this.count, that.count);
 
     }
 

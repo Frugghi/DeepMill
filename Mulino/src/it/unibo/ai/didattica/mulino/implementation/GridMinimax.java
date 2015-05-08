@@ -1,6 +1,5 @@
 package it.unibo.ai.didattica.mulino.implementation;
 
-import fr.avianey.minimax4j.Minimax;
 import it.unibo.ai.didattica.mulino.domain.MillMinimax;
 import it.unibo.ai.didattica.mulino.domain.State;
 
@@ -158,7 +157,7 @@ public class GridMinimax extends IterativeDeepeningMinimax<GridMove> implements 
 
     @Override
     public List<GridMove> getPossibleMoves() {
-        List<GridMove> moves = new ArrayList<GridMove>(3 * count[FREE]);
+        List<GridMove> moves = new ArrayList<>(3 * count[FREE]);
         if (played[currentPlayer] < PIECES) { // Fase 1
             for (int toZ = 0; toZ < Z_SIZE; toZ++) {
                 for (int toX = 0; toX < X_SIZE; toX++) {
@@ -279,11 +278,9 @@ public class GridMinimax extends IterativeDeepeningMinimax<GridMove> implements 
                 }
             }
         } else { // Modifichiamo la board per questo calcolo... non penso sia una grande idea!!
-            boolean willMill = false;
-
             setGridPosition(FREE, fromX, fromZ);
 
-            willMill = willMill(player, Integer.MAX_VALUE, Integer.MAX_VALUE, toX, toZ);
+            boolean willMill = willMill(player, Integer.MAX_VALUE, Integer.MAX_VALUE, toX, toZ);
 
             setGridPosition(player, fromX, fromZ);
 
@@ -370,7 +367,7 @@ public class GridMinimax extends IterativeDeepeningMinimax<GridMove> implements 
         return numberOfMorrises;
     }
     
-    private boolean pieceIsBlocked(int player, int z, int x){
+    private boolean pieceIsBlocked(int z, int x){
         if(x % 2 == 0){ //siamo negli angoli
                 if(grid[z][x == 0 ? 7 : x-1] != FREE && grid[z][x+1] != FREE)
                     return true;
@@ -407,8 +404,9 @@ public class GridMinimax extends IterativeDeepeningMinimax<GridMove> implements 
         for (int z = 0; z < Z_SIZE; z++) {
             for (int x = 1; x < X_SIZE; x+=1) {
                 if(grid[z][x] == player) //ciclo sulle pedine del giocatore
-                    if(this.pieceIsBlocked(player, z, x))
+                    if (this.pieceIsBlocked(z, x)) {
                         totBlocked++;
+                    }
             }
         }
 
@@ -430,29 +428,29 @@ public class GridMinimax extends IterativeDeepeningMinimax<GridMove> implements 
 
     @Override
     public String toString() {
-        StringBuffer result = new StringBuffer();
-        result.append("7 " + grid[0][6] + "--------" + grid[0][5] + "--------" + grid[0][4] + "\n");
-        result.append("6 |--" + grid[1][6] + "-----" + grid[1][5] + "-----" + grid[1][4] + "--|\n");
-        result.append("5 |--|--" + grid[2][6] + "--" + grid[2][5] + "--" + grid[2][4] + "--|--|\n");
-        result.append("4 " + grid[0][7] + "--" + grid[1][7] + "--" + grid[2][7] + "     " + grid[2][3] + "--" + grid[1][3] + "--" + grid[0][3] +"\n");
-        result.append("3 |--|--" + grid[1][0] + "--" + grid[2][1] + "--" + grid[2][2] + "--|--|\n");
-        result.append("2 |--" + grid[1][0] + "-----" + grid[1][1] + "-----" + grid[1][2] + "--|\n");
-        result.append("1 " + grid[0][0] + "--------" + grid[0][1] + "--------" + grid[0][2] + "\n");
-        result.append("  a  b  c  d  e  f  g\n");
-        result.append("White Played Checkers: " + played[PLAYER_W] + ";\n");
-        result.append("Black Played Checkers: " + played[PLAYER_B] + ";\n");
-        result.append("White Checkers On Board: " + count[PLAYER_W] + ";\n");
-        result.append("Black Checkers On Board: " + count[PLAYER_B] + ";\n");
-        result.append("Current player: " + currentPlayer + ";\n");
-        result.append("Opponent player: " + opponentPlayer + ";\n");
-        result.append("\n");
-        
-        result.append("Number of morrises player ("+ PLAYER_W+ ") : "+ this.numberOfMorrises(PLAYER_W)+ "\n");
-        result.append("Number of morrises player ("+ PLAYER_B+ ") : "+ this.numberOfMorrises(PLAYER_B)+ "\n");
-        result.append("Number of pieces blocked player ("+ PLAYER_W+ ") : "+ this.numberOfPiecesBlocked(PLAYER_W)+ "\n");
-        result.append("Number of pieces blocked player ("+ PLAYER_B+ ") : "+ this.numberOfPiecesBlocked(PLAYER_B)+ "\n");
+        String result = "";
+        result += "7 " + grid[0][6] + "--------" + grid[0][5] + "--------" + grid[0][4] + "\n";
+        result += "6 |--" + grid[1][6] + "-----" + grid[1][5] + "-----" + grid[1][4] + "--|\n";
+        result += "5 |--|--" + grid[2][6] + "--" + grid[2][5] + "--" + grid[2][4] + "--|--|\n";
+        result += "4 " + grid[0][7] + "--" + grid[1][7] + "--" + grid[2][7] + "     " + grid[2][3] + "--" + grid[1][3] + "--" + grid[0][3] +"\n";
+        result += "3 |--|--" + grid[1][0] + "--" + grid[2][1] + "--" + grid[2][2] + "--|--|\n";
+        result += "2 |--" + grid[1][0] + "-----" + grid[1][1] + "-----" + grid[1][2] + "--|\n";
+        result += "1 " + grid[0][0] + "--------" + grid[0][1] + "--------" + grid[0][2] + "\n";
+        result += "  a  b  c  d  e  f  g\n";
+        result += "White Played Checkers: " + played[PLAYER_W] + ";\n";
+        result += "Black Played Checkers: " + played[PLAYER_B] + ";\n";
+        result += "White Checkers On Board: " + count[PLAYER_W] + ";\n";
+        result += "Black Checkers On Board: " + count[PLAYER_B] + ";\n";
+        result += "Current player: " + currentPlayer + ";\n";
+        result += "Opponent player: " + opponentPlayer + ";\n";
+        result += "\n";
 
-        return result.toString();
+        result += "Number of morrises player ("+ PLAYER_W+ ") : "+ this.numberOfMorrises(PLAYER_W)+ "\n";
+        result += "Number of morrises player ("+ PLAYER_B+ ") : "+ this.numberOfMorrises(PLAYER_B)+ "\n";
+        result += "Number of pieces blocked player ("+ PLAYER_W+ ") : "+ this.numberOfPiecesBlocked(PLAYER_W)+ "\n";
+        result += "Number of pieces blocked player ("+ PLAYER_B+ ") : "+ this.numberOfPiecesBlocked(PLAYER_B)+ "\n";
+
+        return result;
     }
     
 }

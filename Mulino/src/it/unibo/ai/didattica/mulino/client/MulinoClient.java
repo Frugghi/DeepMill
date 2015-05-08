@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 import fr.avianey.minimax4j.Minimax;
 import it.unibo.ai.didattica.mulino.actions.Action;
@@ -20,11 +19,10 @@ import it.unibo.ai.didattica.mulino.implementation.GridMinimax;
 public class MulinoClient {
 
     private State.Checker player;
-    private Socket playerSocket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
 
-    public MulinoClient(State.Checker player) throws UnknownHostException, IOException {
+    public MulinoClient(State.Checker player) throws IOException {
         this.player = player;
         int port = 0;
         switch (player) {
@@ -37,7 +35,7 @@ public class MulinoClient {
             default:
                 System.exit(5);
         }
-        playerSocket = new Socket("localhost", port);
+        Socket playerSocket = new Socket("localhost", port);
         out = new ObjectOutputStream(playerSocket.getOutputStream());
         in = new ObjectInputStream(new BufferedInputStream(playerSocket.getInputStream()));
     }
@@ -186,7 +184,7 @@ public class MulinoClient {
                 humanPlayer.start();
                 break;
             case IA:
-                MillMinimax ia = null;
+                MillMinimax ia;
                 if (bitState) {
                     ia = new BitBoardMinimax(algorithm, useHeuristic);
                 } else {

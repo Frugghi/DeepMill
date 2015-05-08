@@ -13,8 +13,7 @@ public class Player extends Thread {
         IA ("DeepMill"),
         REPLAY ("Replay");
         private final String name;
-        private Behaviour(String s) { name = s; }
-        public boolean equalsName(String otherName){ return (otherName == null)? false:name.equals(otherName); }
+        Behaviour(String s) { name = s; }
         public String toString(){ return name; }
     }
 
@@ -53,8 +52,8 @@ public class Player extends Thread {
     public void run() {
         boolean myTurn = (color == it.unibo.ai.didattica.mulino.domain.State.Checker.WHITE);
         String actionString = "";
-        it.unibo.ai.didattica.mulino.domain.State currentState = null;
-        BufferedReader in = null;
+        it.unibo.ai.didattica.mulino.domain.State currentState;
+        BufferedReader in;
         switch (behaviour) {
             case HUMAN:
                 in = new BufferedReader(new InputStreamReader(System.in));
@@ -74,7 +73,7 @@ public class Player extends Thread {
 
         MillMove move;
 
-        MulinoClient client = null;
+        MulinoClient client;
         try {
             client = new MulinoClient(color);
         } catch (IOException e) {
@@ -140,7 +139,7 @@ public class Player extends Thread {
                 case HUMAN:
                     try {
                         actionString = in.readLine();
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                         return;
                     }
