@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove> implements MillMinimax<BitBoardMove> {
+public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Long> implements MillMinimax<BitBoardMove> {
 	
     public static final int PIECES = 9;
 

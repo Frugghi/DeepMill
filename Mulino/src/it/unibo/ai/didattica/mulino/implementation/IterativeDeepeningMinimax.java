@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class IterativeDeepeningMinimax<M extends Move> extends HeuristicMinimax<M> {
+public abstract class IterativeDeepeningMinimax<M extends Move, T extends Comparable<T>> extends HeuristicMinimax<M, T> {
 
     protected int depth;
 

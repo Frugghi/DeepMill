@@ -5,10 +5,11 @@ import fr.avianey.minimax4j.Move;
 
 import java.util.*;
 
-public abstract class HeuristicMinimax<M extends Move> extends Minimax<M> {
+public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> extends Minimax<M> {
 
     private int maxDepth;
     private Map<Integer, List<Move>> killerMoves = new HashMap<>();
+    private Map<T, TranspositionTableEntry> transpositionTable = new HashMap<>();
     private int currentDepth;
     private int nodesCount;
     private boolean useHeuristic;
@@ -33,8 +34,18 @@ public abstract class HeuristicMinimax<M extends Move> extends Minimax<M> {
         }
     };
 
-    static final class MoveWrapper<M extends Move> {
+    private static final class MoveWrapper<M extends Move> {
         public M move;
+    }
+
+    private static enum ScoreType {
+        LOWER_BOUND, UPPER_BOUND, EXACT_SCORE;
+    }
+
+    private static final class TranspositionTableEntry<M extends Move> {
+        public double score;
+        public M move;
+        public ScoreType type;
     }
 
     public HeuristicMinimax(Algorithm algo, boolean useHeuristic) {
@@ -102,6 +113,8 @@ public abstract class HeuristicMinimax<M extends Move> extends Minimax<M> {
             }
         }
         this.killerMoves = killerMoves;
+
+        this.transpositionTable.clear();
     }
 
     private List<M> sortMoves(List<M> moves) {
@@ -110,13 +123,18 @@ public abstract class HeuristicMinimax<M extends Move> extends Minimax<M> {
         return moves;
     }
 
+    public abstract T getTransposition();
+
+    public Collection<T> getSymetricTranspositions() {
+        return Collections.singleton(getTransposition());
+    }
 
     /*
      * Negascout
      * w/ Killer Heuristic
      */
 
-    private double negascout(final MoveWrapper<M> wrapper, final int depth, double alpha, double beta) {
+    private double negascout(final MoveWrapper<M> wrapper, final int depth, final double alpha, final double beta) {
         this.nodesCount++;
 
         if (depth == 0 || isOver()) {
@@ -130,11 +148,12 @@ public abstract class HeuristicMinimax<M extends Move> extends Minimax<M> {
 
         List<M> moves = sortMoves(getPossibleMoves());
 
+        double a = alpha;
         double b = beta;
         M bestMove = null;
         if (moves.isEmpty()) {
             next();
-            double score = negascoutScore(true, depth, alpha, beta, b);
+            double score = negascoutScore(true, depth, a, beta, b);
             previous();
             return score;
         }
@@ -143,10 +162,10 @@ public abstract class HeuristicMinimax<M extends Move> extends Minimax<M> {
         boolean first = true;
         for (M move : moves) {
             makeMove(move);
-            score = negascoutScore(first, depth, alpha, beta, b);
+            score = negascoutScore(first, depth, a, beta, b);
             unmakeMove(move);
-            if (score > alpha) {
-                alpha = score;
+            if (score > a) {
+                a = score;
                 bestMove = move;
 
                 List<Move> currentDepthKillerMoves = this.killerMoves.get(this.currentDepth);
@@ -157,17 +176,25 @@ public abstract class HeuristicMinimax<M extends Move> extends Minimax<M> {
                     currentDepthKillerMoves.add(0, move);
                 }
 
-                if (alpha >= beta) {
+                if (a >= beta) {
                     break;
                 }
             }
-            b = alpha + 1;
+            b = a + 1;
             first = false;
         }
         if (wrapper != null) {
             wrapper.move = bestMove;
         }
-        return alpha;
+
+        TranspositionTableEntry entry = new TranspositionTableEntry();
+        entry.move = bestMove;
+        entry.score = a;
+        entry.type = (a <= alpha ?  ScoreType.LOWER_BOUND :
+                     (b >= beta  ?  ScoreType.UPPER_BOUND :
+                                    ScoreType.EXACT_SCORE));
+
+        return a;
     }
 
     @Override

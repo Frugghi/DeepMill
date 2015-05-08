@@ -6,7 +6,7 @@ import it.unibo.ai.didattica.mulino.domain.State;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GridMinimax extends IterativeDeepeningMinimax<GridMove> implements MillMinimax<GridMove> {
+public class GridMinimax extends IterativeDeepeningMinimax<GridMove, Integer> implements MillMinimax<GridMove> {
 
     public static final int PIECES = 9;
 
@@ -340,7 +340,6 @@ public class GridMinimax extends IterativeDeepeningMinimax<GridMove> implements 
     public double maxEvaluateValue() {
         return 100;
     }
-    
 
     private int numberOfMorrises(int player){
         int numberOfMorrises = 0;
@@ -424,6 +423,11 @@ public class GridMinimax extends IterativeDeepeningMinimax<GridMove> implements 
     public void previous() {
         currentPlayer = 3 - currentPlayer;
         opponentPlayer = 3 - opponentPlayer;
+    }
+
+    @Override
+    public Integer getTransposition() {
+        return null;
     }
 
     @Override
