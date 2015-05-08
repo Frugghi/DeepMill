@@ -9,17 +9,9 @@ import java.util.Map;
 public abstract class IterativeDeepeningMinimax<M extends Move> extends HeuristicMinimax<M> {
 
     protected int depth;
-    private boolean abort;
-    private Map<Integer,Double> hashMap = new HashMap<>();
 
     public IterativeDeepeningMinimax(Algorithm algo, boolean useHeuristic) {
         super(algo, useHeuristic);
-
-        this.abort = false;
-    }
-
-    public Map<Integer,Double> getHashMap() {
-        return this.hashMap;
     }
 
     public M getBestMove(final int maxDepth, final int maxTime) {
@@ -27,7 +19,7 @@ public abstract class IterativeDeepeningMinimax<M extends Move> extends Heuristi
             public void run() {
                 try {
                     Thread.sleep(maxTime);
-                    IterativeDeepeningMinimax.this.abort = true;
+                    IterativeDeepeningMinimax.this.setAbort(true);
                 } catch (InterruptedException e) {
                 }
             }
@@ -47,21 +39,19 @@ public abstract class IterativeDeepeningMinimax<M extends Move> extends Heuristi
 
     @Override
     public M getBestMove(final int maxDepth) {
-        this.abort = false;
-
         this.purgeHeuristic(2);
 
         M bestMove = null;
-        for (this.depth = 1; this.depth != maxDepth && !this.abort; this.depth++) {
+        for (this.depth = 1; this.depth != maxDepth && !this.shouldAbort(); this.depth++) {
             System.out.print("Depth " + this.depth);
 
             M move = super.getBestMove(this.depth);
 
-            if (!this.abort) {
+            if (!this.shouldAbort()) {
                 bestMove = move;
 
                 this.makeMove(bestMove);
-                this.abort = this.isOver();
+                this.setAbort(this.isOver());
                 this.unmakeMove(bestMove);
 
                 System.out.println("... done! " + this.getNodesCount() + " nodes evaluated.");
@@ -70,68 +60,8 @@ public abstract class IterativeDeepeningMinimax<M extends Move> extends Heuristi
             }
         }
 
-        this.abort = false;
+        this.setAbort(false);
         return bestMove;
-    }
-    
-    private void updateHashMap(int depth, double score) {
-
-	}
-
-    @Override
-    protected double minimaxScore(int depth, int who) {
-        if (this.abort) {
-            return this.maxEvaluateValue();
-        } else {
-            // salvare lo score + depth bla bla
-            double score = super.minimaxScore(depth, who);
-
-            updateHashMap(depth, score);
-
-            return score;
-        }
-    }
-
-	@Override
-    protected double alphabetaScore(int depth, int who, double alpha, double beta) {
-        if (this.abort) {
-            return this.maxEvaluateValue();
-        } else {
-            // salvare lo score + depth bla bla
-            double score = super.alphabetaScore(depth, who, alpha, beta);
-
-            updateHashMap(depth, score);
-
-            return score;
-        }
-    }
-
-    @Override
-    protected double negamaxScore(int depth, double alpha, double beta) {
-        if (this.abort) {
-            return this.maxEvaluateValue();
-        } else {
-            // salvare lo score + depth bla bla
-            double score = super.negamaxScore(depth, alpha, beta);
-
-            updateHashMap(depth, score);
-
-            return score;
-        }
-    }
-
-    @Override
-    protected double negascoutScore(boolean first, int depth, double alpha, double beta, double b) {
-        if (this.abort) {
-            return this.maxEvaluateValue();
-        } else {
-            // salvare lo score + depth bla bla
-            double score = super.negascoutScore(first, depth, alpha, beta, b);
-
-            updateHashMap(depth, score);
-
-            return score;
-        }
     }
 
 }
