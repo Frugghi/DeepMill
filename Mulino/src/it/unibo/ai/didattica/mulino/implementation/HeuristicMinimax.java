@@ -66,6 +66,18 @@ public abstract class HeuristicMinimax<M extends Move> extends Minimax<M> {
             return super.getBestMove(depth);
         }
 
+        /* Se abbiamo delle killer moves da prima
+         * shiftiamo di 2 la depth per riutilizzarle.
+         * 2 perche' sono state fatte 2 mosse
+         */
+        Map<Integer, List<Move>> killerMoves = new HashMap<>();
+        for (Integer key : this.killerMoves.keySet()) {
+            if (key > 1) {
+                killerMoves.put(key - 2, this.killerMoves.get(key));
+            }
+        }
+        this.killerMoves = killerMoves;
+
         MoveWrapper<M> wrapper = new MoveWrapper<>();
         switch (this.getAlgo()) {
             case NEGASCOUT:
