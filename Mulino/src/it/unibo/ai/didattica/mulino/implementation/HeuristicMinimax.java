@@ -13,7 +13,7 @@ public abstract class HeuristicMinimax<M extends Move> extends Minimax<M> {
     private int nodesCount;
     private boolean useHeuristic;
 
-    final Comparator<Move> KillerComparator = new Comparator<Move>() {
+    private final Comparator<Move> KillerComparator = new Comparator<Move>() {
 
         @Override
         public int compare(Move o1, Move o2) {
@@ -67,6 +67,7 @@ public abstract class HeuristicMinimax<M extends Move> extends Minimax<M> {
         }
 
         MoveWrapper<M> wrapper = new MoveWrapper<>();
+
         switch (this.getAlgo()) {
             case NEGASCOUT:
                 negascout(wrapper, depth, -maxEvaluateValue(), maxEvaluateValue());
@@ -118,37 +119,37 @@ public abstract class HeuristicMinimax<M extends Move> extends Minimax<M> {
             double score = negascoutScore(true, depth, alpha, beta, b);
             previous();
             return score;
-        } else {
-            double score;
-            boolean first = true;
-            for (M move : moves) {
-                makeMove(move);
-                score = negascoutScore(first, depth, alpha, beta, b);
-                unmakeMove(move);
-                if (score > alpha) {
-                    alpha = score;
-                    bestMove = move;
-
-                    List<Move> currentDepthKillerMoves = this.killerMoves.get(this.currentDepth);
-                    if (!currentDepthKillerMoves.contains(move)) {
-                        if (currentDepthKillerMoves.size() >= 2) {
-                            currentDepthKillerMoves.remove(1);
-                        }
-                        currentDepthKillerMoves.add(0, move);
-                    }
-
-                    if (alpha >= beta) {
-                        break;
-                    }
-                }
-                b = alpha + 1;
-                first = false;
-            }
-            if (wrapper != null) {
-                wrapper.move = bestMove;
-            }
-            return alpha;
         }
+
+        double score;
+        boolean first = true;
+        for (M move : moves) {
+            makeMove(move);
+            score = negascoutScore(first, depth, alpha, beta, b);
+            unmakeMove(move);
+            if (score > alpha) {
+                alpha = score;
+                bestMove = move;
+
+                List<Move> currentDepthKillerMoves = this.killerMoves.get(this.currentDepth);
+                if (!currentDepthKillerMoves.contains(move)) {
+                    if (currentDepthKillerMoves.size() >= 2) {
+                        currentDepthKillerMoves.remove(1);
+                    }
+                    currentDepthKillerMoves.add(0, move);
+                }
+
+                if (alpha >= beta) {
+                    break;
+                }
+            }
+            b = alpha + 1;
+            first = false;
+        }
+        if (wrapper != null) {
+            wrapper.move = bestMove;
+        }
+        return alpha;
     }
 
     @Override

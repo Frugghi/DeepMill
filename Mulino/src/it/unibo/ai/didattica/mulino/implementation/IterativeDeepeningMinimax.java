@@ -59,6 +59,11 @@ public abstract class IterativeDeepeningMinimax<M extends Move> extends Heuristi
 
             if (!this.abort) {
                 bestMove = move;
+
+                this.makeMove(bestMove);
+                this.abort = this.isOver();
+                this.unmakeMove(bestMove);
+
                 System.out.println("... done! " + this.getNodesCount() + " nodes evaluated.");
             } else {
                 System.out.println("... aborted!");
@@ -86,8 +91,6 @@ public abstract class IterativeDeepeningMinimax<M extends Move> extends Heuristi
             return score;
         }
     }
-
-    
 
 	@Override
     protected double alphabetaScore(int depth, int who, double alpha, double beta) {
@@ -129,13 +132,6 @@ public abstract class IterativeDeepeningMinimax<M extends Move> extends Heuristi
 
             return score;
         }
-    }
-
-    public List<M> getOrderedPossibleMoves(List<M> moves) {
-
-        // ordinare le mosse secondo i punteggi salvati
-
-        return moves;
     }
 
 }
