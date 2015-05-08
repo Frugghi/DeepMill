@@ -49,6 +49,8 @@ public abstract class IterativeDeepeningMinimax<M extends Move> extends Heuristi
     public M getBestMove(final int maxDepth) {
         this.abort = false;
 
+        this.purgeHeuristic(2);
+
         M bestMove = null;
         for (this.depth = 1; this.depth != maxDepth && !this.abort; this.depth++) {
             System.out.print("Depth " + this.depth);
