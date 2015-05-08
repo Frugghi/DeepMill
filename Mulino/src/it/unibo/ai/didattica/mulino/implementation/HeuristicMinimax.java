@@ -12,6 +12,7 @@ public abstract class HeuristicMinimax<M extends Move> extends Minimax<M> {
     private int currentDepth;
     private int nodesCount;
     private boolean useHeuristic;
+    private boolean abort;
 
     private final Comparator<Move> KillerComparator = new Comparator<Move>() {
 
@@ -54,7 +55,17 @@ public abstract class HeuristicMinimax<M extends Move> extends Minimax<M> {
         this.useHeuristic = useHeuristic;
     }
 
+    public boolean shouldAbort() {
+        return this.abort;
+    }
+
+    public void setAbort(boolean abort) {
+        this.abort = abort;
+    }
+
     public M getBestMove(final int depth) {
+        this.setAbort(false);
+
         if (depth <= 0) {
             throw new IllegalArgumentException("Search depth MUST be > 0");
         }
@@ -92,6 +103,13 @@ public abstract class HeuristicMinimax<M extends Move> extends Minimax<M> {
         }
         this.killerMoves = killerMoves;
     }
+
+    private List<M> sortMoves(List<M> moves) {
+        Collections.sort(moves, KillerComparator);
+
+        return moves;
+    }
+
 
     /*
      * Negascout
@@ -132,7 +150,7 @@ public abstract class HeuristicMinimax<M extends Move> extends Minimax<M> {
                 bestMove = move;
 
                 List<Move> currentDepthKillerMoves = this.killerMoves.get(this.currentDepth);
-                if (!currentDepthKillerMoves.contains(move)) {
+                if (!this.abort && !currentDepthKillerMoves.contains(move)) {
                     if (currentDepthKillerMoves.size() >= 2) {
                         currentDepthKillerMoves.remove(1);
                     }
@@ -153,7 +171,38 @@ public abstract class HeuristicMinimax<M extends Move> extends Minimax<M> {
     }
 
     @Override
+    protected double minimaxScore(int depth, int who) {
+        if (this.abort) {
+            return this.maxEvaluateValue();
+        } else {
+            return super.minimaxScore(depth, who);
+        }
+    }
+
+    @Override
+    protected double alphabetaScore(int depth, int who, double alpha, double beta) {
+        if (this.abort) {
+            return this.maxEvaluateValue();
+        } else {
+            return super.alphabetaScore(depth, who, alpha, beta);
+        }
+    }
+
+    @Override
+    protected double negamaxScore(int depth, double alpha, double beta) {
+        if (this.abort) {
+            return this.maxEvaluateValue();
+        } else {
+            return super.negamaxScore(depth, alpha, beta);
+        }
+    }
+
+    @Override
     protected double negascoutScore(final boolean first, final int depth, final double alpha, final double beta, final double b) {
+        if (this.abort) {
+            return this.maxEvaluateValue();
+        }
+
         if (!this.useHeuristic) {
             return super.negascoutScore(first, depth, alpha, beta, b);
         }
@@ -164,12 +213,6 @@ public abstract class HeuristicMinimax<M extends Move> extends Minimax<M> {
             score = -negascout(null, depth - 1, -beta, -alpha);
         }
         return score;
-    }
-
-    private List<M> sortMoves(List<M> moves) {
-        Collections.sort(moves, KillerComparator);
-
-        return moves;
     }
 
 }
