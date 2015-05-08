@@ -152,8 +152,8 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove> imp
 
     private BitBoardMove lastMove;
 
-    public BitBoardMinimax(Algorithm algo) {
-        super(algo);
+    public BitBoardMinimax(Algorithm algo, boolean useHeuristic) {
+        super(algo, useHeuristic);
 
         this.board = new int[2];
         this.board[PLAYER_W] = 0;
@@ -211,24 +211,6 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove> imp
         } else {
             this.board[player] |= i;
         }
-    }
-
-    public Object cloneState() {
-        BitBoardMinimax clone = new BitBoardMinimax(this.getAlgo());
-
-        clone.currentPlayer = this.currentPlayer;
-        clone.opponentPlayer = this.opponentPlayer;
-
-        clone.board[PLAYER_W] = this.board[PLAYER_W];
-        clone.board[PLAYER_B] = this.board[PLAYER_B];
-
-        clone.count[PLAYER_W] = this.count[PLAYER_W];
-        clone.count[PLAYER_B] = this.count[PLAYER_B];
-
-        clone.played[PLAYER_W] = this.played[PLAYER_W];
-        clone.played[PLAYER_B] = this.played[PLAYER_B];
-
-        return clone;
     }
 
     @Override

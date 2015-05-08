@@ -11,7 +11,4 @@ public interface MillMinimax<M extends MillMove> {
     void makeMove(M move);
     void unmakeMove(M move);
     M getBestMove(int depth, int maxTime);
-
-    Object cloneState();
-
 }

@@ -27,8 +27,8 @@ public class GridMinimax extends IterativeDeepeningMinimax<GridMove> implements 
 
     private GridMove lastMove;
 
-    public GridMinimax(Algorithm algo) {
-        super(algo);
+    public GridMinimax(Algorithm algo, boolean useHeuristic) {
+        super(algo, useHeuristic);
 
         this.grid = new int[Z_SIZE][X_SIZE];
         this.played = new int[3];
@@ -453,29 +453,6 @@ public class GridMinimax extends IterativeDeepeningMinimax<GridMove> implements 
         result.append("Number of pieces blocked player ("+ PLAYER_B+ ") : "+ this.numberOfPiecesBlocked(PLAYER_B)+ "\n");
 
         return result.toString();
-    }
-
-    public GridMinimax cloneState() {
-        GridMinimax clone = new GridMinimax(this.getAlgo());
-
-        for (int z = 0; z < Z_SIZE; z++) {
-            for (int x = 0; x < X_SIZE; x++) {
-                clone.grid[z][x] = this.grid[z][x];
-            }
-        }
-
-        clone.currentPlayer = this.currentPlayer;
-        clone.opponentPlayer = this.opponentPlayer;
-
-        clone.count[FREE] = this.count[FREE];
-        clone.count[PLAYER_W] = this.count[PLAYER_W];
-        clone.count[PLAYER_B] = this.count[PLAYER_B];
-
-        clone.played[FREE] = this.played[FREE];
-        clone.played[PLAYER_W] = this.played[PLAYER_W];
-        clone.played[PLAYER_B] = this.played[PLAYER_B];
-
-        return clone;
     }
     
 }

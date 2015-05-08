@@ -1,20 +1,19 @@
 package it.unibo.ai.didattica.mulino.implementation;
 
-import fr.avianey.minimax4j.Minimax;
 import fr.avianey.minimax4j.Move;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class IterativeDeepeningMinimax<M extends Move> extends Minimax<M> {
+public abstract class IterativeDeepeningMinimax<M extends Move> extends HeuristicMinimax<M> {
 
     protected int depth;
     private boolean abort;
     private Map<Integer,Double> hashMap = new HashMap<>();
 
-    public IterativeDeepeningMinimax(Algorithm algo) {
-        super(algo);
+    public IterativeDeepeningMinimax(Algorithm algo, boolean useHeuristic) {
+        super(algo, useHeuristic);
 
         this.abort = false;
     }
@@ -58,7 +57,7 @@ public abstract class IterativeDeepeningMinimax<M extends Move> extends Minimax<
 
             if (!this.abort) {
                 bestMove = move;
-                System.out.println("... done! " + this.nodesCount + " nodes evaluated.");
+                System.out.println("... done! " + this.getNodesCount() + " nodes evaluated.");
             } else {
                 System.out.println("... aborted!");
             }
@@ -123,20 +122,6 @@ public abstract class IterativeDeepeningMinimax<M extends Move> extends Minimax<
         } else {
             // salvare lo score + depth bla bla
             double score = super.negascoutScore(first, depth, alpha, beta, b);
-
-            updateHashMap(depth, score);
-
-            return score;
-        }
-    }
-
-    @Override
-    protected double killerNegascoutScore(boolean first, int depth, double alpha, double beta, double b) {
-        if (this.abort) {
-            return this.maxEvaluateValue();
-        } else {
-            // salvare lo score + depth bla bla
-            double score = super.killerNegascoutScore(first, depth, alpha, beta, b);
 
             updateHashMap(depth, score);
 

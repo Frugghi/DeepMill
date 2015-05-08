@@ -101,8 +101,9 @@ public class MulinoClient {
             System.out.println("-h --human     Set the player as Human");
             System.out.println("-i --ia        Set the player as IA");
             System.out.println("-a <algorithm> Set the IA algorithm: minimax, alpha_beta, negamax, negascout");
-            System.out.println("-d <depth>     Set the IA algorithm's search depth (override iterative deepening)");
+            System.out.println("-d <depth>     Set the IA algorithm's max search depth (default is no limit)");
             System.out.println("-t <time>      Search w/ iterative deepening for <time> seconds");
+            System.out.println("--no-heuristic Disable the algorithm's heuristic");
             System.out.println("--debug        Print the debug output to standard output");
             System.out.println("--grid         Use grid state");
             System.out.println("--bit          Use bit state");
@@ -112,11 +113,12 @@ public class MulinoClient {
 
         Player.Behaviour behaviour = Player.Behaviour.IA;
         State.Checker playerColor = State.Checker.WHITE;
-        Minimax.Algorithm algorithm = Minimax.Algorithm.KILLERNEGASCOUT;
+        Minimax.Algorithm algorithm = Minimax.Algorithm.NEGASCOUT;
         int depth = 0;
         int maxTime = 58;
         boolean debug = false;
         boolean bitState = true;
+        boolean useHeuristic = true;
         String replay = null;
         for (int i = 0; i < args.length; i++) {
             switch (args[i].toLowerCase()) {
@@ -150,9 +152,6 @@ public class MulinoClient {
                         case "negascout":
                             algorithm = Minimax.Algorithm.NEGASCOUT;
                             break;
-                        case "killer_negascout":
-                            algorithm = Minimax.Algorithm.KILLERNEGASCOUT;
-                            break;
                     }
                     break;
                 case "-d":
@@ -160,6 +159,9 @@ public class MulinoClient {
                     break;
                 case "-t":
                     maxTime = Integer.parseInt(args[++i]);
+                    break;
+                case "--no-heuristic":
+                    useHeuristic = false;
                     break;
                 case "--debug":
                     debug = true;
@@ -186,9 +188,9 @@ public class MulinoClient {
             case IA:
                 MillMinimax ia = null;
                 if (bitState) {
-                    ia = new BitBoardMinimax(algorithm);
+                    ia = new BitBoardMinimax(algorithm, useHeuristic);
                 } else {
-                    ia = new GridMinimax(algorithm);
+                    ia = new GridMinimax(algorithm, useHeuristic);
                 }
 
                 Player iaPlayer = new Player(playerColor, ia, depth, maxTime);
