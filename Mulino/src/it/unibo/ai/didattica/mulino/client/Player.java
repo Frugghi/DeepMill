@@ -106,13 +106,19 @@ public class Player extends Thread {
                 System.out.println("Your Opponent did his move, and the result is:\n" + currentState.toString());
 
                 if (behaviour == Behaviour.IA) {
-                    for (String position : currentState.getPositions()) {
-                        ia.setGridPosition(currentState.getBoard().get(position), position);
-                    }
-
-                    ia.setCount(currentState.getWhiteCheckersOnBoard(), currentState.getBlackCheckersOnBoard());
-                    ia.setPlayed(ia.maxPlayedPieces() - currentState.getWhiteCheckers(), ia.maxPlayedPieces() - currentState.getBlackCheckers());
-                    ia.next();
+                	
+                	MillMinimax state=ia.convertState(currentState);
+                	
+                	for(Object m : ia.getPossibleMoves()){
+                		ia.makeMove((MillMove)m); 
+                		if(state.equals(ia)){
+                			break;
+                		}
+                		ia.unmakeMove((MillMove)m);
+                	}
+                	
+                	if(!state.equals(ia))
+                		ia=state;
 
                     if (debug) System.out.println("DEEPMILL DEBUG: \n" + ia.toString());
                 }

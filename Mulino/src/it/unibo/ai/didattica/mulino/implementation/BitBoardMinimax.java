@@ -1,6 +1,7 @@
 package it.unibo.ai.didattica.mulino.implementation;
 
 import it.unibo.ai.didattica.mulino.domain.MillMinimax;
+import it.unibo.ai.didattica.mulino.domain.MillMove;
 import it.unibo.ai.didattica.mulino.domain.State;
 
 import java.util.ArrayList;
@@ -149,8 +150,6 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
     private int currentPlayer;
     private int opponentPlayer;
 
-    private BitBoardMove lastMove;
-
     public BitBoardMinimax(Algorithm algo, boolean useHeuristic) {
         super(algo, useHeuristic);
 
@@ -225,7 +224,8 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
 
     @Override
     public void makeMove(BitBoardMove move) {
-        this.lastMove = move;
+       
+        this.movesHistory.add(0, move);
 
         this.setGridPosition(this.currentPlayer, move.getTo());
 
@@ -247,10 +247,9 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
 
     @Override
     public void unmakeMove(BitBoardMove move) {
-        this.lastMove = null;
-
+    	this.movesHistory.remove(0);
         this.previous();
-
+        
         this.setGridPosition(FREE, move.getTo());
 
         if (move.isPutMove()) {
@@ -356,7 +355,7 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
             return -this.maxEvaluateValue();
         }
 
-        int lastMove = (this.lastMove != null && this.lastMove.isRemoveMove() ? 1 : 0);
+        int lastMove = (!this.movesHistory.isEmpty() && this.movesHistory.get(0).isRemoveMove() ? 1 : 0);
 
         if (this.played[PLAYER_B] < PIECES && this.played[PLAYER_W] < PIECES) { // Fase 1
             return 18 * lastMove +
@@ -603,5 +602,20 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
         result = 31 * result + this.currentPlayer;
         result = 31 * result + this.opponentPlayer;
         return result;
+    }
+    
+    public MillMinimax convertState(State currentState){
+    	
+    	BitBoardMinimax ia = new BitBoardMinimax(this.getAlgo(), this.isUsingHeuristic());
+    	
+    	 for (String position : currentState.getPositions()) {
+             ia.setGridPosition(currentState.getBoard().get(position), position);
+         }
+
+         ia.setCount(currentState.getWhiteCheckersOnBoard(), currentState.getBlackCheckersOnBoard());
+         ia.setPlayed(ia.maxPlayedPieces() - currentState.getWhiteCheckers(), ia.maxPlayedPieces() - currentState.getBlackCheckers());
+         ia.next();
+         
+         return ia;
     }
 }

@@ -457,4 +457,18 @@ public class GridMinimax extends IterativeDeepeningMinimax<GridMove, Integer> im
         return result;
     }
     
+  public MillMinimax convertState(State currentState){
+    	
+    	GridMinimax ia = new GridMinimax(this.getAlgo(), this.isUsingHeuristic());
+    	
+    	 for (String position : currentState.getPositions()) {
+             ia.setGridPosition(currentState.getBoard().get(position), position);
+         }
+
+         ia.setCount(currentState.getWhiteCheckersOnBoard(), currentState.getBlackCheckersOnBoard());
+         ia.setPlayed(ia.maxPlayedPieces() - currentState.getWhiteCheckers(), ia.maxPlayedPieces() - currentState.getBlackCheckers());
+         ia.next();
+         
+         return ia;
+    }
 }

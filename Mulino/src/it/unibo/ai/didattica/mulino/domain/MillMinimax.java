@@ -1,5 +1,7 @@
 package it.unibo.ai.didattica.mulino.domain;
 
+import java.util.List;
+
 public interface MillMinimax<M extends MillMove> {
 
     void setPlayed(int white, int black);
@@ -11,4 +13,6 @@ public interface MillMinimax<M extends MillMove> {
     void makeMove(M move);
     void unmakeMove(M move);
     M getBestMove(int depth, int maxTime);
+    MillMinimax convertState(State state);
+    List<M> getPossibleMoves();
 }

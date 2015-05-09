@@ -14,6 +14,7 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
     private int nodesCount;
     private boolean useHeuristic;
     private boolean abort;
+    protected List<M> movesHistory = new ArrayList<> ();
 
     private final Comparator<Move> KillerComparator = new Comparator<Move>() {
 
@@ -119,6 +120,19 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
 
     private List<M> sortMoves(List<M> moves) {
         Collections.sort(moves, KillerComparator);
+    
+        if(movesHistory.size()>= 4 && movesHistory.get(0).equals(movesHistory.get(2)) &&
+        		movesHistory.get(1).equals(movesHistory.get(3))){
+        	
+        	int index=moves.indexOf(movesHistory.get(1));
+        	
+        	if ( index != -1 ){
+        		moves.add(moves.remove(index));
+        	}
+        		
+        	
+        }
+        	
 
         return moves;
     }
