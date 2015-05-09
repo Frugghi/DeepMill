@@ -106,19 +106,19 @@ public class Player extends Thread {
                 System.out.println("Your Opponent did his move, and the result is:\n" + currentState.toString());
 
                 if (behaviour == Behaviour.IA) {
-                	
-                	MillMinimax state=ia.convertState(currentState);
+                	MillMinimax state = ia.convertState(currentState);
                 	
                 	for(Object m : ia.getPossibleMoves()){
                 		ia.makeMove((MillMove)m); 
-                		if(state.equals(ia)){
-                			break;
-                		}
+                		if (state.equals(ia)) {
+                            break;
+                        }
                 		ia.unmakeMove((MillMove)m);
                 	}
                 	
-                	if(!state.equals(ia))
-                		ia=state;
+                	if (!state.equals(ia)) {
+                        ia = state;
+                    }
 
                     if (debug) System.out.println("DEEPMILL DEBUG: \n" + ia.toString());
                 }

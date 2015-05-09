@@ -121,18 +121,14 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
     private List<M> sortMoves(List<M> moves) {
         Collections.sort(moves, KillerComparator);
     
-        if(movesHistory.size()>= 4 && movesHistory.get(0).equals(movesHistory.get(2)) &&
-        		movesHistory.get(1).equals(movesHistory.get(3))){
-        	
-        	int index=moves.indexOf(movesHistory.get(1));
-        	
-        	if ( index != -1 ){
-        		moves.add(moves.remove(index));
-        	}
-        		
-        	
+        if (this.movesHistory.size()>= 4 && this.movesHistory.get(0).equals(this.movesHistory.get(2)) && this.movesHistory.get(1).equals(this.movesHistory.get(3))){
+
+            int index = moves.indexOf(this.movesHistory.get(1));
+
+            if (index != -1) {
+                moves.add(moves.remove(index));
+            }
         }
-        	
 
         return moves;
     }

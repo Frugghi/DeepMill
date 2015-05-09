@@ -224,7 +224,6 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
 
     @Override
     public void makeMove(BitBoardMove move) {
-       
         this.movesHistory.add(0, move);
 
         this.setGridPosition(this.currentPlayer, move.getTo());
@@ -248,6 +247,7 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
     @Override
     public void unmakeMove(BitBoardMove move) {
     	this.movesHistory.remove(0);
+
         this.previous();
         
         this.setGridPosition(FREE, move.getTo());
@@ -567,6 +567,12 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
         result += "Number of 2 pieces configurations player (B) : " + this.numberOf2PiecesConfiguration(PLAYER_B) + "\n";
         result += "Number of 3 pieces configurations player (W) : " + this.numberOf3PiecesConfiguration(PLAYER_W) + "\n";
         result += "Number of 3 pieces configurations player (B) : " + this.numberOf3PiecesConfiguration(PLAYER_B) + "\n";
+
+        result += "Moves history: ";
+        for (BitBoardMove move : this.movesHistory) {
+            result += move.toStringMove() + ", ";
+        }
+        result += "\n";
 
         return result;
     }
