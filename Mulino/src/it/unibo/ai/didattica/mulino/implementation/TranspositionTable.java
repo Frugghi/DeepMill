@@ -73,7 +73,12 @@ public class TranspositionTable<T extends Comparable<T>, M extends Move> {
     }
 
     public void put(T hash, Entry<M> entry) {
-        this.table.put(hash, entry);
+        Entry<M> oldEntry = this.table.get(hash);
+        if (oldEntry != null && oldEntry.depth > entry.depth) {
+            return;
+        } else {
+            this.table.put(hash, entry);
+        }
     }
 
     public void clear() {
