@@ -18,8 +18,9 @@ public class BoardEvaluator {
         System.out.println("2 - Evaluate board");
         System.out.println("3 - Generate possible moves");
         System.out.println("4 - Unmake last move");
-        System.out.println("5 - Clear board");
-        System.out.println("6 - Exit");
+        System.out.println("5 - Swap players");
+        System.out.println("6 - Clear board");
+        System.out.println("7 - Exit");
 
         BitBoardMinimax ia = new BitBoardMinimax(Minimax.Algorithm.NEGASCOUT, true);
         String action;
@@ -30,8 +31,12 @@ public class BoardEvaluator {
                         byte player = 0;
                         String m;
                         while ((m = in.readLine()).length() == 2) {
-                            BitBoardMove move = new BitBoardMove(player, BitBoardMove.string2byte(m));
-                            ia.makeMove(move);
+                            if (m.equals("--")) {
+                                ia.next();
+                            } else {
+                                BitBoardMove move = new BitBoardMove(player, BitBoardMove.string2byte(m));
+                                ia.makeMove(move);
+                            }
                             player = (byte) (1 - player);
                         }
                         break;
@@ -49,9 +54,12 @@ public class BoardEvaluator {
                         ia.unmakeMove(ia.getLastMove());
                         break;
                     case "5":
-                        ia = new BitBoardMinimax(ia.getAlgo(), ia.isUsingHeuristic());
+                        ia.next();
                         break;
                     case "6":
+                        ia = new BitBoardMinimax(ia.getAlgo(), ia.isUsingHeuristic());
+                        break;
+                    case "7":
                         System.exit(0);
                         break;
                 }
