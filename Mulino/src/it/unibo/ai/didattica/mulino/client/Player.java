@@ -21,8 +21,6 @@ public abstract class Player extends Thread {
         boolean myTurn = (color == it.unibo.ai.didattica.mulino.domain.State.Checker.WHITE);
         String actionString = "";
 
-        MillMove move;
-
         try {
             client = new MulinoClient(color);
         } catch (IOException e) {

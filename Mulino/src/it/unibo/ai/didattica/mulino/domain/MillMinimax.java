@@ -1,18 +1,27 @@
 package it.unibo.ai.didattica.mulino.domain;
 
-import java.util.List;
+import it.unibo.ai.didattica.mulino.implementation.IterativeDeepeningMinimax;
 
-public interface MillMinimax<M extends MillMove> {
+public abstract class MillMinimax<M extends MillMove, T extends Comparable<T>> extends IterativeDeepeningMinimax<M, T> {
 
-    void setPlayed(int white, int black);
-    void setCount(int white, int black);
-    void setGridPosition(State.Checker player, String position);
-    int maxPlayedPieces();
+    public static final int PIECES = 9;
 
-    void next();
-    void makeMove(M move);
-    void unmakeMove(M move);
-    M getBestMove(int depth, int maxTime);
-    MillMinimax convertState(State state);
-    List<M> getPossibleMoves();
+    public MillMinimax(Algorithm algo, boolean useHeuristic) {
+        super(algo, useHeuristic);
+    }
+
+    protected void updateState(State state) {
+        for (String position : state.getPositions()) {
+            this.setGridPosition(state.getBoard().get(position), position);
+        }
+
+        this.setCount(state.getWhiteCheckersOnBoard(), state.getBlackCheckersOnBoard());
+        this.setPlayed(PIECES - state.getWhiteCheckers(), PIECES - state.getBlackCheckers());
+    }
+
+    public abstract MillMinimax fromState(State state);
+    protected abstract void setPlayed(int white, int black);
+    protected abstract void setCount(int white, int black);
+    protected abstract void setGridPosition(State.Checker player, String position);
+
 }

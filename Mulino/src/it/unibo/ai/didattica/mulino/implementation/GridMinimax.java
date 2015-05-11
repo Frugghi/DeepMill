@@ -6,9 +6,7 @@ import it.unibo.ai.didattica.mulino.domain.State;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GridMinimax extends IterativeDeepeningMinimax<GridMove, Integer> implements MillMinimax<GridMove> {
-
-    public static final int PIECES = 9;
+public class GridMinimax extends MillMinimax<GridMove, Integer> {
 
     public static final int FREE     = 0;
     public static final int PLAYER_W = 1;
@@ -17,9 +15,9 @@ public class GridMinimax extends IterativeDeepeningMinimax<GridMove, Integer> im
     private static final int Z_SIZE = 3;
     private static final int X_SIZE = 8;
 
-    private final int[] played;
-    private final int[] count;
-    private final int[][] grid;
+    private final int[] played = new int[3];
+    private final int[] count = new int[3];
+    private final int[][] grid = new int[Z_SIZE][X_SIZE];
 
     private int currentPlayer;
     private int opponentPlayer;
@@ -28,10 +26,6 @@ public class GridMinimax extends IterativeDeepeningMinimax<GridMove, Integer> im
 
     public GridMinimax(Algorithm algo, boolean useHeuristic) {
         super(algo, useHeuristic);
-
-        this.grid = new int[Z_SIZE][X_SIZE];
-        this.played = new int[3];
-        this.count = new int[3];
 
         for (int z = 0; z < Z_SIZE; z++) {
             for (int x = 0; x < X_SIZE; x++) {
@@ -53,20 +47,27 @@ public class GridMinimax extends IterativeDeepeningMinimax<GridMove, Integer> im
         this.lastMove = null;
     }
 
-    public void setPlayed(int white, int black) {
+    @Override
+    public MillMinimax fromState(State state) {
+        GridMinimax ia =  new GridMinimax(this.getAlgo(), this.isUsingHeuristic());
+        ia.updateState(state);
+        ia.currentPlayer = this.currentPlayer;
+        ia.opponentPlayer = this.opponentPlayer;
+        ia.next();
+
+        return ia;
+    }
+
+    protected void setPlayed(int white, int black) {
         played[FREE] = PIECES * 2 - (white + black);
         played[PLAYER_W] = white;
         played[PLAYER_B] = black;
     }
 
-    public void setCount(int white, int black) {
+    protected void setCount(int white, int black) {
         count[FREE] = Z_SIZE * X_SIZE - (white + black);
         count[PLAYER_W] = white;
         count[PLAYER_B] = black;
-    }
-
-    public int maxPlayedPieces() {
-        return BitBoardMinimax.PIECES;
     }
 
     @Override
@@ -305,6 +306,11 @@ public class GridMinimax extends IterativeDeepeningMinimax<GridMove, Integer> im
     }
 
     @Override
+    protected boolean isQuiet() {
+        return true;
+    }
+
+    @Override
     public double evaluate() {
         if (this.hasWon(currentPlayer)) { // Se vinco e' la mossa migliore
             return this.maxEvaluateValue();
@@ -456,19 +462,5 @@ public class GridMinimax extends IterativeDeepeningMinimax<GridMove, Integer> im
 
         return result;
     }
-    
-  public MillMinimax convertState(State currentState){
-    	
-    	GridMinimax ia = new GridMinimax(this.getAlgo(), this.isUsingHeuristic());
-    	
-    	 for (String position : currentState.getPositions()) {
-             ia.setGridPosition(currentState.getBoard().get(position), position);
-         }
 
-         ia.setCount(currentState.getWhiteCheckersOnBoard(), currentState.getBlackCheckersOnBoard());
-         ia.setPlayed(ia.maxPlayedPieces() - currentState.getWhiteCheckers(), ia.maxPlayedPieces() - currentState.getBlackCheckers());
-         ia.next();
-         
-         return ia;
-    }
 }

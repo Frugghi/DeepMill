@@ -1,7 +1,6 @@
 package it.unibo.ai.didattica.mulino.implementation;
 
 import it.unibo.ai.didattica.mulino.domain.MillMinimax;
-import it.unibo.ai.didattica.mulino.domain.MillMove;
 import it.unibo.ai.didattica.mulino.domain.State;
 
 import java.util.ArrayList;
@@ -9,41 +8,39 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Long> implements MillMinimax<BitBoardMove> {
-	
-    public static final int PIECES = 9;
+public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long> {
 
-    public static final int PLAYER_W = 0;
-    public static final int PLAYER_B = 1;
-    public static final int FREE     = 2;
+    public static final byte PLAYER_W = 0;
+    public static final byte PLAYER_B = 1;
+    public static final byte FREE     = 2;
 
-    private static final int _A1 = 0;  protected static final int A1 = 1 << _A1;
-    private static final int _B2 = 1;  protected static final int B2 = 1 << _B2;
-    private static final int _C3 = 2;  protected static final int C3 = 1 << _C3;
-    private static final int _D1 = 3;  protected static final int D1 = 1 << _D1;
-    private static final int _D2 = 4;  protected static final int D2 = 1 << _D2;
-    private static final int _D3 = 5;  protected static final int D3 = 1 << _D3;
+    protected static final byte _A1 = 0;  protected static final int A1 = 1 << _A1;
+    protected static final byte _B2 = 1;  protected static final int B2 = 1 << _B2;
+    protected static final byte _C3 = 2;  protected static final int C3 = 1 << _C3;
+    protected static final byte _D1 = 3;  protected static final int D1 = 1 << _D1;
+    protected static final byte _D2 = 4;  protected static final int D2 = 1 << _D2;
+    protected static final byte _D3 = 5;  protected static final int D3 = 1 << _D3;
 
-    private static final int _G1 = 6;  protected static final int G1 = 1 << _G1;
-    private static final int _F2 = 7;  protected static final int F2 = 1 << _F2;
-    private static final int _E3 = 8;  protected static final int E3 = 1 << _E3;
-    private static final int _G4 = 9;  protected static final int G4 = 1 << _G4;
-    private static final int _F4 = 10; protected static final int F4 = 1 << _F4;
-    private static final int _E4 = 11; protected static final int E4 = 1 << _E4;
+    protected static final byte _G1 = 6;  protected static final int G1 = 1 << _G1;
+    protected static final byte _F2 = 7;  protected static final int F2 = 1 << _F2;
+    protected static final byte _E3 = 8;  protected static final int E3 = 1 << _E3;
+    protected static final byte _G4 = 9;  protected static final int G4 = 1 << _G4;
+    protected static final byte _F4 = 10; protected static final int F4 = 1 << _F4;
+    protected static final byte _E4 = 11; protected static final int E4 = 1 << _E4;
 
-    private static final int _G7 = 12; protected static final int G7 = 1 << _G7;
-    private static final int _F6 = 13; protected static final int F6 = 1 << _F6;
-    private static final int _E5 = 14; protected static final int E5 = 1 << _E5;
-    private static final int _D7 = 15; protected static final int D7 = 1 << _D7;
-    private static final int _D6 = 16; protected static final int D6 = 1 << _D6;
-    private static final int _D5 = 17; protected static final int D5 = 1 << _D5;
+    protected static final byte _G7 = 12; protected static final int G7 = 1 << _G7;
+    protected static final byte _F6 = 13; protected static final int F6 = 1 << _F6;
+    protected static final byte _E5 = 14; protected static final int E5 = 1 << _E5;
+    protected static final byte _D7 = 15; protected static final int D7 = 1 << _D7;
+    protected static final byte _D6 = 16; protected static final int D6 = 1 << _D6;
+    protected static final byte _D5 = 17; protected static final int D5 = 1 << _D5;
 
-    private static final int _A7 = 18; protected static final int A7 = 1 << _A7;
-    private static final int _B6 = 19; protected static final int B6 = 1 << _B6;
-    private static final int _C5 = 20; protected static final int C5 = 1 << _C5;
-    private static final int _A4 = 21; protected static final int A4 = 1 << _A4;
-    private static final int _B4 = 22; protected static final int B4 = 1 << _B4;
-    private static final int _C4 = 23; protected static final int C4 = 1 << _C4;
+    protected static final byte _A7 = 18; protected static final int A7 = 1 << _A7;
+    protected static final byte _B6 = 19; protected static final int B6 = 1 << _B6;
+    protected static final byte _C5 = 20; protected static final int C5 = 1 << _C5;
+    protected static final byte _A4 = 21; protected static final int A4 = 1 << _A4;
+    protected static final byte _B4 = 22; protected static final int B4 = 1 << _B4;
+    protected static final byte _C4 = 23; protected static final int C4 = 1 << _C4;
     
     private static final int MILL_1 =   A1 | D1 | G1;
     private static final int MILL_2 =   B2 | D2 | F2;
@@ -116,7 +113,7 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
             { B2, A4, B6, C4 }, // B4
             { C3, B4, C5 }      // C4
     };
-    private static final int[][] INT_MOVES = {
+    private static final byte[][] INT_MOVES = {
             { _A4, _D1 },           // A1
             { _B4, _D2 },           // B2
             { _C4, _D3 },           // C3
@@ -143,25 +140,22 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
             { _C3, _B4, _C5 }       // C4
     };
 
-    private final int[] board;
-    private final int[] played;
-    private final int[] count;
+    private final int[] board = new int[2];
+    private final int[] played = new int[2];
+    private final int[] count = new int[2];
 
-    private int currentPlayer;
-    private int opponentPlayer;
+    private byte currentPlayer;
+    private byte opponentPlayer;
 
     public BitBoardMinimax(Algorithm algo, boolean useHeuristic) {
         super(algo, useHeuristic);
 
-        this.board = new int[2];
         this.board[PLAYER_W] = 0;
         this.board[PLAYER_B] = 0;
 
-        this.played = new int[2];
         this.played[PLAYER_W] = 0;
         this.played[PLAYER_B] = 0;
 
-        this.count = new int[2];
         this.count[PLAYER_W] = 0;
         this.count[PLAYER_B] = 0;
 
@@ -169,22 +163,29 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
         this.opponentPlayer = PLAYER_B;
     }
 
-    public int maxPlayedPieces() {
-        return BitBoardMinimax.PIECES;
+    @Override
+    public MillMinimax fromState(State state) {
+        BitBoardMinimax ia =  new BitBoardMinimax(this.getAlgo(), this.isUsingHeuristic());
+        ia.updateState(state);
+        ia.currentPlayer = this.currentPlayer;
+        ia.opponentPlayer = this.opponentPlayer;
+        ia.next();
+
+        return ia;
     }
 
-    public void setPlayed(int white, int black) {
+    protected void setPlayed(int white, int black) {
         this.played[PLAYER_W] = white;
         this.played[PLAYER_B] = black;
     }
 
-    public void setCount(int white, int black) {
+    protected void setCount(int white, int black) {
         this.count[PLAYER_W] = white;
         this.count[PLAYER_B] = black;
     }
 
-    public void setGridPosition(State.Checker player, String position) {
-        int i = BitBoardMove.string2bitPattern(position);
+    protected void setGridPosition(State.Checker player, String position) {
+        int i = (1 << BitBoardMove.string2byte(position));
 
         switch (player) {
             case WHITE:
@@ -213,32 +214,49 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
 
     @Override
     public boolean isOver() {
-        return this.hasWon(PLAYER_W) || this.hasWon(PLAYER_B);
+        return this.hasWon(PLAYER_W) || this.hasWon(PLAYER_B) || this.isADraw();
     }
 
     private boolean hasWon(int player) {
-        return (this.played[PLAYER_B] + this.played[PLAYER_W]) == PIECES * 2 &&
-                (this.count[1 - player] <= 2 ||                                  // L'avversario ha meno di 3 pezzi
-                numberOfPiecesBlocked(1 - player) == this.count[1 - player]);    // L'avversario non puo' muoversi
+        return this.phase1completed() &&
+                (this.count[1 - player] <= 2 ||                                        // L'avversario ha meno di 3 pezzi
+                numberOfPiecesBlocked((byte) (1 - player)) == this.count[1 - player]); // L'avversario non puo' muoversi
+    }
+
+    private boolean isADraw() {
+        return this.movesHistory.size() > 12 &&
+                this.movesHistory.get(0).equals(this.movesHistory.get(4)) && this.movesHistory.get(0).equals(this.movesHistory.get(8)) &&
+                this.movesHistory.get(1).equals(this.movesHistory.get(5)) && this.movesHistory.get(1).equals(this.movesHistory.get(9)) &&
+                this.movesHistory.get(2).equals(this.movesHistory.get(6)) && this.movesHistory.get(2).equals(this.movesHistory.get(10)) &&
+                this.movesHistory.get(3).equals(this.movesHistory.get(7)) && this.movesHistory.get(3).equals(this.movesHistory.get(11));
+    }
+
+    private boolean phase1completed() {
+        return (this.played[PLAYER_B] + this.played[PLAYER_W]) == PIECES * 2;
+    }
+
+    @Override
+    public boolean shouldAvoidRepetitions() {
+        return this.phase1completed();
     }
 
     @Override
     public void makeMove(BitBoardMove move) {
         this.movesHistory.add(0, move);
 
-        this.setGridPosition(this.currentPlayer, move.getTo());
+        this.setGridPosition(this.currentPlayer, (1 << move.getTo()));
 
         if (move.isPutMove()) {
             this.played[this.currentPlayer]++;
             this.count[this.currentPlayer]++;
         } else {
-            this.setGridPosition(FREE, move.getFrom());
+            this.setGridPosition(FREE, (1 << move.getFrom()));
         }
 
         if (move.isRemoveMove()) {
             this.count[this.opponentPlayer]--;
 
-            this.setGridPosition(FREE, move.getRemove());
+            this.setGridPosition(FREE, (1 << move.getRemove()));
         }
 
         this.next();
@@ -250,19 +268,19 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
 
         this.previous();
         
-        this.setGridPosition(FREE, move.getTo());
+        this.setGridPosition(FREE, (1 << move.getTo()));
 
         if (move.isPutMove()) {
             this.played[this.currentPlayer]--;
             this.count[this.currentPlayer]--;
         } else {
-            this.setGridPosition(this.currentPlayer, move.getFrom());
+            this.setGridPosition(this.currentPlayer, (1 << move.getFrom()));
         }
 
         if (move.isRemoveMove()) {
             this.count[this.opponentPlayer]++;
 
-            this.setGridPosition(this.opponentPlayer, move.getRemove());
+            this.setGridPosition(this.opponentPlayer, (1 << move.getRemove()));
         }
     }
 
@@ -271,22 +289,22 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
         List<BitBoardMove> moves = new ArrayList<>(3 * (24 - this.count[PLAYER_W] - this.count[PLAYER_B]));
 
         if (this.played[this.currentPlayer] < PIECES) { // Fase 1
-            for (int to = 0; to < 24; to++) {
+            for (byte to = 0; to < 24; to++) {
                 this.addMoves(moves, to);
             }
         } else if (this.count[this.currentPlayer] == 3) { // Fase 3
-            for (int from = 0; from < 24; from++) {
+            for (byte from = 0; from < 24; from++) {
                 if (((this.board[this.currentPlayer] >>> from) & 1) == 1) {
-                    for (int to = 0; to < 24; to++) {
+                    for (byte to = 0; to < 24; to++) {
                         this.addMoves(moves, from, to);
                     }
                 }
             }
         } else { // Fase 2
-            for (int from = 0; from < 24; from++) {
+            for (byte from = 0; from < 24; from++) {
                 if (((this.board[this.currentPlayer] >>> from) & 1) == 1) {
-                    for (int i = 0; i < INT_MOVES[from].length; i++) {
-                        this.addMoves(moves, from, INT_MOVES[from][i]);
+                    for (byte to : INT_MOVES[from]) {
+                        this.addMoves(moves, from, to);
                     }
                 }
             }
@@ -295,39 +313,38 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
         return moves;
     }
 
-    private void addMoves(List<BitBoardMove> moves, int to) {
-        this.addMoves(moves, Integer.MAX_VALUE, to);
+    private void addMoves(List<BitBoardMove> moves, byte to) {
+        this.addMoves(moves, Byte.MAX_VALUE, to);
     }
 
-    private void addMoves(List<BitBoardMove> moves, int from, int to) {
-        int emptyBoard = this.board[PLAYER_W] | this.board[PLAYER_B];
-        if (((emptyBoard >>> to) & 1) == 0) {
+    private void addMoves(List<BitBoardMove> moves, byte from, byte to) {
+        int completeBoard = this.board[PLAYER_W] | this.board[PLAYER_B];
+        if (((completeBoard >>> to) & 1) == 0) {
             if (this.willMill(this.currentPlayer, from, to)) {
                 boolean onlyMills = this.onlyMills(this.opponentPlayer);
                 int opponentBoard = this.board[this.opponentPlayer];
-                for (int remove = 0; remove < 24; remove++) {
+                for (byte remove = 0; remove < 24; remove++) {
                     if (((opponentBoard >>> remove) & 1) == 1 && (onlyMills || !this.isMill(opponentBoard, remove))) {
-                        moves.add(0, new BitBoardMove(this.currentPlayer, from == Integer.MAX_VALUE ? Integer.MAX_VALUE : (1 << from), (1 << to), (1 << remove)));
+                        moves.add(0, new BitBoardMove(this.currentPlayer, from == Byte.MAX_VALUE ? Byte.MAX_VALUE : from, to, remove));
                     }
                 }
             } else {
-                moves.add(new BitBoardMove(this.currentPlayer, from == Integer.MAX_VALUE ? Integer.MAX_VALUE : (1 << from), (1 << to)));
+                moves.add(new BitBoardMove(this.currentPlayer, from == Byte.MAX_VALUE ? Byte.MAX_VALUE : from, to));
             }
         }
     }
 
-    private boolean willMill(int player, int from, int to) {
+    private boolean willMill(byte player, byte from, byte to) {
         int board = this.board[player] | (1 << to);
-        if (from != Integer.MAX_VALUE) {
+        if (from != Byte.MAX_VALUE) {
             board &= ~(1 << from);
         }
 
         return this.isMill(board, to);
     }
 
-    private boolean isMill(int board, int pos) {
-        for (int i = 0; i < MILLS[pos].length; i++) {
-            int mill = MILLS[pos][i];
+    private boolean isMill(int board, byte pos) {
+        for (int mill : MILLS[pos]) {
             if ((board & mill) == mill) {
                 return true;
             }
@@ -336,9 +353,9 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
         return false;
     }
 
-    private boolean onlyMills(int player) {
+    private boolean onlyMills(byte player) {
         int board = this.board[player];
-        for (int i = 0; i < 24; i++) {
+        for (byte i = 0; i < 24; i++) {
             if (((board >>> i) & 1) == 1 && !this.isMill(board, i)) {
                 return false;
             }
@@ -348,28 +365,45 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
     }
 
     @Override
+    protected boolean isQuiet() {
+        boolean lastMoveBlockedMill = false;
+        int opponentBoard = this.board[this.opponentPlayer];
+
+        for (int mill : MILLS[this.movesHistory.get(0).getTo()]) {
+            if (Integer.bitCount((opponentBoard & mill)) == 2) {
+                lastMoveBlockedMill = true;
+                break;
+            }
+        }
+
+        return (!lastMoveBlockedMill && this.numberOf2PiecesConfiguration(this.opponentPlayer) == 0) || this.numberOf2PiecesConfiguration(this.currentPlayer) > 0;
+    }
+
+    @Override
     public double evaluate() {
         if (this.hasWon(currentPlayer)) { // Se vinco e' la mossa migliore
             return this.maxEvaluateValue();
         } else if (this.hasWon(opponentPlayer)) { // Se perdo e' la mossa peggiore
             return -this.maxEvaluateValue();
+        } else if (this.isADraw()) {
+            return 0;
         }
 
-        int lastMove = (!this.movesHistory.isEmpty() && this.movesHistory.get(0).isRemoveMove() ? 1 : 0);
+        int lastIsRemoveMove = (!this.movesHistory.isEmpty() && this.movesHistory.get(0).isRemoveMove() ? 1 : 0);
 
-        if (this.played[PLAYER_B] < PIECES && this.played[PLAYER_W] < PIECES) { // Fase 1
-            return 18 * lastMove +
+        if (!this.phase1completed()) { // Fase 1
+            return 18 * lastIsRemoveMove +
                     26 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer]) +
                      1 * (this.numberOfPiecesBlocked(this.opponentPlayer) - this.numberOfPiecesBlocked(this.currentPlayer)) +
                      9 * (this.numberOfMorrises(this.currentPlayer) - this.numberOfMorrises(this.opponentPlayer)) +
                     10 * (this.numberOf2PiecesConfiguration(this.currentPlayer) - this.numberOf2PiecesConfiguration(this.opponentPlayer)) +
                      7 * (this.numberOf3PiecesConfiguration(this.currentPlayer) - this.numberOf3PiecesConfiguration(this.opponentPlayer));
         } else if (this.count[PLAYER_B] == 3 || this.count[PLAYER_W] == 3) { // Fase 3
-            return 16 * lastMove +
+            return 16 * lastIsRemoveMove +
                     10 * (this.numberOf2PiecesConfiguration(this.currentPlayer) - this.numberOf2PiecesConfiguration(this.opponentPlayer)) +
                      1 * (this.numberOf3PiecesConfiguration(this.currentPlayer) - this.numberOf3PiecesConfiguration(this.opponentPlayer));
         } else { // Fase 2
-            return 14 * lastMove +
+            return 14 * lastIsRemoveMove +
                     43 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer]) +
                     10 * (this.numberOfPiecesBlocked(this.opponentPlayer) - this.numberOfPiecesBlocked(this.currentPlayer)) +
                     11 * (this.numberOfMorrises(this.currentPlayer) - this.numberOfMorrises(this.opponentPlayer)) +
@@ -377,12 +411,25 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
         }
     }
 
+    private int numberOfImpossibleMorrises() {
+        int blackBoard = this.board[PLAYER_B];
+        int whiteBoard = this.board[PLAYER_W];
+        int numberOfImpossibleMorrieses = 0;
+        for (int mill : ALL_MILLS) {
+            if ((whiteBoard & mill) != 0 && (blackBoard & mill) != 0) {
+                numberOfImpossibleMorrieses++;
+            }
+        }
+
+        return numberOfImpossibleMorrieses;
+    }
+
     private int numberOfMorrises(int player) {
         int board = this.board[player];
         int numberOfMorrises = 0;
 
-        for (int i = 0; i < ALL_MILLS.length; i++) {
-            if ((board & ALL_MILLS[i]) == ALL_MILLS[i]) {
+        for (int mill :  ALL_MILLS) {
+            if ((board & mill) == mill) {
                 numberOfMorrises++;
             }
         }
@@ -390,7 +437,7 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
         return numberOfMorrises;
     }
 
-    private boolean pieceIsBlocked(int board, int piece){
+    private boolean pieceIsBlocked(int board, byte piece){
         int moves = 0;
         for (int i = 0; i < BIT_MOVES[piece].length; i++) {
             moves |= BIT_MOVES[piece][i];
@@ -399,11 +446,11 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
         return (board & moves) == moves;
     }
 
-    private int numberOfPiecesBlocked(int player){
+    private int numberOfPiecesBlocked(byte player){
         int emptyBoard = this.board[PLAYER_W] | this.board[PLAYER_B];
         int totBlocked = 0;
 
-        for (int i = 0; i < 24; i++) {
+        for (byte i = 0; i < 24; i++) {
             if (((this.board[player] >>> i) & 1) == 1 && this.pieceIsBlocked(emptyBoard, i)) {
                 totBlocked++;
             }
@@ -435,10 +482,10 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
         for (int pos = 0; pos < 24; pos++) {
             if (((board >>> pos) & 1) == 1) {
                 boolean possibileConfiguration = true;
-                for (int i = 0; i < MILLS[pos].length; i++) {
-                    int pieces = board & MILLS[pos][i];
-                    int opponentPieces = opponentBoard & MILLS[pos][i];
-                    if (opponentPieces != 0 || pieces == MILLS[pos][i] || pieces == (1 << pos)) {
+                for (int mill : MILLS[pos]) {
+                    int pieces = board & mill;
+                    int opponentPieces = opponentBoard & mill;
+                    if (opponentPieces != 0 || pieces == mill || pieces == (1 << pos)) {
                         possibileConfiguration = false;
                         break;
                     }
@@ -465,6 +512,46 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
         return tot2piecesConfiguration;
     }
 
+    private int numberOfPotential3PiecesConfiguration(int player) {
+        int board = this.board[player];
+        int opponentBoard = this.board[1 - player];
+        int totPotential3piecesConfiguration = 0;
+        for (int pos = 0; pos < 24; pos++) {
+            if (((board >>> pos) & 1) == 1) {
+                for (int mill : MILLS[pos]) {
+                    if ((opponentBoard & mill) == 0 && (board & mill) == (1 << pos)) {
+                        int count = 0;
+                        for (int i = 0; i < 24; i++) {
+                            if (i == pos) {
+                                continue;
+                            }
+
+                            if (((mill >>> i) & 1) == 1) {
+                                count++;
+
+                                for (int otherMill : MILLS[i]) {
+                                    if (otherMill == mill) {
+                                        continue;
+                                    }
+
+                                    if ((opponentBoard & otherMill) == 0 && Integer.bitCount((board & otherMill)) == 1) {
+                                        totPotential3piecesConfiguration++;
+                                    }
+                                }
+                            }
+
+                            if (count == 2) {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return totPotential3piecesConfiguration / 2;
+    }
+
     @Override
     public double maxEvaluateValue() {
         return Integer.MAX_VALUE;
@@ -472,23 +559,25 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
 
     @Override
     public void next() {
-        this.currentPlayer = 1 - this.currentPlayer;
-        this.opponentPlayer = 1 - this.opponentPlayer;
+        this.currentPlayer = (byte) (1 - this.currentPlayer);
+        this.opponentPlayer = (byte) (1 - this.opponentPlayer);
     }
 
     @Override
     public void previous() {
-        this.currentPlayer = 1 - this.currentPlayer;
-        this.opponentPlayer = 1 - this.opponentPlayer;
+        this.currentPlayer = (byte) (1 - this.currentPlayer);
+        this.opponentPlayer = (byte) (1 - this.opponentPlayer);
     }
 
     public Long getTransposition() {
         long whiteBoard = this.board[PLAYER_W];
         long blackBoard = this.board[PLAYER_B];
+        long phase = (this.phase1completed() ? (this.count[PLAYER_W] == 3 || this.count[PLAYER_B] == 3 ? 3 : 2) : 1);
 
         long hash = this.currentPlayer;
-        hash |= (whiteBoard <<  1); // [0..23]  white board
-        hash |= (blackBoard << 25); // [24..47] black board
+        hash |= (phase << 1);
+        hash |= (whiteBoard <<  3); // [0..23]  white board
+        hash |= (blackBoard << 27); // [24..47] black board
 
         return hash;
     }
@@ -528,16 +617,6 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
         return ((board >>> 6) & (first << 18));
     }
 
-    public Integer getGroup() {
-        if (this.played[PLAYER_B] < PIECES && this.played[PLAYER_W] < PIECES) { // Fase 1
-            return 1;
-        } else if (this.count[PLAYER_B] == 3 || this.count[PLAYER_W] == 3) { // Fase 3
-            return 3;
-        } else { // Fase 2
-            return 2;
-        }
-    }
-
     @Override
     public String toString() {
         String result = "";
@@ -555,18 +634,24 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
         result += "Black Checkers On Board: " + this.count[PLAYER_B] + ";\n";
         result += "Current player: " + (this.currentPlayer == PLAYER_W ? "W" : "B") + ";\n";
         result += "Opponent player: " + (this.opponentPlayer == PLAYER_W ? "W" : "B") + ";\n";
+        this.previous();
+        result += "Table score: " + this.evaluate() + ";\n";
+        this.next();
         result += "\n";
 
-        result += "Number of morrises player (W) : " + this.numberOfMorrises(PLAYER_W) + "\n";
-        result += "Number of morrises player (B) : " + this.numberOfMorrises(PLAYER_B) + "\n";
-        result += "Number of double morrises player (W) : " + this.numberOfDoubleMorrises(PLAYER_W) + "\n";
-        result += "Number of double morrises player (B) : " + this.numberOfDoubleMorrises(PLAYER_B) + "\n";
-        result += "Number of pieces blocked player (W) : " + this.numberOfPiecesBlocked(PLAYER_W) + "\n";
-        result += "Number of pieces blocked player (B) : " + this.numberOfPiecesBlocked(PLAYER_B )+ "\n";
-        result += "Number of 2 pieces configurations player (W) : " + this.numberOf2PiecesConfiguration(PLAYER_W) + "\n";
-        result += "Number of 2 pieces configurations player (B) : " + this.numberOf2PiecesConfiguration(PLAYER_B) + "\n";
-        result += "Number of 3 pieces configurations player (W) : " + this.numberOf3PiecesConfiguration(PLAYER_W) + "\n";
-        result += "Number of 3 pieces configurations player (B) : " + this.numberOf3PiecesConfiguration(PLAYER_B) + "\n";
+        result += "Number of morrises player (W): " + this.numberOfMorrises(PLAYER_W) + "\n";
+        result += "Number of morrises player (B): " + this.numberOfMorrises(PLAYER_B) + "\n";
+        result += "Number of double morrises player (W): " + this.numberOfDoubleMorrises(PLAYER_W) + "\n";
+        result += "Number of double morrises player (B): " + this.numberOfDoubleMorrises(PLAYER_B) + "\n";
+        result += "Number of pieces blocked player (W): " + this.numberOfPiecesBlocked(PLAYER_W) + "\n";
+        result += "Number of pieces blocked player (B): " + this.numberOfPiecesBlocked(PLAYER_B )+ "\n";
+        result += "Number of 2 pieces configurations player (W): " + this.numberOf2PiecesConfiguration(PLAYER_W) + "\n";
+        result += "Number of 2 pieces configurations player (B): " + this.numberOf2PiecesConfiguration(PLAYER_B) + "\n";
+        result += "Number of 3 pieces configurations player (W): " + this.numberOf3PiecesConfiguration(PLAYER_W) + "\n";
+        result += "Number of 3 pieces configurations player (B): " + this.numberOf3PiecesConfiguration(PLAYER_B) + "\n";
+        result += "Number of potential 3 pieces configurations player (W): " + this.numberOfPotential3PiecesConfiguration(PLAYER_W) + "\n";
+        result += "Number of potential 3 pieces configurations player (B): " + this.numberOfPotential3PiecesConfiguration(PLAYER_B) + "\n";
+        result += "\n";
 
         result += "Moves history: ";
         for (BitBoardMove move : this.movesHistory) {
@@ -597,7 +682,6 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
         if (this.currentPlayer != that.currentPlayer) return false;
         if (this.opponentPlayer != that.opponentPlayer) return false;
         return Arrays.equals(this.board, that.board) && Arrays.equals(this.played, that.played) && Arrays.equals(this.count, that.count);
-
     }
 
     @Override
@@ -609,19 +693,5 @@ public class BitBoardMinimax extends IterativeDeepeningMinimax<BitBoardMove, Lon
         result = 31 * result + this.opponentPlayer;
         return result;
     }
-    
-    public MillMinimax convertState(State currentState){
-    	
-    	BitBoardMinimax ia = new BitBoardMinimax(this.getAlgo(), this.isUsingHeuristic());
-    	
-    	 for (String position : currentState.getPositions()) {
-             ia.setGridPosition(currentState.getBoard().get(position), position);
-         }
 
-         ia.setCount(currentState.getWhiteCheckersOnBoard(), currentState.getBlackCheckersOnBoard());
-         ia.setPlayed(ia.maxPlayedPieces() - currentState.getWhiteCheckers(), ia.maxPlayedPieces() - currentState.getBlackCheckers());
-         ia.next();
-         
-         return ia;
-    }
 }
