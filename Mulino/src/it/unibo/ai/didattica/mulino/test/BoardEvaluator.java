@@ -42,6 +42,9 @@ public class BoardEvaluator {
                         break;
                     case "2":
                         System.out.println(ia.toString());
+                        ia.previous();
+                        System.out.println("Total score: " + ia.evaluate());
+                        ia.next();
                         break;
                     case "3":
                         List<BitBoardMove> moves = ia.getPossibleMoves();
