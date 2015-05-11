@@ -9,7 +9,7 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
 
     private int maxDepth;
     private Map<Integer, List<Move>> killerMoves = new HashMap<>();
-    private Map<T, TranspositionTableEntry> transpositionTable = new HashMap<>();
+    private TranspositionTable<T, M> transpositionTable = new TranspositionTable<>();
     private int currentDepth;
     private int nodesCount;
     private boolean useHeuristic;
@@ -17,7 +17,6 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
     protected List<M> movesHistory = new ArrayList<> ();
 
     private final Comparator<Move> KillerComparator = new Comparator<Move>() {
-
         @Override
         public int compare(Move o1, Move o2) {
             List<Move> killerMoves = HeuristicMinimax.this.killerMoves.get(HeuristicMinimax.this.currentDepth);
@@ -37,16 +36,6 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
 
     private static final class MoveWrapper<M extends Move> {
         public M move;
-    }
-
-    private static enum ScoreType {
-        LOWER_BOUND, UPPER_BOUND, EXACT_SCORE;
-    }
-
-    private static final class TranspositionTableEntry<M extends Move> {
-        public double score;
-        public M move;
-        public ScoreType type;
     }
 
     public HeuristicMinimax(Algorithm algo, boolean useHeuristic) {
@@ -75,12 +64,18 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
         this.abort = abort;
     }
 
+    public M getLastMove() {
+        return this.movesHistory.get(0);
+    }
+
     public M getBestMove(final int depth) {
         this.setAbort(false);
 
         if (depth <= 0) {
             throw new IllegalArgumentException("Search depth MUST be > 0");
         }
+
+        this.transpositionTable.clear();
 
         this.nodesCount = 0;
         this.maxDepth = depth;
@@ -118,12 +113,23 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
         this.transpositionTable.clear();
     }
 
-    private List<M> sortMoves(List<M> moves) {
+    private List<M> sortMoves(List<M> moves, int depth) {
         Collections.sort(moves, KillerComparator);
-    
-        if (this.movesHistory.size()>= 4 && this.movesHistory.get(0).equals(this.movesHistory.get(2)) && this.movesHistory.get(1).equals(this.movesHistory.get(3))){
 
-            int index = moves.indexOf(this.movesHistory.get(1));
+        T hash = this.getTransposition();
+        if (hash != null) {
+            TranspositionTable.Entry<M> entry = this.transpositionTable.get(hash, depth);
+            if (entry != null) {
+                int index = moves.indexOf(entry.move);
+
+                if (index > 0) {
+                    moves.add(0, moves.remove(index));
+                }
+            }
+        }
+
+        if (this.shouldAvoidRepetitions() && this.movesHistory.size() >= 4) {
+            int index = moves.indexOf(this.movesHistory.get(3));
 
             if (index != -1) {
                 moves.add(moves.remove(index));
@@ -131,6 +137,10 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
         }
 
         return moves;
+    }
+
+    public boolean shouldAvoidRepetitions() {
+        return false;
     }
 
     public abstract T getTransposition();
@@ -147,19 +157,55 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
     private double negascout(final MoveWrapper<M> wrapper, final int depth, final double alpha, final double beta) {
         this.nodesCount++;
 
-        if (depth == 0 || isOver()) {
-            return evaluate();
+        if (depth == 0) {
+            if (isQuiet() || isOver()) {
+                return evaluate();
+            } else {
+                //System.out.println("Quiescence " + this.toString());
+                return quiescence(this.maxDepth * 2, alpha, beta);
+            }
         }
 
         this.currentDepth = this.maxDepth - depth;
+
+        double a = alpha;
+        double b = beta;
+
+        T hash = this.getTransposition();
+        if (hash != null && !this.abort) {
+            TranspositionTable.Entry<M> entry = this.transpositionTable.get(hash, depth);
+            if (entry != null) {
+                switch (entry.type) {
+                    case LOWER_BOUND:
+                        a = Math.max(a, entry.score);
+                        break;
+                    case UPPER_BOUND:
+                        b = Math.min(b, entry.score);
+                        break;
+                    case EXACT_SCORE:
+                        if (wrapper != null) {
+                            wrapper.move = entry.move;
+                        }
+
+                        return entry.score;
+                }
+
+                if (a >= b) {
+                    if (wrapper != null) {
+                        wrapper.move = entry.move;
+                    }
+
+                    return a;
+                }
+            }
+        }
+
         if (this.killerMoves.get(this.currentDepth) == null) {
             this.killerMoves.put(this.currentDepth, new ArrayList<Move>());
         }
 
-        List<M> moves = sortMoves(getPossibleMoves());
+        List<M> moves = sortMoves(getPossibleMoves(), depth);
 
-        double a = alpha;
-        double b = beta;
         M bestMove = null;
         if (moves.isEmpty()) {
             next();
@@ -179,7 +225,11 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
                 bestMove = move;
 
                 List<Move> currentDepthKillerMoves = this.killerMoves.get(this.currentDepth);
-                if (!this.abort && !currentDepthKillerMoves.contains(move)) {
+                if (currentDepthKillerMoves == null) {
+                    currentDepthKillerMoves = new ArrayList<>();
+                    this.killerMoves.put(this.currentDepth, currentDepthKillerMoves);
+                }
+                if (!this.abort && move != null && !currentDepthKillerMoves.contains(move)) {
                     if (currentDepthKillerMoves.size() >= 2) {
                         currentDepthKillerMoves.remove(1);
                     }
@@ -197,15 +247,73 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
             wrapper.move = bestMove;
         }
 
-        TranspositionTableEntry entry = new TranspositionTableEntry();
-        entry.move = bestMove;
-        entry.score = a;
-        entry.type = (a <= alpha ?  ScoreType.LOWER_BOUND :
-                     (b >= beta  ?  ScoreType.UPPER_BOUND :
-                                    ScoreType.EXACT_SCORE));
+        if (hash != null && !this.abort) {
+            TranspositionTable.Entry<M> entry = new TranspositionTable.Entry<>();
+            entry.move = bestMove;
+            entry.depth = depth;
+            entry.score = a;
+            entry.type = (a <= alpha ? TranspositionTable.EntryType.UPPER_BOUND :
+                         (a >= beta  ? TranspositionTable.EntryType.LOWER_BOUND :
+                                       TranspositionTable.EntryType.EXACT_SCORE));
+            this.transpositionTable.put(hash, entry);
+        }
 
         return a;
     }
+
+    private double quiescence(final int depth, final double alpha, final double beta) {
+        this.nodesCount++;
+
+        if (depth == 0 || isQuiet() || isOver()) {
+            return evaluate();
+        }
+
+        double a = alpha;
+        double b = beta;
+
+        List<M> moves = this.getPossibleMoves();
+
+        if (moves.isEmpty()) {
+            next();
+            double score = quiescenceScore(depth, true, a, beta, b);
+            previous();
+            return score;
+        }
+
+        double score;
+        boolean first = true;
+        for (M move : moves) {
+            makeMove(move);
+            score = quiescenceScore(depth, first, a, beta, b);
+            unmakeMove(move);
+            if (score > a) {
+                a = score;
+
+                if (a >= beta) {
+                    break;
+                }
+            }
+            b = a + 1;
+            first = false;
+        }
+
+        return a;
+    }
+
+    protected double quiescenceScore(final int depth, final boolean first, final double alpha, final double beta, final double b) {
+        if (this.abort) {
+            return this.maxEvaluateValue();
+        }
+
+        double score = -quiescence(depth - 1, -b, -alpha);
+        if (!first && alpha < score && score < beta) {
+            // fails high... full re-search
+            score = -quiescence(depth - 1, -beta, -alpha);
+        }
+        return score;
+    }
+
+    protected abstract boolean isQuiet();
 
     @Override
     protected double minimaxScore(int depth, int who) {
@@ -250,6 +358,10 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
             score = -negascout(null, depth - 1, -beta, -alpha);
         }
         return score;
+    }
+
+    public void printStatistics() {
+        System.out.println("[NODES = " + this.nodesCount + ", TT HITS: " + this.transpositionTable.getTableHits() + ", UP HITS: " + this.transpositionTable.getUpperBoundHits() + ", LW HITS: " + this.transpositionTable.getLowerBoundHits() + ", EX HITS: " + this.transpositionTable.getExactScoreHits() + ", TT SIZE: " + this.transpositionTable.size() + "]");
     }
 
 }

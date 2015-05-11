@@ -376,7 +376,7 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long> {
             }
         }
 
-        return (!lastMoveBlockedMill && this.numberOf2PiecesConfiguration(this.opponentPlayer) == 0) || this.numberOf2PiecesConfiguration(this.currentPlayer) > 0;
+        return !lastMoveBlockedMill && this.numberOf2PiecesConfiguration(this.opponentPlayer) == 0 && this.numberOf2PiecesConfiguration(this.currentPlayer) == 0;
     }
 
     @Override
