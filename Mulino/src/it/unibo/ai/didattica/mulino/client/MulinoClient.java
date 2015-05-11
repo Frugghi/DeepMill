@@ -109,7 +109,6 @@ public class MulinoClient {
             System.exit(-1);
         }
 
-        Player.Behaviour behaviour = Player.Behaviour.IA;
         State.Checker playerColor = State.Checker.WHITE;
         Minimax.Algorithm algorithm = Minimax.Algorithm.NEGASCOUT;
         int depth = 0;
@@ -117,6 +116,7 @@ public class MulinoClient {
         boolean debug = false;
         boolean bitState = true;
         boolean useHeuristic = true;
+        boolean iaPlayer = true;
         String replay = null;
         for (int i = 0; i < args.length; i++) {
             switch (args[i].toLowerCase()) {
@@ -130,11 +130,11 @@ public class MulinoClient {
                     break;
                 case "-h":
                 case "--human":
-                    behaviour = Player.Behaviour.HUMAN;
+                    iaPlayer = false;
                     break;
                 case "-i":
                 case "--ia":
-                    behaviour = Player.Behaviour.IA;
+                    iaPlayer = true;
                     break;
                 case "-a":
                     switch (args[++i].toLowerCase()) {
@@ -171,39 +171,32 @@ public class MulinoClient {
                     bitState = true;
                     break;
                 case "-r":
-                    behaviour = Player.Behaviour.REPLAY;
                     replay = args[++i];
                     break;
             }
         }
 
-        switch (behaviour) {
-            case HUMAN:
-                Player humanPlayer = new Player(playerColor);
-                humanPlayer.setDebug(debug);
-                humanPlayer.start();
-                break;
-            case IA:
-                MillMinimax ia;
-                if (bitState) {
-                    ia = new BitBoardMinimax(algorithm, useHeuristic);
-                } else {
-                    ia = new GridMinimax(algorithm, useHeuristic);
-                }
+        if (replay != null) {
+            ReplayPlayer whitePlayer = new ReplayPlayer(State.Checker.WHITE, replay, maxTime);
+            whitePlayer.start();
 
-                Player iaPlayer = new Player(playerColor, ia, depth, maxTime);
-                iaPlayer.setDebug(debug);
-                iaPlayer.start();
-                break;
-            case REPLAY:
-                Player whitePlayer = new Player(State.Checker.WHITE, replay, maxTime);
-                whitePlayer.start();
+            ReplayPlayer blackPlayer = new ReplayPlayer(State.Checker.BLACK, replay, maxTime);
+            blackPlayer.start();
+        } else if (iaPlayer) {
+            MillMinimax ia;
+            if (bitState) {
+                ia = new BitBoardMinimax(algorithm, useHeuristic);
+            } else {
+                ia = new GridMinimax(algorithm, useHeuristic);
+            }
 
-                Player blackPlayer = new Player(State.Checker.BLACK, replay, maxTime);
-                blackPlayer.start();
-                break;
+            IAPlayer player = new IAPlayer(playerColor, ia, depth, maxTime);
+            player.setDebug(debug);
+            player.start();
+        } else {
+            HumanPlayer player = new HumanPlayer(playerColor);
+            player.start();
         }
-
     }
 
 }
