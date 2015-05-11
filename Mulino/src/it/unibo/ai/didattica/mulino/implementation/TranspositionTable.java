@@ -46,7 +46,11 @@ public class TranspositionTable<T extends Comparable<T>, M extends Move> {
     }
     public double getHitRatio() {
         int totalHits = this.getTableHits();
-        return totalHits / (totalHits + this.missedHits);
+        if (totalHits == 0 && this.missedHits == 0) {
+            return 0;
+        } else {
+            return totalHits / (totalHits + this.missedHits);
+        }
     }
 
     public Entry<M> get(T hash, int depth) {

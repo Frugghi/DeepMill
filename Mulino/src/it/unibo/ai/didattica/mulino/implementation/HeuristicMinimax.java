@@ -139,13 +139,9 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
 
     public abstract T getTransposition();
 
-    public Collection<T> getSymetricTranspositions() {
-        return Collections.singleton(getTransposition());
-    }
-
     /*
      * Negascout
-     * w/ Killer Heuristic
+     * w/ Killer Heuristic, Transposition Table and Quiescence search
      */
 
     private double negascout(final MoveWrapper<M> wrapper, final int depth, final double alpha, final double beta) {
@@ -159,9 +155,7 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
             if (isQuiet() || isOver()) {
                 return evaluate();
             } else {
-                //return evaluate();
-                //System.out.println("Quiescence " + this.toString());
-                return quiescence(this.maxDepth * 2, true, alpha, beta);
+                return quiescence(alpha, beta);
             }
         }
 
@@ -265,18 +259,16 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
         return a;
     }
 
-    private double quiescence(final int depth, final boolean offensive, final double alpha, final double beta) {
+    private double quiescence(final double alpha, final double beta) {
         this.quiescenceNodesCount++;
 
         if (this.abort) {
             return this.maxEvaluateValue();
         }
 
-        if (/*depth == 0 ||*/ isQuiet() || isOver()) {
+        if (isQuiet() || isOver()) {
             return evaluate();
         }
-
-        //System.out.println(this.toString());
 
         double a = alpha;
         double b = beta;
@@ -285,7 +277,7 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
 
         if (moves.isEmpty()) {
             next();
-            double score = quiescenceScore(depth, !offensive, true, a, beta, b);
+            double score = quiescenceScore(true, a, beta, b);
             previous();
             return score;
         }
@@ -294,7 +286,7 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
         boolean first = true;
         for (M move : moves) {
             makeMove(move);
-            score = quiescenceScore(depth, !offensive, first, a, beta, b);
+            score = quiescenceScore(first, a, beta, b);
             unmakeMove(move);
             if (this.abort) {
                 break;
@@ -314,15 +306,15 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
         return a;
     }
 
-    protected double quiescenceScore(final int depth, final boolean offensive, final boolean first, final double alpha, final double beta, final double b) {
+    protected double quiescenceScore(final boolean first, final double alpha, final double beta, final double b) {
         if (this.abort) {
             return this.maxEvaluateValue();
         }
 
-        double score = -quiescence(depth - 1, !offensive, -b, -alpha);
+        double score = -quiescence(-b, -alpha);
         if (!this.abort && !first && alpha < score && score < beta) {
             // fails high... full re-search
-            score = -quiescence(depth - 1, !offensive, -beta, -alpha);
+            score = -quiescence(-beta, -alpha);
         }
         return score;
     }

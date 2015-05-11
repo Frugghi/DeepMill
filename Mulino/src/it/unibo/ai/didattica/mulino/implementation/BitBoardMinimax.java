@@ -367,7 +367,7 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long> {
             return 0;
         }
 
-        int lastIsRemoveMove = (!this.movesHistory.isEmpty() && this.movesHistory.get(0).isRemoveMove() ? 1 : 0);
+        int lastIsRemoveMove = (!this.movesHistory.isEmpty() && this.movesHistory.get(0).isRemoveMove() ? -1 : 0);
 
         if (!this.phase1completed()) { // Fase 1
             return 18 * lastIsRemoveMove +
@@ -558,31 +558,6 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long> {
         hash |= (blackBoard << 27); // [24..47] black board
 
         return hash;
-    }
-
-    public Collection<Long> getSymetricTranspositions() {
-        List<Long> transpositions = new ArrayList<>();
-        long whiteBoard = this.board[PLAYER_W];
-        long blackBoard = this.board[PLAYER_B];
-
-        long hash = this.currentPlayer;
-        hash |= (whiteBoard <<  1); // [0..23]  white board
-        hash |= (blackBoard << 25); // [24..47] black board
-
-        transpositions.add(hash);
-
-        for (int i = 1; i < 4; i++) {
-            whiteBoard = this.rotateBoard(whiteBoard);
-            blackBoard = this.rotateBoard(blackBoard);
-
-            hash = this.currentPlayer;
-            hash |= (whiteBoard <<  1); // [0..23]  white board
-            hash |= (blackBoard << 25); // [24..47] black board
-
-            transpositions.add(hash);
-        }
-
-        return transpositions;
     }
 
     private int rotateBoard(int board) {
