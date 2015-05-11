@@ -14,50 +14,50 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long> {
     public static final byte PLAYER_B = 1;
     public static final byte FREE     = 2;
 
-    protected static final byte _A1 = 0;  protected static final int A1 = 1 << _A1;
-    protected static final byte _B2 = 1;  protected static final int B2 = 1 << _B2;
-    protected static final byte _C3 = 2;  protected static final int C3 = 1 << _C3;
-    protected static final byte _D1 = 3;  protected static final int D1 = 1 << _D1;
-    protected static final byte _D2 = 4;  protected static final int D2 = 1 << _D2;
-    protected static final byte _D3 = 5;  protected static final int D3 = 1 << _D3;
+    protected static final byte A1 = 0;
+    protected static final byte B2 = 1;
+    protected static final byte C3 = 2;
+    protected static final byte D1 = 3;
+    protected static final byte D2 = 4;
+    protected static final byte D3 = 5;
 
-    protected static final byte _G1 = 6;  protected static final int G1 = 1 << _G1;
-    protected static final byte _F2 = 7;  protected static final int F2 = 1 << _F2;
-    protected static final byte _E3 = 8;  protected static final int E3 = 1 << _E3;
-    protected static final byte _G4 = 9;  protected static final int G4 = 1 << _G4;
-    protected static final byte _F4 = 10; protected static final int F4 = 1 << _F4;
-    protected static final byte _E4 = 11; protected static final int E4 = 1 << _E4;
+    protected static final byte G1 = 6;
+    protected static final byte F2 = 7;
+    protected static final byte E3 = 8;
+    protected static final byte G4 = 9;
+    protected static final byte F4 = 10;
+    protected static final byte E4 = 11;
 
-    protected static final byte _G7 = 12; protected static final int G7 = 1 << _G7;
-    protected static final byte _F6 = 13; protected static final int F6 = 1 << _F6;
-    protected static final byte _E5 = 14; protected static final int E5 = 1 << _E5;
-    protected static final byte _D7 = 15; protected static final int D7 = 1 << _D7;
-    protected static final byte _D6 = 16; protected static final int D6 = 1 << _D6;
-    protected static final byte _D5 = 17; protected static final int D5 = 1 << _D5;
+    protected static final byte G7 = 12;
+    protected static final byte F6 = 13;
+    protected static final byte E5 = 14;
+    protected static final byte D7 = 15;
+    protected static final byte D6 = 16;
+    protected static final byte D5 = 17;
 
-    protected static final byte _A7 = 18; protected static final int A7 = 1 << _A7;
-    protected static final byte _B6 = 19; protected static final int B6 = 1 << _B6;
-    protected static final byte _C5 = 20; protected static final int C5 = 1 << _C5;
-    protected static final byte _A4 = 21; protected static final int A4 = 1 << _A4;
-    protected static final byte _B4 = 22; protected static final int B4 = 1 << _B4;
-    protected static final byte _C4 = 23; protected static final int C4 = 1 << _C4;
+    protected static final byte A7 = 18;
+    protected static final byte B6 = 19;
+    protected static final byte C5 = 20;
+    protected static final byte A4 = 21;
+    protected static final byte B4 = 22;
+    protected static final byte C4 = 23;
     
-    private static final int MILL_1 =   A1 | D1 | G1;
-    private static final int MILL_2 =   B2 | D2 | F2;
-    private static final int MILL_3 =   C3 | D3 | E3;
-    private static final int MILL_4_1 = A4 | B4 | C4;
-    private static final int MILL_4_2 = E4 | F4 | G4;
-    private static final int MILL_5 =   C5 | D5 | E5;
-    private static final int MILL_6 =   B6 | D6 | F6;
-    private static final int MILL_7 =   A7 | D7 | G7;
-    private static final int MILL_A =   A1 | A4 | A7;
-    private static final int MILL_B =   B2 | B4 | B6;
-    private static final int MILL_C =   C3 | C4 | C5;
-    private static final int MILL_D_1 = D1 | D2 | D3;
-    private static final int MILL_D_2 = D5 | D6 | D7;
-    private static final int MILL_E =   E3 | E4 | E5;
-    private static final int MILL_F =   F2 | F4 | F6;
-    private static final int MILL_G =   G1 | G4 | G7;
+    private static final int MILL_1 =   (1 << A1) | (1 << D1) | (1 << G1);
+    private static final int MILL_2 =   (1 << B2) | (1 << D2) | (1 << F2);
+    private static final int MILL_3 =   (1 << C3) | (1 << D3) | (1 << E3);
+    private static final int MILL_4_1 = (1 << A4) | (1 << B4) | (1 << C4);
+    private static final int MILL_4_2 = (1 << E4) | (1 << F4) | (1 << G4);
+    private static final int MILL_5 =   (1 << C5) | (1 << D5) | (1 << E5);
+    private static final int MILL_6 =   (1 << B6) | (1 << D6) | (1 << F6);
+    private static final int MILL_7 =   (1 << A7) | (1 << D7) | (1 << G7);
+    private static final int MILL_A =   (1 << A1) | (1 << A4) | (1 << A7);
+    private static final int MILL_B =   (1 << B2) | (1 << B4) | (1 << B6);
+    private static final int MILL_C =   (1 << C3) | (1 << C4) | (1 << C5);
+    private static final int MILL_D_1 = (1 << D1) | (1 << D2) | (1 << D3);
+    private static final int MILL_D_2 = (1 << D5) | (1 << D6) | (1 << D7);
+    private static final int MILL_E =   (1 << E3) | (1 << E4) | (1 << E5);
+    private static final int MILL_F =   (1 << F2) | (1 << F4) | (1 << F6);
+    private static final int MILL_G =   (1 << G1) | (1 << G4) | (1 << G7);
 
     private static final int[] ALL_MILLS = { MILL_1, MILL_2, MILL_3, MILL_4_1, MILL_4_2, MILL_5, MILL_6, MILL_7,
                                              MILL_A, MILL_B, MILL_C, MILL_D_1, MILL_D_2, MILL_E, MILL_F, MILL_G };
@@ -87,7 +87,7 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long> {
             { MILL_4_1, MILL_B }, // B4
             { MILL_4_1, MILL_C }  // C4
     };
-    private static final int[][] BIT_MOVES = {
+    private static final byte[][] MOVES = {
             { A4, D1 },         // A1
             { B4, D2 },         // B2
             { C4, D3 },         // C3
@@ -112,32 +112,6 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long> {
             { A1, A7, B4 },     // A4
             { B2, A4, B6, C4 }, // B4
             { C3, B4, C5 }      // C4
-    };
-    private static final byte[][] INT_MOVES = {
-            { _A4, _D1 },           // A1
-            { _B4, _D2 },           // B2
-            { _C4, _D3 },           // C3
-            { _A1, _D2, _G1 },      // D1
-            { _D1, _B2, _D3, _F2 }, // D2
-            { _C3, _D2, _E3 },      // D3
-            { _D1, _G4 },           // G1
-            { _D2, _F4 },           // F2
-            { _D3, _E4 },           // E3
-            { _G1, _F4, _G7 },      // G4
-            { _F2, _E4, _F6, _G4 }, // F4
-            { _E3, _E5, _F4 },      // E4
-            { _G4, _D7 },           // G7
-            { _F4, _D6 },           // F6
-            { _E4, _D5 },           // E5
-            { _D6, _A7, _G7 },      // D7
-            { _D5, _B6, _D7, _F6 }, // D6
-            { _C5, _D6, _E5 },      // D5
-            { _A4, _D7 },           // A7
-            { _B4, _D6 },           // B6
-            { _C4, _D5 },           // C5
-            { _A1, _A7, _B4 },      // A4
-            { _B2, _A4, _B6, _C4 }, // B4
-            { _C3, _B4, _C5 }       // C4
     };
 
     private final int[] board = new int[2];
@@ -203,7 +177,7 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long> {
         }
     }
 
-    private void setGridPosition(int player, int i) {
+    private void setGridPosition(byte player, int i) {
         if (player == FREE) {
             this.board[PLAYER_W] &= ~i;
             this.board[PLAYER_B] &= ~i;
@@ -217,7 +191,7 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long> {
         return this.hasWon(PLAYER_W) || this.hasWon(PLAYER_B) || this.isADraw();
     }
 
-    private boolean hasWon(int player) {
+    private boolean hasWon(byte player) {
         return this.phase1completed() &&
                 (this.count[1 - player] <= 2 ||                                        // L'avversario ha meno di 3 pezzi
                 numberOfPiecesBlocked((byte) (1 - player)) == this.count[1 - player]); // L'avversario non puo' muoversi
@@ -303,7 +277,7 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long> {
         } else { // Fase 2
             for (byte from = 0; from < 24; from++) {
                 if (((this.board[this.currentPlayer] >>> from) & 1) == 1) {
-                    for (byte to : INT_MOVES[from]) {
+                    for (byte to : MOVES[from]) {
                         this.addMoves(moves, from, to);
                     }
                 }
@@ -439,8 +413,8 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long> {
 
     private boolean pieceIsBlocked(int board, byte piece){
         int moves = 0;
-        for (int i = 0; i < BIT_MOVES[piece].length; i++) {
-            moves |= BIT_MOVES[piece][i];
+        for (byte move : MOVES[piece]) {
+            moves |= (1 << move);
         }
 
         return (board & moves) == moves;
@@ -459,15 +433,15 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long> {
         return totBlocked;
     }
 
-    private int numberOfDoubleMorrises(int player) {
+    private int numberOfDoubleMorrises(byte player) {
         int board = this.board[player];
         int totDoubleMorris = 0;
-        for (int pos = 0; pos < 24; pos++) {
-            int mill = 0;
-            for (int i = 0; i < MILLS[pos].length; i++) {
-                mill |= MILLS[pos][i];
+        for (byte pos = 0; pos < 24; pos++) {
+            int doubleMill = 0;
+            for (int mill : MILLS[pos]) {
+                doubleMill |= mill;
             }
-            if ((board & mill) == mill) {
+            if ((board & doubleMill) == doubleMill) {
                 totDoubleMorris++;
             }
         }
@@ -475,11 +449,11 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long> {
         return totDoubleMorris;
     }
 
-    private int numberOf3PiecesConfiguration(int player) {
+    private int numberOf3PiecesConfiguration(byte player) {
         int board = this.board[player];
         int opponentBoard = this.board[1 - player];
         int tot3piecesConfiguration = 0;
-        for (int pos = 0; pos < 24; pos++) {
+        for (byte pos = 0; pos < 24; pos++) {
             if (((board >>> pos) & 1) == 1) {
                 boolean possibileConfiguration = true;
                 for (int mill : MILLS[pos]) {
@@ -499,7 +473,7 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long> {
         return tot3piecesConfiguration;
     }
 
-    private int numberOf2PiecesConfiguration(int player) {
+    private int numberOf2PiecesConfiguration(byte player) {
         int board = this.board[player];
         int opponentBoard = this.board[1 - player];
         int tot2piecesConfiguration = 0;
@@ -512,16 +486,16 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long> {
         return tot2piecesConfiguration;
     }
 
-    private int numberOfPotential3PiecesConfiguration(int player) {
+    private int numberOfPotential3PiecesConfiguration(byte player) {
         int board = this.board[player];
         int opponentBoard = this.board[1 - player];
         int totPotential3piecesConfiguration = 0;
-        for (int pos = 0; pos < 24; pos++) {
+        for (byte pos = 0; pos < 24; pos++) {
             if (((board >>> pos) & 1) == 1) {
                 for (int mill : MILLS[pos]) {
                     if ((opponentBoard & mill) == 0 && (board & mill) == (1 << pos)) {
                         int count = 0;
-                        for (int i = 0; i < 24; i++) {
+                        for (byte i = 0; i < 24; i++) {
                             if (i == pos) {
                                 continue;
                             }
