@@ -68,7 +68,7 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
             throw new IllegalArgumentException("Search depth MUST be > 0");
         }
 
-        this.transpositionTable.clear();
+        //this.transpositionTable.clear();
 
         this.nodesCount = 0;
         this.quiescenceNodesCount = 0;
@@ -219,6 +219,7 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
             makeMove(move);
             score = negascoutScore(first, depth, a, beta, b);
             unmakeMove(move);
+
             if (this.abort) {
                 break;
             }
@@ -319,7 +320,7 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
         }
 
         double score = -quiescence(depth - 1, !offensive, -b, -alpha);
-        if (!first && alpha < score && score < beta) {
+        if (!this.abort && !first && alpha < score && score < beta) {
             // fails high... full re-search
             score = -quiescence(depth - 1, !offensive, -beta, -alpha);
         }
@@ -366,7 +367,7 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
         }
 
         double score = -negascout(null, depth - 1, -b, -alpha);
-        if (!first && alpha < score && score < beta) {
+        if (!this.abort && !first && alpha < score && score < beta) {
             // fails high... full re-search
             score = -negascout(null, depth - 1, -beta, -alpha);
         }
@@ -374,7 +375,7 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
     }
 
     public void printStatistics() {
-        System.out.println("[NODES = " + this.nodesCount + ", QNODES = " + this.quiescenceNodesCount + ", TT HITS: " + this.transpositionTable.getTableHits() + ", UP HITS: " + this.transpositionTable.getUpperBoundHits() + ", LW HITS: " + this.transpositionTable.getLowerBoundHits() + ", EX HITS: " + this.transpositionTable.getExactScoreHits() + ", TT SIZE: " + this.transpositionTable.size() + "]");
+        System.out.println("[NODES = " + this.nodesCount + ", QNODES = " + this.quiescenceNodesCount + ", TT HITS: " + (int)(this.transpositionTable.getHitRatio() * 100) + "%, UP HITS: " + this.transpositionTable.getUpperBoundHits() + ", LW HITS: " + this.transpositionTable.getLowerBoundHits() + ", EX HITS: " + this.transpositionTable.getExactScoreHits() + ", TT SIZE: " + this.transpositionTable.size() + "]");
     }
 
 }

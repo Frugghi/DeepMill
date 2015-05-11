@@ -62,6 +62,8 @@ public abstract class Player extends Thread {
             System.out.println("Effect of your move: \n" + currentState.toString());
 
             myTurn = false;
+
+            System.gc();
         }
     }
 

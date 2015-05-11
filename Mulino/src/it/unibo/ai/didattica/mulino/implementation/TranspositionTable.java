@@ -3,9 +3,12 @@ package it.unibo.ai.didattica.mulino.implementation;
 import fr.avianey.minimax4j.Move;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class TranspositionTable<T extends Comparable<T>, M extends Move> {
+
+    public static final int MAX_SIZE = (int)Math.pow(2, 22);
 
     public enum EntryType {
         LOWER_BOUND, UPPER_BOUND, EXACT_SCORE;
@@ -18,10 +21,16 @@ public class TranspositionTable<T extends Comparable<T>, M extends Move> {
         public int depth;
     }
 
-    private Map<T, Entry<M>> table = new HashMap<>();
+    private Map<T, Entry<M>> table = new LinkedHashMap<T, Entry<M>>(){
+        @Override
+        protected boolean removeEldestEntry(Map.Entry eldest) {
+            return this.size() > TranspositionTable.MAX_SIZE;
+        }
+    };
     private int lowerBoundHits = 0;
     private int upperBoundHits = 0;
     private int exactScoreHits = 0;
+    private int missedHits = 0;
 
     public int getTableHits() {
         return this.lowerBoundHits + this.upperBoundHits + this.exactScoreHits;
@@ -34,6 +43,10 @@ public class TranspositionTable<T extends Comparable<T>, M extends Move> {
     }
     public int getExactScoreHits() {
         return this.exactScoreHits;
+    }
+    public double getHitRatio() {
+        int totalHits = this.getTableHits();
+        return totalHits / (totalHits + this.missedHits);
     }
 
     public Entry<M> get(T hash, int depth) {
@@ -52,6 +65,8 @@ public class TranspositionTable<T extends Comparable<T>, M extends Move> {
             }
 
             return entry;
+        } else {
+            this.missedHits++;
         }
 
         return null;
@@ -66,6 +81,7 @@ public class TranspositionTable<T extends Comparable<T>, M extends Move> {
         this.upperBoundHits = 0;
         this.lowerBoundHits = 0;
         this.exactScoreHits = 0;
+        this.missedHits = 0;
     }
 
     public int size() {
