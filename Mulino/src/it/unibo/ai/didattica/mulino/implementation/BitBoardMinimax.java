@@ -340,17 +340,21 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long> {
 
     @Override
     protected boolean isQuiet() {
-        boolean lastMoveBlockedMill = false;
-        int opponentBoard = this.board[this.opponentPlayer];
+        if (!this.phase1completed()) {
+            boolean lastMoveBlockedMill = false;
+            int opponentBoard = this.board[this.currentPlayer];
 
-        for (int mill : MILLS[this.movesHistory.get(0).getTo()]) {
-            if (Integer.bitCount((opponentBoard & mill)) == 2) {
-                lastMoveBlockedMill = true;
-                break;
+            for (int mill : MILLS[this.movesHistory.get(0).getTo()]) {
+                if (Integer.bitCount((opponentBoard & mill)) == 2) {
+                    lastMoveBlockedMill = true;
+                    break;
+                }
             }
-        }
 
-        return !lastMoveBlockedMill && this.numberOf2PiecesConfiguration(this.opponentPlayer) == 0 && this.numberOf2PiecesConfiguration(this.currentPlayer) == 0;
+            return !lastMoveBlockedMill || this.numberOf2PiecesConfiguration(this.currentPlayer) == 0;
+        } else {
+            return true;
+        }
     }
 
     @Override
@@ -608,9 +612,6 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long> {
         result += "Black Checkers On Board: " + this.count[PLAYER_B] + ";\n";
         result += "Current player: " + (this.currentPlayer == PLAYER_W ? "W" : "B") + ";\n";
         result += "Opponent player: " + (this.opponentPlayer == PLAYER_W ? "W" : "B") + ";\n";
-        this.previous();
-        result += "Table score: " + this.evaluate() + ";\n";
-        this.next();
         result += "\n";
 
         result += "Number of morrises player (W): " + this.numberOfMorrises(PLAYER_W) + "\n";
@@ -636,10 +637,10 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long> {
         return result;
     }
 
-    private String playerString(int i) {
-        if ((this.board[PLAYER_W] & i) == i) {
+    private String playerString(byte i) {
+        if (((this.board[PLAYER_W] >>> i) & 1) == 1) {
             return "W";
-        } else if ((this.board[PLAYER_B] & i) == i) {
+        } else if (((this.board[PLAYER_B] >>> i) & 1) == 1) {
             return "B";
         } else {
             return "O";

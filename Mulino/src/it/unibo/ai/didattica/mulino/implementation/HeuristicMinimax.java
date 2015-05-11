@@ -12,6 +12,7 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
     private TranspositionTable<T, M> transpositionTable = new TranspositionTable<>();
     private int currentDepth;
     private int nodesCount;
+    private int quiescenceNodesCount;
     private boolean useHeuristic;
     private boolean abort;
     protected List<M> movesHistory = new ArrayList<> ();
@@ -44,16 +45,8 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
         this.useHeuristic = useHeuristic;
     }
 
-    public int getNodesCount() {
-        return this.nodesCount;
-    }
-
     public boolean isUsingHeuristic() {
         return this.useHeuristic;
-    }
-
-    public void setUseHeuristic(boolean useHeuristic) {
-        this.useHeuristic = useHeuristic;
     }
 
     public boolean shouldAbort() {
@@ -78,6 +71,7 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
         this.transpositionTable.clear();
 
         this.nodesCount = 0;
+        this.quiescenceNodesCount = 0;
         this.maxDepth = depth;
 
         if (!this.useHeuristic) {
@@ -157,12 +151,17 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
     private double negascout(final MoveWrapper<M> wrapper, final int depth, final double alpha, final double beta) {
         this.nodesCount++;
 
+        if (this.abort) {
+            return this.maxEvaluateValue();
+        }
+
         if (depth == 0) {
             if (isQuiet() || isOver()) {
                 return evaluate();
             } else {
+                //return evaluate();
                 //System.out.println("Quiescence " + this.toString());
-                return quiescence(this.maxDepth * 2, alpha, beta);
+                return quiescence(this.maxDepth * 2, true, alpha, beta);
             }
         }
 
@@ -220,6 +219,10 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
             makeMove(move);
             score = negascoutScore(first, depth, a, beta, b);
             unmakeMove(move);
+            if (this.abort) {
+                break;
+            }
+
             if (score > a) {
                 a = score;
                 bestMove = move;
@@ -229,7 +232,7 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
                     currentDepthKillerMoves = new ArrayList<>();
                     this.killerMoves.put(this.currentDepth, currentDepthKillerMoves);
                 }
-                if (!this.abort && move != null && !currentDepthKillerMoves.contains(move)) {
+                if (move != null && !currentDepthKillerMoves.contains(move)) {
                     if (currentDepthKillerMoves.size() >= 2) {
                         currentDepthKillerMoves.remove(1);
                     }
@@ -261,12 +264,18 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
         return a;
     }
 
-    private double quiescence(final int depth, final double alpha, final double beta) {
-        this.nodesCount++;
+    private double quiescence(final int depth, final boolean offensive, final double alpha, final double beta) {
+        this.quiescenceNodesCount++;
 
-        if (depth == 0 || isQuiet() || isOver()) {
+        if (this.abort) {
+            return this.maxEvaluateValue();
+        }
+
+        if (/*depth == 0 ||*/ isQuiet() || isOver()) {
             return evaluate();
         }
+
+        //System.out.println(this.toString());
 
         double a = alpha;
         double b = beta;
@@ -275,7 +284,7 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
 
         if (moves.isEmpty()) {
             next();
-            double score = quiescenceScore(depth, true, a, beta, b);
+            double score = quiescenceScore(depth, !offensive, true, a, beta, b);
             previous();
             return score;
         }
@@ -284,8 +293,12 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
         boolean first = true;
         for (M move : moves) {
             makeMove(move);
-            score = quiescenceScore(depth, first, a, beta, b);
+            score = quiescenceScore(depth, !offensive, first, a, beta, b);
             unmakeMove(move);
+            if (this.abort) {
+                break;
+            }
+
             if (score > a) {
                 a = score;
 
@@ -300,15 +313,15 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
         return a;
     }
 
-    protected double quiescenceScore(final int depth, final boolean first, final double alpha, final double beta, final double b) {
+    protected double quiescenceScore(final int depth, final boolean offensive, final boolean first, final double alpha, final double beta, final double b) {
         if (this.abort) {
             return this.maxEvaluateValue();
         }
 
-        double score = -quiescence(depth - 1, -b, -alpha);
+        double score = -quiescence(depth - 1, !offensive, -b, -alpha);
         if (!first && alpha < score && score < beta) {
             // fails high... full re-search
-            score = -quiescence(depth - 1, -beta, -alpha);
+            score = -quiescence(depth - 1, !offensive, -beta, -alpha);
         }
         return score;
     }
@@ -361,7 +374,7 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
     }
 
     public void printStatistics() {
-        System.out.println("[NODES = " + this.nodesCount + ", TT HITS: " + this.transpositionTable.getTableHits() + ", UP HITS: " + this.transpositionTable.getUpperBoundHits() + ", LW HITS: " + this.transpositionTable.getLowerBoundHits() + ", EX HITS: " + this.transpositionTable.getExactScoreHits() + ", TT SIZE: " + this.transpositionTable.size() + "]");
+        System.out.println("[NODES = " + this.nodesCount + ", QNODES = " + this.quiescenceNodesCount + ", TT HITS: " + this.transpositionTable.getTableHits() + ", UP HITS: " + this.transpositionTable.getUpperBoundHits() + ", LW HITS: " + this.transpositionTable.getLowerBoundHits() + ", EX HITS: " + this.transpositionTable.getExactScoreHits() + ", TT SIZE: " + this.transpositionTable.size() + "]");
     }
 
 }

@@ -49,7 +49,7 @@ public abstract class IterativeDeepeningMinimax<M extends Move, T extends Compar
 
             M move = super.getBestMove(this.depth);
 
-            if (move == null) {
+            if (!this.shouldAbort() && move == null) {
                 System.err.println("Best move is null at depth " + this.depth);
                 this.purgeHeuristic(0);
                 move = super.getBestMove(this.depth);
