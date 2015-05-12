@@ -16,7 +16,7 @@ public abstract class IterativeDeepeningMinimax<M extends InvertibleMove<M>, T e
                     Thread.sleep(maxTime);
                     IterativeDeepeningMinimax.this.setAbort(true);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    System.out.println("Timeout thread is alive!");
                 }
             }
         };
@@ -28,7 +28,6 @@ public abstract class IterativeDeepeningMinimax<M extends InvertibleMove<M>, T e
         this.timeoutTime = Long.MAX_VALUE;
 
         if (timeout.isAlive()) {
-            System.out.println("Timeout thread is alive!");
             timeout.interrupt();
         }
         System.out.println("Reached depth: " + (this.depth - 1));

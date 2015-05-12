@@ -1,6 +1,7 @@
 package it.unibo.ai.didattica.mulino.minimax;
 
 import fr.avianey.minimax4j.Move;
+import org.apache.commons.collections4.map.LRUMap;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -20,12 +21,13 @@ public class TranspositionTable<T extends Comparable<T>, M extends Move> {
         public int depth;
     }
 
-    private Map<T, Entry<M>> table = new LinkedHashMap<T, Entry<M>>(TranspositionTable.MAX_SIZE){
+    private Map<T, Entry<M>> table = new LRUMap(TranspositionTable.MAX_SIZE);
+    /*private Map<T, Entry<M>> table = new LinkedHashMap<T, Entry<M>>(TranspositionTable.MAX_SIZE){
         @Override
         protected boolean removeEldestEntry(Map.Entry eldest) {
             return this.size() > TranspositionTable.MAX_SIZE;
         }
-    };
+    };*/
     private int lowerBoundHits = 0;
     private int upperBoundHits = 0;
     private int exactScoreHits = 0;
