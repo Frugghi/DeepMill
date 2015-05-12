@@ -57,6 +57,7 @@ public abstract class IterativeDeepeningMinimax<M extends InvertibleMove<M>, T e
                 if (now - lastIteration > this.timeoutTime - now) {
                     System.out.print("... completed! " + (now - time) + "ms ");
                     this.printStatistics();
+                    this.depth++;
                     break;
                 }
 
