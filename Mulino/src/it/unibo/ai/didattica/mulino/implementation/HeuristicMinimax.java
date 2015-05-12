@@ -237,7 +237,10 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
                 if (a >= beta) {
                     break;
                 }
+            } else if (first && bestMove == null) {
+                bestMove = move;
             }
+
             b = a + 1;
             first = false;
         }
@@ -367,7 +370,7 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
     }
 
     public void printStatistics() {
-        System.out.println("[NODES = " + this.nodesCount + ", QNODES = " + this.quiescenceNodesCount + ", TT HITS: " + (int)(this.transpositionTable.getHitRatio() * 100) + "%, UP HITS: " + this.transpositionTable.getUpperBoundHits() + ", LW HITS: " + this.transpositionTable.getLowerBoundHits() + ", EX HITS: " + this.transpositionTable.getExactScoreHits() + ", TT SIZE: " + this.transpositionTable.size() + "]");
+        System.out.println("[NODES = " + this.nodesCount + ", QNODES = " + this.quiescenceNodesCount + ", TT HITS: " + (int)(this.transpositionTable.getHitRatio() * 100) + "%, TT SIZE: " + this.transpositionTable.size() + "]");
     }
 
 }

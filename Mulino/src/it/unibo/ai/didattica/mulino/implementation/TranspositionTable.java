@@ -49,7 +49,7 @@ public class TranspositionTable<T extends Comparable<T>, M extends Move> {
         if (totalHits == 0 && this.missedHits == 0) {
             return 0;
         } else {
-            return totalHits / (totalHits + this.missedHits);
+            return ((double)totalHits / (double)(totalHits + this.missedHits));
         }
     }
 

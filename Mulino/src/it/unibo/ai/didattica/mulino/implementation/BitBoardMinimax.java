@@ -552,6 +552,28 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long> {
         long blackBoard = this.board[PLAYER_B];
         long phase = (this.phase1completed() ? (this.count[PLAYER_W] == 3 || this.count[PLAYER_B] == 3 ? 3 : 2) : 1);
 
+        byte maxValue = -1;
+        int maxPattern = 0;
+        for (byte i = 0; i < 4; i++) {
+            byte value = (byte)((whiteBoard >>> (6 * i)) & 0b00111111);
+            if (value > maxValue) {
+                maxValue = value;
+                maxPattern = (1 << i);
+            } else if (value == maxValue) {
+                maxPattern |= (1 << i);
+            }
+        }
+        if ((maxPattern & 0b0011) == 0b0010) {
+            whiteBoard = rotateBoard90(whiteBoard);
+            blackBoard = rotateBoard90(blackBoard);
+        } else if ((maxPattern & 0b0110) == 0b0100) {
+            whiteBoard = rotateBoard180(whiteBoard);
+            blackBoard = rotateBoard180(blackBoard);
+        } else if ((maxPattern & 0b1100) == 0b1000) {
+            whiteBoard = rotateBoard270(whiteBoard);
+            blackBoard = rotateBoard270(blackBoard);
+        }
+
         long hash = this.currentPlayer;
         hash |= (phase << 1);
         hash |= (whiteBoard <<  3); // [0..23]  white board
@@ -560,14 +582,19 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long> {
         return hash;
     }
 
-    private int rotateBoard(int board) {
-        int first = (board & 0b00111111);
-        return ((board >>> 6) & (first << 18));
+    private long rotateBoard90(long board) {
+        long first = (board & 0b111111);
+        return ((board >>> 6) | (first << 18));
     }
 
-    private long rotateBoard(long board) {
-        long first = (board & 0b00111111);
-        return ((board >>> 6) & (first << 18));
+    private long rotateBoard180(long board) {
+        long first = (board & 0b111111111111);
+        return ((board >>> 12) | (first << 12));
+    }
+
+    private long rotateBoard270(long board) {
+        long first = (board & 0b111111111111111111);
+        return ((board >>> 18) | (first << 6));
     }
 
     @Override
