@@ -127,7 +127,7 @@ public abstract class Minimax<M extends Move> {
     }
     
     /**
-     * Minimax algorithm implementation :
+     * Minimax algorithm grid :
      * <pre>
      * function minimax(node, depth, maximizingPlayer)
      *     if depth = 0 or node is a terminal node
@@ -313,7 +313,7 @@ public abstract class Minimax<M extends Move> {
      * rootMinimaxValue := -rootNegamaxValue
      * </pre>
      * 
-     * This implementation use alpha-beta cut-offs.
+     * This grid use alpha-beta cut-offs.
      * 
      * @param wrapper
      * @param depth
@@ -500,7 +500,7 @@ public abstract class Minimax<M extends Move> {
     public abstract void previous();
 
     /**
-     * Get the implementation used for tree search.
+     * Get the grid used for tree search.
      * @return the {@link Algorithm} used.
      */
     public Algorithm getAlgo() {

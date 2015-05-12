@@ -1,8 +1,8 @@
-package it.unibo.ai.didattica.mulino.implementation;
+package it.unibo.ai.didattica.mulino.domain.grid;
 
 import it.unibo.ai.didattica.mulino.domain.MillMove;
 
-public class GridMove implements MillMove {
+public class GridMove implements MillMove<GridMove> {
 
     private int player;
 
@@ -37,48 +37,24 @@ public class GridMove implements MillMove {
         return fromX;
     }
 
-    public void setFromX(int fromX) {
-        this.fromX = fromX;
-    }
-
     public int getFromZ() {
         return fromZ;
-    }
-
-    public void setFromZ(int fromZ) {
-        this.fromZ = fromZ;
     }
 
     public int getToX() {
         return toX;
     }
 
-    public void setToX(int toX) {
-        this.toX = toX;
-    }
-
     public int getToZ() {
         return toZ;
-    }
-
-    public void setToZ(int toZ) {
-        this.toZ = toZ;
     }
 
     public int getRemoveX() {
         return removeX;
     }
 
-    public void setRemoveX(int removeX) {
-        this.removeX = removeX;
-    }
-
     public int getRemoveZ() {
         return removeZ;
-    }
-
-    public void setRemoveZ(int removeZ) {
-        this.removeZ = removeZ;
     }
 
     public int getPlayer() {
@@ -95,6 +71,10 @@ public class GridMove implements MillMove {
 
     public boolean isRemoveMove() {
         return this.removeZ != Integer.MAX_VALUE;
+    }
+
+    public GridMove inverse() {
+        return null;
     }
 
     public String toString() {

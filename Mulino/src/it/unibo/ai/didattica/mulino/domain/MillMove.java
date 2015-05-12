@@ -1,8 +1,8 @@
 package it.unibo.ai.didattica.mulino.domain;
 
-import fr.avianey.minimax4j.Move;
+import it.unibo.ai.didattica.mulino.minimax.InvertibleMove;
 
-public interface MillMove extends Move {
+public interface MillMove<M> extends InvertibleMove<M> {
 
     String toStringMove();
     boolean isPutMove();

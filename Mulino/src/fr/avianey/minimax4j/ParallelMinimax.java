@@ -27,7 +27,7 @@ import java.util.concurrent.RecursiveTask;
  */
 
 /**
- * A {@link Minimax} implementation that distribute the tree exploration across processors.<br/>
+ * A {@link Minimax} grid that distribute the tree exploration across processors.<br/>
  * 
  * @author antoine vianey
  * @param <M>

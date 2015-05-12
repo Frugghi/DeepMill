@@ -1,4 +1,4 @@
-package it.unibo.ai.didattica.mulino.implementation;
+package it.unibo.ai.didattica.mulino.domain.grid;
 
 import it.unibo.ai.didattica.mulino.domain.MillMinimax;
 import it.unibo.ai.didattica.mulino.domain.State;
@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class GridMinimax extends MillMinimax<GridMove, Integer> {
+public class GridMinimax extends MillMinimax<GridMove, Integer, GridMinimax> {
 
     public static final int FREE     = 0;
     public static final int PLAYER_W = 1;
@@ -45,7 +45,7 @@ public class GridMinimax extends MillMinimax<GridMove, Integer> {
     }
 
     @Override
-    public MillMinimax fromState(State state) {
+    public GridMinimax fromState(State state) {
         GridMinimax ia =  new GridMinimax(this.getAlgo(), this.isUsingHeuristic());
         ia.updateState(state);
         ia.currentPlayer = this.currentPlayer;

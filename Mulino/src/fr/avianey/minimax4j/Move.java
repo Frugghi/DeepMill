@@ -23,7 +23,7 @@ package fr.avianey.minimax4j;
 /**
  * 
  * Implement this interface to describe a Move in your game.<br>
- * A typical implementation for a Chess game would be :
+ * A typical grid for a Chess game would be :
  * <ul>
  * <li>The color of the piece</li>
  * <li>The type of the piece (king, queen, pawn, ...)</li>

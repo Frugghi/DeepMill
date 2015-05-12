@@ -1,8 +1,8 @@
-package it.unibo.ai.didattica.mulino.implementation;
+package it.unibo.ai.didattica.mulino.domain.bitboard;
 
 import it.unibo.ai.didattica.mulino.domain.MillMove;
 
-public class BitBoardMove implements MillMove {
+public class BitBoardMove implements MillMove<BitBoardMove> {
 
     private byte player;
 
@@ -43,6 +43,14 @@ public class BitBoardMove implements MillMove {
 
     public boolean isRemoveMove() {
         return this.remove != Byte.MAX_VALUE;
+    }
+
+    public BitBoardMove inverse() {
+        if (isPutMove() || isRemoveMove()) {
+            return null;
+        }
+
+        return new BitBoardMove(this.player, this.to, this.from);
     }
 
     @Override

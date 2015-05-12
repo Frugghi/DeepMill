@@ -37,9 +37,9 @@ import java.util.TreeMap;
  * 
  * @author antoine vianey
  *
- * @param <M> the {@link Move} implementation
+ * @param <M> the {@link Move} grid
  * @param <T> the transposition table key
- * @param <G> the transposition group implementation or {@link Void} if grouping is not necessary. 
+ * @param <G> the transposition group grid or {@link Void} if grouping is not necessary.
  * @see Transposition
  */
 public abstract class TranspositionMinimax<M extends Move, T, G extends Comparable<G>> extends Minimax<M> {
@@ -47,7 +47,7 @@ public abstract class TranspositionMinimax<M extends Move, T, G extends Comparab
 	/**
 	 * Factory for transposition table.
 	 * Unless {@link TranspositionMinimax#TranspositionIA(fr.avianey.minimax4j.Minimax.Algorithm, TranspositionTableFactory)}
-	 * is used as super constructor, an {@link HashMap} is used as default implementation.
+	 * is used as super constructor, an {@link HashMap} is used as default grid.
 	 * 
 	 * @author antoine vianey
 	 *

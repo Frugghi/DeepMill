@@ -1,9 +1,9 @@
-package it.unibo.ai.didattica.mulino.client;
+package it.unibo.ai.didattica.mulino.client.players;
 
 import it.unibo.ai.didattica.mulino.domain.MillMinimax;
 import it.unibo.ai.didattica.mulino.domain.MillMove;
 
-public class IAPlayer<IA extends MillMinimax> extends Player {
+public class IAPlayer<IA extends MillMinimax<M, ?, IA>, M extends MillMove<M>> extends Player {
 
     private IA ia;
     private int depth;
@@ -18,10 +18,6 @@ public class IAPlayer<IA extends MillMinimax> extends Player {
         this.ia = ia;
     }
 
-    public boolean isDebug() {
-        return this.debug;
-    }
-
     public void setDebug(boolean debug) {
         this.debug = debug;
     }
@@ -30,15 +26,15 @@ public class IAPlayer<IA extends MillMinimax> extends Player {
     protected void updateState() {
         super.updateState();
 
-        IA state = (IA)ia.fromState(this.currentState);
+        IA state = ia.fromState(this.currentState);
         if (debug) System.out.println("DEEPMILL DEBUG:\nReceived state:\n" + ia.toString());
 
-        for(Object m : ia.getPossibleMoves()){
-            ia.makeMove((MillMove)m);
+        for(M m : ia.getPossibleMoves()){
+            ia.makeMove(m);
             if (state.equals(ia)) {
                 break;
             }
-            ia.unmakeMove((MillMove)m);
+            ia.unmakeMove(m);
         }
 
         if (!state.equals(ia)) {
@@ -53,7 +49,7 @@ public class IAPlayer<IA extends MillMinimax> extends Player {
     protected String doMove() {
         String actionString;
         long startTime = System.currentTimeMillis();
-        MillMove move = (MillMove) ia.getBestMove(depth, 1000 * maxTime);
+        M move = ia.getBestMove(depth, 1000 * maxTime);
         System.out.println("Time elapsed: " + (System.currentTimeMillis() - startTime) + "ms");
 
         if (debug) System.out.println("DEEPMILL DEBUG: " + move.toString());

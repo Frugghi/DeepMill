@@ -1,8 +1,8 @@
 package it.unibo.ai.didattica.mulino.test;
 
 import fr.avianey.minimax4j.Minimax;
-import it.unibo.ai.didattica.mulino.implementation.BitBoardMinimax;
-import it.unibo.ai.didattica.mulino.implementation.BitBoardMove;
+import it.unibo.ai.didattica.mulino.domain.bitboard.BitBoardMinimax;
+import it.unibo.ai.didattica.mulino.domain.bitboard.BitBoardMove;
 
 import java.io.BufferedReader;
 import java.io.IOException;

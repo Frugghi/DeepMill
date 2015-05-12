@@ -1,4 +1,4 @@
-package it.unibo.ai.didattica.mulino.client;
+package it.unibo.ai.didattica.mulino.client.players;
 
 import java.io.*;
 
@@ -22,16 +22,20 @@ public class ReplayPlayer extends Player {
     protected String doMove() {
         try {
             try {
-                Thread.sleep(this.moveTime * 1000);
+                sleep(this.moveTime * 1000);
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }
 
-            String actionString = null;
-            while (!(actionString = in.readLine()).startsWith("Player " + this.client.getPlayer().toString() + " move: ")) {
-
+            String actionString;
+            while ((actionString = in.readLine()) != null) {
+                if (actionString.startsWith("Player " + this.client.getPlayer().toString() + " move: ")) {
+                    break;
+                }
             }
-            actionString = actionString.substring(("Player " + this.client.getPlayer().toString() + " move: ").length());
+            if (actionString != null) {
+                actionString = actionString.substring(("Player " + this.client.getPlayer().toString() + " move: ").length());
+            }
 
             return actionString;
         } catch (IOException e) {

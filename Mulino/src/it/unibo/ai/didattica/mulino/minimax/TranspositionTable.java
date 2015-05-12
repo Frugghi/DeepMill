@@ -1,8 +1,7 @@
-package it.unibo.ai.didattica.mulino.implementation;
+package it.unibo.ai.didattica.mulino.minimax;
 
 import fr.avianey.minimax4j.Move;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -34,15 +33,6 @@ public class TranspositionTable<T extends Comparable<T>, M extends Move> {
 
     public int getTableHits() {
         return this.lowerBoundHits + this.upperBoundHits + this.exactScoreHits;
-    }
-    public int getLowerBoundHits() {
-        return this.lowerBoundHits;
-    }
-    public int getUpperBoundHits() {
-        return this.upperBoundHits;
-    }
-    public int getExactScoreHits() {
-        return this.exactScoreHits;
     }
     public double getHitRatio() {
         int totalHits = this.getTableHits();
@@ -78,9 +68,7 @@ public class TranspositionTable<T extends Comparable<T>, M extends Move> {
 
     public void put(T hash, Entry<M> entry) {
         Entry<M> oldEntry = this.table.get(hash);
-        if (oldEntry != null && oldEntry.depth > entry.depth) {
-            return;
-        } else {
+        if (oldEntry == null || oldEntry.depth <= entry.depth) {
             this.table.put(hash, entry);
         }
     }

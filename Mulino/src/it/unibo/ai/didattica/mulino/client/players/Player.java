@@ -1,6 +1,7 @@
-package it.unibo.ai.didattica.mulino.client;
+package it.unibo.ai.didattica.mulino.client.players;
 
 import fr.avianey.minimax4j.Minimax;
+import it.unibo.ai.didattica.mulino.client.MulinoClient;
 import it.unibo.ai.didattica.mulino.domain.MillMinimax;
 import it.unibo.ai.didattica.mulino.domain.MillMove;
 import it.unibo.ai.didattica.mulino.domain.State;

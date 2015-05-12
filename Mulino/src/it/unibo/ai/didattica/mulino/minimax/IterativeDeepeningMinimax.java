@@ -1,12 +1,6 @@
-package it.unibo.ai.didattica.mulino.implementation;
+package it.unibo.ai.didattica.mulino.minimax;
 
-import fr.avianey.minimax4j.Move;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-public abstract class IterativeDeepeningMinimax<M extends Move, T extends Comparable<T>> extends HeuristicMinimax<M, T> {
+public abstract class IterativeDeepeningMinimax<M extends InvertibleMove<M>, T extends Comparable<T>> extends HeuristicMinimax<M, T> {
 
     protected int depth;
     private long timeoutTime = Long.MAX_VALUE;
@@ -22,6 +16,7 @@ public abstract class IterativeDeepeningMinimax<M extends Move, T extends Compar
                     Thread.sleep(maxTime);
                     IterativeDeepeningMinimax.this.setAbort(true);
                 } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         };

@@ -1,4 +1,5 @@
 package it.unibo.ai.didattica.mulino.client;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -10,11 +11,13 @@ import it.unibo.ai.didattica.mulino.actions.Action;
 import it.unibo.ai.didattica.mulino.actions.Phase1Action;
 import it.unibo.ai.didattica.mulino.actions.Phase2Action;
 import it.unibo.ai.didattica.mulino.actions.PhaseFinalAction;
-import it.unibo.ai.didattica.mulino.domain.MillMinimax;
+import it.unibo.ai.didattica.mulino.client.players.HumanPlayer;
+import it.unibo.ai.didattica.mulino.client.players.IAPlayer;
+import it.unibo.ai.didattica.mulino.client.players.ReplayPlayer;
 import it.unibo.ai.didattica.mulino.domain.State;
 import it.unibo.ai.didattica.mulino.engine.TCPMulino;
-import it.unibo.ai.didattica.mulino.implementation.BitBoardMinimax;
-import it.unibo.ai.didattica.mulino.implementation.GridMinimax;
+import it.unibo.ai.didattica.mulino.domain.bitboard.BitBoardMinimax;
+import it.unibo.ai.didattica.mulino.domain.grid.GridMinimax;
 
 public class MulinoClient {
 
@@ -183,14 +186,13 @@ public class MulinoClient {
             ReplayPlayer blackPlayer = new ReplayPlayer(State.Checker.BLACK, replay, maxTime);
             blackPlayer.start();
         } else if (iaPlayer) {
-            MillMinimax ia;
+            IAPlayer player;
             if (bitState) {
-                ia = new BitBoardMinimax(algorithm, useHeuristic);
+                player = new IAPlayer<>(playerColor, new BitBoardMinimax(algorithm, useHeuristic), depth, maxTime);
             } else {
-                ia = new GridMinimax(algorithm, useHeuristic);
+                player = new IAPlayer<>(playerColor, new GridMinimax(algorithm, useHeuristic), depth, maxTime);
             }
 
-            IAPlayer player = new IAPlayer(playerColor, ia, depth, maxTime);
             player.setDebug(debug);
             player.start();
         } else {

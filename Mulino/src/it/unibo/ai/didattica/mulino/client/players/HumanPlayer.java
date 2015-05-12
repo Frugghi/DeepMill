@@ -1,4 +1,4 @@
-package it.unibo.ai.didattica.mulino.client;
+package it.unibo.ai.didattica.mulino.client.players;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

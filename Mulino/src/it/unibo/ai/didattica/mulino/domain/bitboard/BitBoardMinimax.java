@@ -1,14 +1,13 @@
-package it.unibo.ai.didattica.mulino.implementation;
+package it.unibo.ai.didattica.mulino.domain.bitboard;
 
 import it.unibo.ai.didattica.mulino.domain.MillMinimax;
 import it.unibo.ai.didattica.mulino.domain.State;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
-public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long> {
+public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMinimax> {
 
     public static final byte PLAYER_W = 0;
     public static final byte PLAYER_B = 1;
@@ -138,7 +137,7 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long> {
     }
 
     @Override
-    public MillMinimax fromState(State state) {
+    public BitBoardMinimax fromState(State state) {
         BitBoardMinimax ia =  new BitBoardMinimax(this.getAlgo(), this.isUsingHeuristic());
         ia.updateState(state);
         ia.currentPlayer = this.currentPlayer;
@@ -372,7 +371,7 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long> {
         if (!this.phase1completed()) { // Fase 1
             return 18 * lastIsRemoveMove +
                     26 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer]) +
-                     1 * (this.numberOfPiecesBlocked(this.opponentPlayer) - this.numberOfPiecesBlocked(this.currentPlayer)) +
+                         (this.numberOfPiecesBlocked(this.opponentPlayer) - this.numberOfPiecesBlocked(this.currentPlayer)) +
                      8 * (this.numberOfPotential3PiecesConfiguration(this.currentPlayer) - this.numberOfPotential3PiecesConfiguration(this.opponentPlayer)) +
                      9 * (this.numberOfMorrises(this.currentPlayer) - this.numberOfMorrises(this.opponentPlayer)) +
                     10 * (this.numberOf2PiecesConfiguration(this.currentPlayer) - this.numberOf2PiecesConfiguration(this.opponentPlayer)) +
@@ -380,7 +379,7 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long> {
         } else if (this.count[PLAYER_B] == 3 || this.count[PLAYER_W] == 3) { // Fase 3
             return 16 * lastIsRemoveMove +
                     10 * (this.numberOf2PiecesConfiguration(this.currentPlayer) - this.numberOf2PiecesConfiguration(this.opponentPlayer)) +
-                     1 * (this.numberOf3PiecesConfiguration(this.currentPlayer) - this.numberOf3PiecesConfiguration(this.opponentPlayer));
+                         (this.numberOf3PiecesConfiguration(this.currentPlayer) - this.numberOf3PiecesConfiguration(this.opponentPlayer));
         } else { // Fase 2
             return 14 * lastIsRemoveMove +
                     43 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer]) +

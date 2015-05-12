@@ -1,11 +1,11 @@
-package it.unibo.ai.didattica.mulino.implementation;
+package it.unibo.ai.didattica.mulino.minimax;
 
 import fr.avianey.minimax4j.Minimax;
 import fr.avianey.minimax4j.Move;
 
 import java.util.*;
 
-public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> extends Minimax<M> {
+public abstract class HeuristicMinimax<M extends InvertibleMove<M>, T extends Comparable<T>> extends Minimax<M> {
 
     private int maxDepth;
     private Map<Integer, List<Move>> killerMoves = new HashMap<>();
@@ -23,9 +23,9 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
             List<Move> killerMoves = HeuristicMinimax.this.killerMoves.get(HeuristicMinimax.this.currentDepth);
             boolean o1isKillerMove = killerMoves.contains(o1);
             boolean o2isKillerMove = killerMoves.contains(o2);
-            if (o1isKillerMove == true && o2isKillerMove == true) {
+            if (o1isKillerMove && o2isKillerMove) {
                 return killerMoves.indexOf(o1) < killerMoves.indexOf(o2) ? -1 : 1;
-            } else if (o1isKillerMove == false && o2isKillerMove == false) {
+            } else if (!o1isKillerMove && !o2isKillerMove) {
                 return 0;
             } else if (o1isKillerMove) {
                 return -1;
@@ -122,11 +122,14 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
             }
         }
 
-        if (this.shouldAvoidRepetitions() && this.movesHistory.size() >= 4) {
-            int index = moves.indexOf(this.movesHistory.get(3));
+        if (this.shouldAvoidRepetitions() && this.movesHistory.size() >= 2) {
+            M inverseMove = this.movesHistory.get(1).inverse();
+            if (inverseMove != null) {
+                int index = moves.indexOf(this.movesHistory.get(1));
 
-            if (index != -1) {
-                moves.add(moves.remove(index));
+                if (index != -1) {
+                    moves.add(moves.remove(index));
+                }
             }
         }
 
@@ -165,7 +168,7 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
         double b = beta;
 
         T hash = this.getTransposition();
-        if (hash != null && !this.abort && wrapper == null) {
+        if (hash != null && wrapper == null) {
             TranspositionTable.Entry<M> entry = this.transpositionTable.get(hash, depth);
             if (entry != null) {
                 switch (entry.type) {
@@ -229,7 +232,7 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
                 if (a >= beta) {
                     break;
                 }
-            } else if (first && bestMove == null) {
+            } else if (first) {
                 bestMove = move;
             }
 
