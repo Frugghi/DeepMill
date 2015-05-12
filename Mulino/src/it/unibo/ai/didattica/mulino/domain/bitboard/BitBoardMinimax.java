@@ -377,7 +377,8 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
                     10 * (this.numberOf2PiecesConfiguration(this.currentPlayer) - this.numberOf2PiecesConfiguration(this.opponentPlayer)) +
                      7 * (this.numberOf3PiecesConfiguration(this.currentPlayer) - this.numberOf3PiecesConfiguration(this.opponentPlayer));
         } else if (this.count[PLAYER_B] == 3 || this.count[PLAYER_W] == 3) { // Fase 3
-            return 16 * lastIsRemoveMove +
+            return 1000000 +
+                    16 * lastIsRemoveMove +
                     10 * (this.numberOf2PiecesConfiguration(this.currentPlayer) - this.numberOf2PiecesConfiguration(this.opponentPlayer)) +
                          (this.numberOf3PiecesConfiguration(this.currentPlayer) - this.numberOf3PiecesConfiguration(this.opponentPlayer));
         } else { // Fase 2
@@ -425,6 +426,10 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
     }
 
     private int numberOfPiecesBlocked(byte player){
+        if (this.phase1completed() && this.count[player] == 3) {
+            return 0;
+        }
+
         int emptyBoard = this.board[PLAYER_W] | this.board[PLAYER_B];
         int totBlocked = 0;
 
