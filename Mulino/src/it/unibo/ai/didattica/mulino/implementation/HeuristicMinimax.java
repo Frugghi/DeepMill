@@ -165,7 +165,7 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
         double b = beta;
 
         T hash = this.getTransposition();
-        if (hash != null && !this.abort) {
+        if (hash != null && !this.abort && wrapper == null) {
             TranspositionTable.Entry<M> entry = this.transpositionTable.get(hash, depth);
             if (entry != null) {
                 switch (entry.type) {
@@ -176,18 +176,10 @@ public abstract class HeuristicMinimax<M extends Move, T extends Comparable<T>> 
                         b = Math.min(b, entry.score);
                         break;
                     case EXACT_SCORE:
-                        if (wrapper != null) {
-                            wrapper.move = entry.move;
-                        }
-
                         return entry.score;
                 }
 
                 if (a >= b) {
-                    if (wrapper != null) {
-                        wrapper.move = entry.move;
-                    }
-
                     return a;
                 }
             }

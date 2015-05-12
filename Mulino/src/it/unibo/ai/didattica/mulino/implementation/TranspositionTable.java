@@ -21,7 +21,7 @@ public class TranspositionTable<T extends Comparable<T>, M extends Move> {
         public int depth;
     }
 
-    private Map<T, Entry<M>> table = new LinkedHashMap<T, Entry<M>>(){
+    private Map<T, Entry<M>> table = new LinkedHashMap<T, Entry<M>>(TranspositionTable.MAX_SIZE){
         @Override
         protected boolean removeEldestEntry(Map.Entry eldest) {
             return this.size() > TranspositionTable.MAX_SIZE;

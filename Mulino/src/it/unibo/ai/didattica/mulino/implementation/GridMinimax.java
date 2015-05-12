@@ -4,6 +4,7 @@ import it.unibo.ai.didattica.mulino.domain.MillMinimax;
 import it.unibo.ai.didattica.mulino.domain.State;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class GridMinimax extends MillMinimax<GridMove, Integer> {
@@ -21,8 +22,6 @@ public class GridMinimax extends MillMinimax<GridMove, Integer> {
 
     private int currentPlayer;
     private int opponentPlayer;
-
-    private GridMove lastMove;
 
     public GridMinimax(Algorithm algo, boolean useHeuristic) {
         super(algo, useHeuristic);
@@ -43,8 +42,6 @@ public class GridMinimax extends MillMinimax<GridMove, Integer> {
 
         this.currentPlayer = PLAYER_W;
         this.opponentPlayer = PLAYER_B;
-
-        this.lastMove = null;
     }
 
     @Override
@@ -106,8 +103,6 @@ public class GridMinimax extends MillMinimax<GridMove, Integer> {
 
     @Override
     public void makeMove(GridMove move) {
-        this.lastMove = move;
-
         setGridPosition(currentPlayer, move.getToX(), move.getToZ());
 
         if (move.isPutMove()) {
@@ -132,8 +127,6 @@ public class GridMinimax extends MillMinimax<GridMove, Integer> {
 
     @Override
     public void unmakeMove(GridMove move) {
-        this.lastMove = null;
-
         previous();
 
         setGridPosition(FREE, move.getToX(), move.getToZ());
@@ -460,6 +453,31 @@ public class GridMinimax extends MillMinimax<GridMove, Integer> {
         result += "Number of pieces blocked player ("+ PLAYER_W+ ") : "+ this.numberOfPiecesBlocked(PLAYER_W)+ "\n";
         result += "Number of pieces blocked player ("+ PLAYER_B+ ") : "+ this.numberOfPiecesBlocked(PLAYER_B)+ "\n";
 
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof GridMinimax)) return false;
+
+        GridMinimax that = (GridMinimax) o;
+
+        if (currentPlayer != that.currentPlayer) return false;
+        if (opponentPlayer != that.opponentPlayer) return false;
+        if (!Arrays.equals(played, that.played)) return false;
+        if (!Arrays.equals(count, that.count)) return false;
+        return Arrays.deepEquals(grid, that.grid);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Arrays.hashCode(played);
+        result = 31 * result + Arrays.hashCode(count);
+        result = 31 * result + Arrays.deepHashCode(grid);
+        result = 31 * result + currentPlayer;
+        result = 31 * result + opponentPlayer;
         return result;
     }
 
