@@ -45,6 +45,7 @@ public class BoardEvaluator {
                         ia.previous();
                         System.out.println("Total score: " + ia.evaluate());
                         ia.next();
+                        System.out.println("Hash code: " + Long.toBinaryString(ia.getTransposition()));
                         break;
                     case "3":
                         List<BitBoardMove> moves = ia.getPossibleMoves();
