@@ -259,22 +259,22 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
 
     @Override
     public List<BitBoardMove> getPossibleMoves() {
-        List<BitBoardMove> moves = new ArrayList<>(3 * (24 - this.count[PLAYER_W] - this.count[PLAYER_B]));
+        List<BitBoardMove> moves = new ArrayList<>(3 * (BOARD_SIZE - this.count[PLAYER_W] - this.count[PLAYER_B]));
 
         if (this.played[this.currentPlayer] < PIECES) { // Fase 1
-            for (byte to = 0; to < 24; to++) {
+            for (byte to = 0; to < BOARD_SIZE; to++) {
                 this.addMoves(moves, to);
             }
         } else if (this.count[this.currentPlayer] == 3) { // Fase 3
-            for (byte from = 0; from < 24; from++) {
+            for (byte from = 0; from < BOARD_SIZE; from++) {
                 if (((this.board[this.currentPlayer] >>> from) & 1) == 1) {
-                    for (byte to = 0; to < 24; to++) {
+                    for (byte to = 0; to < BOARD_SIZE; to++) {
                         this.addMoves(moves, from, to);
                     }
                 }
             }
         } else { // Fase 2
-            for (byte from = 0; from < 24; from++) {
+            for (byte from = 0; from < BOARD_SIZE; from++) {
                 if (((this.board[this.currentPlayer] >>> from) & 1) == 1) {
                     for (byte to : MOVES[from]) {
                         this.addMoves(moves, from, to);
@@ -296,7 +296,7 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
             if (this.willMill(this.currentPlayer, from, to)) {
                 boolean onlyMills = this.onlyMills(this.opponentPlayer);
                 int opponentBoard = this.board[this.opponentPlayer];
-                for (byte remove = 0; remove < 24; remove++) {
+                for (byte remove = 0; remove < BOARD_SIZE; remove++) {
                     if (((opponentBoard >>> remove) & 1) == 1 && (onlyMills || !this.isMill(opponentBoard, remove))) {
                         moves.add(0, new BitBoardMove(this.currentPlayer, from == Byte.MAX_VALUE ? Byte.MAX_VALUE : from, to, remove));
                     }
@@ -328,7 +328,7 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
 
     private boolean onlyMills(byte player) {
         int board = this.board[player];
-        for (byte i = 0; i < 24; i++) {
+        for (byte i = 0; i < BOARD_SIZE; i++) {
             if (((board >>> i) & 1) == 1 && !this.isMill(board, i)) {
                 return false;
             }
@@ -392,11 +392,15 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
     }
 
     private int numberOfReachablePositions(byte player) {
+        if (this.phase1completed() && this.count[player] == 3) {
+            return BOARD_SIZE - (this.count[PLAYER_W] + this.count[PLAYER_B]);
+        }
+
         int reachableMap = 0;
-        for (byte pos = 0; pos < 24; pos++) {
+        for (byte pos = 0; pos < BOARD_SIZE; pos++) {
             if (((reachableMap >>> pos) & 1) == 0) {
                 int map = this.mapReachablePositions(player, pos, 0);
-                if (((map >>> 25) & 1) == 1) {
+                if (((map >>> (BOARD_SIZE + 1)) & 1) == 1) {
                     reachableMap |= map;
                 }
             }
@@ -417,7 +421,7 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
 
         for (byte move : MOVES[position]) {
             if (((playerBoard >>> move) & 1) == 1) {
-                mappedPositions |= (1 << 25);
+                mappedPositions |= (1 << (BOARD_SIZE + 1));
             }
 
             if (((completeBoard >>> move) & 1) == 0 && ((mappedPositions >>> move) & 1) == 0) {
@@ -427,7 +431,7 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
 
         return mappedPositions;
     }
-    
+
     private int numberOfImpossibleMorrises() {
         int blackBoard = this.board[PLAYER_B];
         int whiteBoard = this.board[PLAYER_W];
@@ -471,7 +475,7 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
         int emptyBoard = this.board[PLAYER_W] | this.board[PLAYER_B];
         int totBlocked = 0;
 
-        for (byte i = 0; i < 24; i++) {
+        for (byte i = 0; i < BOARD_SIZE; i++) {
             if (((this.board[player] >>> i) & 1) == 1 && this.pieceIsBlocked(emptyBoard, i)) {
                 totBlocked++;
             }
@@ -483,7 +487,7 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
     private int numberOfDoubleMorrises(byte player) {
         int board = this.board[player];
         int totDoubleMorris = 0;
-        for (byte pos = 0; pos < 24; pos++) {
+        for (byte pos = 0; pos < BOARD_SIZE; pos++) {
             int doubleMill = 0;
             for (int mill : MILLS[pos]) {
                 doubleMill |= mill;
@@ -500,7 +504,7 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
         int board = this.board[player];
         int opponentBoard = this.board[1 - player];
         int tot3piecesConfiguration = 0;
-        for (byte pos = 0; pos < 24; pos++) {
+        for (byte pos = 0; pos < BOARD_SIZE; pos++) {
             if (((board >>> pos) & 1) == 1) {
                 boolean possibileConfiguration = true;
                 for (int mill : MILLS[pos]) {
@@ -537,12 +541,12 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
         int board = this.board[player];
         int opponentBoard = this.board[1 - player];
         int totPotential3piecesConfiguration = 0;
-        for (byte pos = 0; pos < 24; pos++) {
+        for (byte pos = 0; pos < BOARD_SIZE; pos++) {
             if (((board >>> pos) & 1) == 1) {
                 for (int mill : MILLS[pos]) {
                     if ((opponentBoard & mill) == 0 && (board & mill) == (1 << pos)) {
                         int count = 0;
-                        for (byte i = 0; i < 24; i++) {
+                        for (byte i = 0; i < BOARD_SIZE; i++) {
                             if (i == pos) {
                                 continue;
                             }

@@ -5,6 +5,7 @@ import it.unibo.ai.didattica.mulino.minimax.IterativeDeepeningMinimax;
 public abstract class MillMinimax<M extends MillMove<M>, T extends Comparable<T>, Type> extends IterativeDeepeningMinimax<M, T> {
 
     public static final int PIECES = 9;
+    public static final int BOARD_SIZE = 24;
 
     public MillMinimax(Algorithm algo, boolean useHeuristic) {
         super(algo, useHeuristic);
