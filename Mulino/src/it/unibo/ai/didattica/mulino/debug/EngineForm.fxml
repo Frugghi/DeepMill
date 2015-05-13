@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.shape.*?>
@@ -45,6 +46,76 @@
                   <Circle fx:id="a1" fill="WHITE" layoutX="2.0" layoutY="300.0" onMouseClicked="#handleCircleClick" opacity="0.0" radius="15.0" stroke="BLACK" strokeType="INSIDE" />
                </children>
             </Pane>
+            <Label layoutX="45.0" layoutY="365.0" text="A">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <Label layoutX="95.0" layoutY="365.0" text="B">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <Label layoutX="145.0" layoutY="365.0" text="C">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <Label layoutX="195.0" layoutY="365.0" text="D">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <Label layoutX="245.0" layoutY="365.0" text="E">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <Label layoutX="295.0" layoutY="365.0" text="F">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <Label layoutX="345.0" layoutY="365.0" text="G">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <Label layoutX="25.0" layoutY="340.0" text="1">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <Label layoutX="25.0" layoutY="290.0" text="2">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <Label layoutX="25.0" layoutY="240.0" text="3">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <Label layoutX="25.0" layoutY="190.0" text="4">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <Label layoutX="25.0" layoutY="140.0" text="5">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <Label layoutX="25.0" layoutY="90.0" text="6">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <Label layoutX="25.0" layoutY="40.0" text="7">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
          </children>
       </AnchorPane>
    </center>
