@@ -435,14 +435,14 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
     private int numberOfImpossibleMorrises() {
         int blackBoard = this.board[PLAYER_B];
         int whiteBoard = this.board[PLAYER_W];
-        int numberOfImpossibleMorrieses = 0;
+        int numberOfImpossibleMorrises = 0;
         for (int mill : ALL_MILLS) {
             if ((whiteBoard & mill) != 0 && (blackBoard & mill) != 0) {
-                numberOfImpossibleMorrieses++;
+                numberOfImpossibleMorrises++;
             }
         }
 
-        return numberOfImpossibleMorrieses;
+        return numberOfImpossibleMorrises;
     }
 
     private int numberOfMorrises(byte player) {
