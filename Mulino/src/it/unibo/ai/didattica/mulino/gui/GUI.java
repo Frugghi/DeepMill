@@ -1,10 +1,11 @@
 package it.unibo.ai.didattica.mulino.gui;
 
+import it.unibo.ai.didattica.mulino.debug.StateUI;
 import it.unibo.ai.didattica.mulino.domain.State;
 
 import javax.swing.JFrame;
 
-public class GUI {
+public class GUI implements StateUI {
 	
 	Background mainFrame;
 	

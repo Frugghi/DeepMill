@@ -6,6 +6,7 @@ import it.unibo.ai.didattica.mulino.actions.Action;
 import it.unibo.ai.didattica.mulino.actions.Phase1;
 import it.unibo.ai.didattica.mulino.actions.Phase2;
 import it.unibo.ai.didattica.mulino.actions.PhaseFinal;
+import it.unibo.ai.didattica.mulino.debug.StateUI;
 import it.unibo.ai.didattica.mulino.domain.State;
 import it.unibo.ai.didattica.mulino.gui.GUI;
 
@@ -18,11 +19,15 @@ public class Engine {
 	
 	private TCPMulino whiteSocket;
 	private TCPMulino blackSocket;
+
+	private StateUI theGui;
 	
-	
-	private GUI theGui;
-	
-	
+	public Engine(State state, State.Checker player, StateUI gui) {
+		currentState = state;
+		currentPlayer = player;
+		delay = 60;
+		this.theGui = gui;
+	}
 	
 	public Engine() {
 		currentState = new State();
@@ -78,7 +83,7 @@ public class Engine {
 			if (t.isAlive()) {
 				System.out.println("Timeout!!!!");
 				System.out.println("Player " + currentPlayer.toString() + " has lost!!!");
-				System.exit(0);
+				return;
 			}
 			try {
 				System.out.println("Player " + currentPlayer.toString() + " move: " + currentAction.toString());
@@ -103,7 +108,7 @@ public class Engine {
 				theGui.update(currentState);
 			} catch (Exception e) {
 				e.printStackTrace();
-				System.exit(1);
+				return;
 			}
 			currentPlayer = (currentPlayer== State.Checker.WHITE) ? State.Checker.BLACK : State.Checker.WHITE;
 		}

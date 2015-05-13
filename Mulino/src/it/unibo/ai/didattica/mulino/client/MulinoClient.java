@@ -11,6 +11,7 @@ import it.unibo.ai.didattica.mulino.actions.Action;
 import it.unibo.ai.didattica.mulino.actions.Phase1Action;
 import it.unibo.ai.didattica.mulino.actions.Phase2Action;
 import it.unibo.ai.didattica.mulino.actions.PhaseFinalAction;
+import it.unibo.ai.didattica.mulino.client.players.EvaluatorPlayer;
 import it.unibo.ai.didattica.mulino.client.players.HumanPlayer;
 import it.unibo.ai.didattica.mulino.client.players.IAPlayer;
 import it.unibo.ai.didattica.mulino.client.players.ReplayPlayer;
@@ -120,6 +121,7 @@ public class MulinoClient {
         boolean bitState = true;
         boolean useHeuristic = true;
         boolean iaPlayer = true;
+        boolean evaluator = false;
         String replay = null;
         for (int i = 0; i < args.length; i++) {
             switch (args[i].toLowerCase()) {
@@ -176,10 +178,26 @@ public class MulinoClient {
                 case "-r":
                     replay = args[++i];
                     break;
+                case "--evaluator":
+                    evaluator = true;
+                    break;
             }
         }
 
-        if (replay != null) {
+        if (evaluator) {
+            EvaluatorPlayer whitePlayer;
+            EvaluatorPlayer blackPlayer;
+            if (bitState) {
+                whitePlayer = new EvaluatorPlayer<>(State.Checker.WHITE, new BitBoardMinimax(algorithm, useHeuristic));
+                blackPlayer = new EvaluatorPlayer<>(State.Checker.BLACK, new BitBoardMinimax(algorithm, useHeuristic));
+            } else {
+                whitePlayer = new EvaluatorPlayer<>(State.Checker.WHITE, new GridMinimax(algorithm, useHeuristic));
+                blackPlayer = new EvaluatorPlayer<>(State.Checker.BLACK, new GridMinimax(algorithm, useHeuristic));
+            }
+
+            whitePlayer.start();
+            blackPlayer.start();
+        } else if (replay != null) {
             ReplayPlayer whitePlayer = new ReplayPlayer(State.Checker.WHITE, replay, maxTime);
             whitePlayer.start();
 

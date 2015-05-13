@@ -1,16 +1,12 @@
 package it.unibo.ai.didattica.mulino.client.players;
 
-import fr.avianey.minimax4j.Minimax;
 import it.unibo.ai.didattica.mulino.client.MulinoClient;
-import it.unibo.ai.didattica.mulino.domain.MillMinimax;
-import it.unibo.ai.didattica.mulino.domain.MillMove;
-import it.unibo.ai.didattica.mulino.domain.State;
 
 import java.io.*;
 
 public abstract class Player extends Thread {
 
-    private it.unibo.ai.didattica.mulino.domain.State.Checker color;
+    protected it.unibo.ai.didattica.mulino.domain.State.Checker color;
     protected MulinoClient client;
     protected it.unibo.ai.didattica.mulino.domain.State currentState;
 
@@ -30,18 +26,11 @@ public abstract class Player extends Thread {
         }
         System.out.println("Hello " + this.toString() + "!");
         System.out.println("You are player " + client.getPlayer().toString() + "!");
-        System.out.println("Current state:");
-        try {
-            currentState = client.read();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
-        System.out.println(currentState.toString());
+        this.initState();
 
         while (true) {
             if (!myTurn) {
-                this.updateState();
+                this.nextMove();
             }
 
             System.out.println("Player " + client.getPlayer().toString() + ", do your move: ");
@@ -68,7 +57,17 @@ public abstract class Player extends Thread {
         }
     }
 
-    protected void updateState() {
+    protected void initState() {
+        System.out.println("Current state:");
+        try {
+            currentState = client.read();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println(currentState.toString());
+    }
+
+    protected void nextMove() {
         System.out.println("Waiting for your opponent move...");
         try {
             this.currentState = this.client.read();

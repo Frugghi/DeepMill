@@ -23,8 +23,16 @@ public class IAPlayer<IA extends MillMinimax<M, ?, IA>, M extends MillMove<M>> e
     }
 
     @Override
-    protected void updateState() {
-        super.updateState();
+    protected void initState() {
+        super.initState();
+
+        ia = ia.fromState(this.currentState);
+        ia.previous();
+    }
+
+    @Override
+    protected void nextMove() {
+        super.nextMove();
 
         IA state = ia.fromState(this.currentState);
         if (debug) System.out.println("DEEPMILL DEBUG:\nReceived state:\n" + ia.toString());
