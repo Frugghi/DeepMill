@@ -9,13 +9,18 @@ public abstract class Player extends Thread {
     protected it.unibo.ai.didattica.mulino.domain.State.Checker color;
     protected MulinoClient client;
     protected it.unibo.ai.didattica.mulino.domain.State currentState;
+    private boolean myTurn;
 
     public Player(it.unibo.ai.didattica.mulino.domain.State.Checker color) {
+        this(color, color == it.unibo.ai.didattica.mulino.domain.State.Checker.WHITE);
+    }
+
+    public Player(it.unibo.ai.didattica.mulino.domain.State.Checker color, boolean firstPlayer) {
         this.color = color;
+        this.myTurn = firstPlayer;
     }
 
     public void run() {
-        boolean myTurn = (color == it.unibo.ai.didattica.mulino.domain.State.Checker.WHITE);
         String actionString = "";
 
         try {

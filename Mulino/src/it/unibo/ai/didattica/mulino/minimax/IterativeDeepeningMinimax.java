@@ -49,7 +49,6 @@ public abstract class IterativeDeepeningMinimax<M extends InvertibleMove<M>, T e
             lastIteration = System.currentTimeMillis();
             M move = super.getBestMove(this.depth);
 
-
             if (!this.shouldAbort() && move != null) {
                 bestMove = move;
 

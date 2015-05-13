@@ -8,7 +8,7 @@ public class EvaluatorPlayer<IA extends MillMinimax<M, ?, IA>, M extends MillMov
     private IA ia;
 
     public EvaluatorPlayer(it.unibo.ai.didattica.mulino.domain.State.Checker color, IA ia) {
-        super(color);
+        super(color, true);
 
         this.ia = ia;
     }
@@ -29,10 +29,6 @@ public class EvaluatorPlayer<IA extends MillMinimax<M, ?, IA>, M extends MillMov
 
         System.out.println(ia.toString());
         System.out.println("Total score: " + ia.evaluate());
-
-        if (color != it.unibo.ai.didattica.mulino.domain.State.Checker.WHITE) {
-            System.exit(0);
-        }
     }
 
     @Override

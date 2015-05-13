@@ -130,16 +130,21 @@ public class Engine implements Initializable, StateUI {
             return;
         }
 
-        switch (event.getButton()) {
-            case PRIMARY:
-                this.setWhite((Circle) event.getSource());
-                break;
-            case SECONDARY:
-                this.setBlack((Circle) event.getSource());
-                break;
-            case MIDDLE:
-                this.setEmpty((Circle) event.getSource());
-                break;
+        Circle circle = (Circle) event.getSource();
+        if (event.getClickCount() == 1) {
+            switch (event.getButton()) {
+                case PRIMARY:
+                    this.setWhite(circle);
+                    break;
+                case SECONDARY:
+                    this.setBlack(circle);
+                    break;
+                case MIDDLE:
+                    this.setEmpty(circle);
+                    break;
+            }
+        } else {
+            this.setEmpty(circle);
         }
     }
 
