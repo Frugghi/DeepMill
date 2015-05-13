@@ -162,12 +162,12 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
 
         switch (player) {
             case WHITE:
-                this.board[PLAYER_W] |= i;
+                this.board[PLAYER_W] |=  i;
                 this.board[PLAYER_B] &= ~i;
                 break;
             case BLACK:
                 this.board[PLAYER_W] &= ~i;
-                this.board[PLAYER_B] |= i;
+                this.board[PLAYER_B] |=  i;
                 break;
             case EMPTY:
                 this.board[PLAYER_W] &= ~i;
@@ -386,10 +386,48 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
                     43 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer]) +
                     10 * (this.numberOfPiecesBlocked(this.opponentPlayer) - this.numberOfPiecesBlocked(this.currentPlayer)) +
                     11 * (this.numberOfMorrises(this.currentPlayer) - this.numberOfMorrises(this.opponentPlayer)) +
-                     8 * (this.numberOfDoubleMorrises(this.currentPlayer) - this.numberOfDoubleMorrises(this.opponentPlayer));
+                     8 * (this.numberOfDoubleMorrises(this.currentPlayer) - this.numberOfDoubleMorrises(this.opponentPlayer)) +
+                         (this.numberOfReachablePositions(this.currentPlayer) - this.numberOfReachablePositions(this.opponentPlayer));
         }
     }
 
+    private int numberOfReachablePositions(byte player) {
+        int reachableMap = 0;
+        for (byte pos = 0; pos < 24; pos++) {
+            if (((reachableMap >>> pos) & 1) == 0) {
+                int map = this.mapReachablePositions(player, pos, 0);
+                if (((map >>> 25) & 1) == 1) {
+                    reachableMap |= map;
+                }
+            }
+        }
+        reachableMap &= 0xFFFFFF;
+
+        return Integer.bitCount(reachableMap);
+    }
+
+    private int mapReachablePositions(byte player, byte position, int mappedPositions) {
+        int completeBoard = this.board[PLAYER_W] | this.board[PLAYER_B];
+        int playerBoard = this.board[player];
+        if (((completeBoard >>> position) & 1) == 1) {
+            return mappedPositions;
+        }
+
+        mappedPositions |= (1 << position);
+
+        for (byte move : MOVES[position]) {
+            if (((playerBoard >>> move) & 1) == 1) {
+                mappedPositions |= (1 << 25);
+            }
+
+            if (((completeBoard >>> move) & 1) == 0 && ((mappedPositions >>> move) & 1) == 0) {
+                mappedPositions |= mapReachablePositions(player, move, mappedPositions);
+            }
+        }
+
+        return mappedPositions;
+    }
+    
     private int numberOfImpossibleMorrises() {
         int blackBoard = this.board[PLAYER_B];
         int whiteBoard = this.board[PLAYER_W];
@@ -403,7 +441,7 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
         return numberOfImpossibleMorrieses;
     }
 
-    private int numberOfMorrises(int player) {
+    private int numberOfMorrises(byte player) {
         int board = this.board[player];
         int numberOfMorrises = 0;
 
@@ -633,6 +671,8 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
         result += "Number of 3 pieces configurations player (B): " + this.numberOf3PiecesConfiguration(PLAYER_B) + "\n";
         result += "Number of potential 3 pieces configurations player (W): " + this.numberOfPotential3PiecesConfiguration(PLAYER_W) + "\n";
         result += "Number of potential 3 pieces configurations player (B): " + this.numberOfPotential3PiecesConfiguration(PLAYER_B) + "\n";
+        result += "Number of reachable positions player (W): " + this.numberOfReachablePositions(PLAYER_W) + "\n";
+        result += "Number of reachable positions player (B): " + this.numberOfReachablePositions(PLAYER_B) + "\n";
         result += "\n";
 
         result += "Moves history: ";
