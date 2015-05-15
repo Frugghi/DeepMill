@@ -142,6 +142,10 @@ public abstract class HeuristicMinimax<M extends InvertibleMove<M>, T extends Co
 
     public abstract T getTransposition();
 
+    public List<M> getPossibleQuiescenceMoves() {
+        return this.getPossibleMoves();
+    }
+
     /*
      * Negascout
      * w/ Killer Heuristic, Transposition Table and Quiescence search
@@ -154,8 +158,9 @@ public abstract class HeuristicMinimax<M extends InvertibleMove<M>, T extends Co
             return this.maxEvaluateValue();
         }
 
-        if (depth == 0) {
-            if (isQuiet() || isOver()) {
+        boolean isOver = isOver();
+        if (depth == 0 || isOver) {
+            if (isOver || isQuiet()) {
                 return evaluate();
             } else {
                 return quiescence(alpha, beta);
@@ -197,7 +202,7 @@ public abstract class HeuristicMinimax<M extends InvertibleMove<M>, T extends Co
         M bestMove = null;
         if (moves.isEmpty()) {
             next();
-            double score = negascoutScore(true, depth, a, beta, b);
+            double score = this.evaluate();
             previous();
             return score;
         }
@@ -271,11 +276,11 @@ public abstract class HeuristicMinimax<M extends InvertibleMove<M>, T extends Co
         double a = alpha;
         double b = beta;
 
-        List<M> moves = this.getPossibleMoves();
+        List<M> moves = this.getPossibleQuiescenceMoves();
 
         if (moves.isEmpty()) {
             next();
-            double score = quiescenceScore(true, a, beta, b);
+            double score = this.evaluate();
             previous();
             return score;
         }
