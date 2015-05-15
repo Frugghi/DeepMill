@@ -366,24 +366,20 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
             return 0;
         }
 
-        int lastIsRemoveMove = (!this.movesHistory.isEmpty() && this.movesHistory.get(0).isRemoveMove() ? -1 : 0);
-
         if (!this.phase1completed()) { // Fase 1
-            return 18 * lastIsRemoveMove +
-                    26 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer]) +
+            return  26 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer] - (this.played[this.currentPlayer] - this.played[this.opponentPlayer])) +
                          (this.numberOfPiecesBlocked(this.opponentPlayer) - this.numberOfPiecesBlocked(this.currentPlayer)) +
                      8 * (this.numberOfPotential3PiecesConfiguration(this.currentPlayer) - this.numberOfPotential3PiecesConfiguration(this.opponentPlayer)) +
                      9 * (this.numberOfMorrises(this.currentPlayer) - this.numberOfMorrises(this.opponentPlayer)) +
                     10 * (this.numberOf2PiecesConfiguration(this.currentPlayer) - this.numberOf2PiecesConfiguration(this.opponentPlayer)) +
                      7 * (this.numberOf3PiecesConfiguration(this.currentPlayer) - this.numberOf3PiecesConfiguration(this.opponentPlayer));
         } else if (this.count[PLAYER_B] == 3 || this.count[PLAYER_W] == 3) { // Fase 3
-            return 1000000 +
-                    16 * lastIsRemoveMove +
+            return  43 * (4 + this.count[this.currentPlayer] - this.count[this.opponentPlayer] * 2) +
                     10 * (this.numberOf2PiecesConfiguration(this.currentPlayer) - this.numberOf2PiecesConfiguration(this.opponentPlayer)) +
-                         (this.numberOf3PiecesConfiguration(this.currentPlayer) - this.numberOf3PiecesConfiguration(this.opponentPlayer));
+                         (this.numberOf3PiecesConfiguration(this.currentPlayer) - this.numberOf3PiecesConfiguration(this.opponentPlayer)) +
+                         (this.numberOfReachablePositions(this.currentPlayer) - this.numberOfReachablePositions(this.opponentPlayer));
         } else { // Fase 2
-            return 14 * lastIsRemoveMove +
-                    43 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer]) +
+            return  43 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer]) +
                     10 * (this.numberOfPiecesBlocked(this.opponentPlayer) - this.numberOfPiecesBlocked(this.currentPlayer)) +
                     11 * (this.numberOfMorrises(this.currentPlayer) - this.numberOfMorrises(this.opponentPlayer)) +
                      8 * (this.numberOfDoubleMorrises(this.currentPlayer) - this.numberOfDoubleMorrises(this.opponentPlayer)) +
