@@ -397,6 +397,10 @@ public class GridMinimax extends MillMinimax<GridMove, Integer, GridMinimax> {
     }
     
     private int numberOfPiecesBlocked(int player){
+        if (this.played[player] == PIECES && this.count[player] == 3) {
+            return 0;
+        }
+
         int totBlocked = 0;
 
         for (int z = 0; z < Z_SIZE; z++) {
