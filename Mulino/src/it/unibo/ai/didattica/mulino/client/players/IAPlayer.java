@@ -35,7 +35,7 @@ public class IAPlayer<IA extends MillMinimax<M, ?, IA>, M extends MillMove<M>> e
         super.nextMove();
 
         IA state = ia.fromState(this.currentState);
-        if (debug) System.out.println("DEEPMILL DEBUG:\nReceived state:\n" + ia.toString());
+        if (debug) System.out.println("DEEPMILL DEBUG:\nOld state:\n" + ia.toString());
 
         for(M m : ia.getPossibleMoves()){
             ia.makeMove(m);

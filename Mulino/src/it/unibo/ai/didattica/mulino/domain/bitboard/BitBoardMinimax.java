@@ -480,6 +480,23 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
         return numberOfImpossibleMorrises;
     }
 
+    private int numberOfHypotheticallyMoves(byte player) {
+        byte position = 0;
+        int count = this.count[player];
+        int board = this.board[player];
+        int numberOfHypotheticallyMoves = 0;
+
+        while (count > 0) {
+            if (((board >>> position) & 1) == 1) {
+                count--;
+                numberOfHypotheticallyMoves += MOVES[position].length;
+            }
+            position++;
+        }
+
+        return numberOfHypotheticallyMoves;
+    }
+
     private int numberOfUnblockableMorrises(byte player) {
         int board = this.board[player];
         int opponentBoard = this.board[1 - player];
@@ -492,14 +509,14 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
                         byte countPlayer = 0;
                         byte countOpponent = 0;
                         for (byte adjacentPosition : MOVES[pos]) {
-                            if (((board >>> adjacentPosition) & 1) == 1) {
+                            if ((mill & adjacentPosition) == 0 && ((board >>> adjacentPosition) & 1) == 1) {
                                 countPlayer++;
                             } else if (((opponentBoard >>> adjacentPosition) & 1) == 1) {
                                 countOpponent++;
                                 break;
                             }
                         }
-                        if (countPlayer >= 3 && countOpponent == 0) {
+                        if (countPlayer >= 1 && countOpponent == 0) {
                             numberOfUnblockableMorrises++;
                         }
                         break;
@@ -646,6 +663,11 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
     @Override
     public double maxEvaluateValue() {
         return Integer.MAX_VALUE;
+    }
+
+    @Override
+    public int iterativeDeepeningIncrease() {
+        return 1;
     }
 
     @Override

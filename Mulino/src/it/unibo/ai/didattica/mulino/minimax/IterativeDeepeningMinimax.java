@@ -9,6 +9,10 @@ public abstract class IterativeDeepeningMinimax<M extends InvertibleMove<M>, T e
         super(algo, useHeuristic);
     }
 
+    public int iterativeDeepeningIncrease() {
+        return 1;
+    }
+
     public M getBestMove(final int maxDepth, final int maxTime) {
         Thread timeout = new Thread() {
             public void run() {
@@ -37,13 +41,17 @@ public abstract class IterativeDeepeningMinimax<M extends InvertibleMove<M>, T e
 
     @Override
     public M getBestMove(final int maxDepth) {
+        if (this.isOver()) {
+            return null;
+        }
+
         this.purgeHeuristic(2);
 
         long time = System.currentTimeMillis();
         long lastIteration;
 
         M bestMove = null;
-        for (this.depth = 1; this.depth != maxDepth && !this.shouldAbort(); this.depth++) {
+        for (this.depth = this.iterativeDeepeningIncrease(); this.depth != maxDepth && !this.shouldAbort(); this.depth += this.iterativeDeepeningIncrease()) {
             System.out.print("Depth " + this.depth);
 
             lastIteration = System.currentTimeMillis();
@@ -64,7 +72,7 @@ public abstract class IterativeDeepeningMinimax<M extends InvertibleMove<M>, T e
                 this.setAbort(this.isOver());
                 this.unmakeMove(bestMove);
 
-                System.out.print("... done! " + (now - time) + "ms ");
+                System.out.print("... done! " + (now - time) + "ms - Best move: " + bestMove.toString() + " - ");
                 this.printStatistics();
             } else {
                 System.out.println("... aborted!");
