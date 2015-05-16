@@ -3,9 +3,7 @@ package it.unibo.ai.didattica.mulino.domain.bitboard;
 import it.unibo.ai.didattica.mulino.domain.MillMinimax;
 import it.unibo.ai.didattica.mulino.domain.State;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMinimax> {
 
@@ -208,6 +206,8 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
         return (this.played[PLAYER_B] + this.played[PLAYER_W]) == PIECES * 2;
     }
 
+    private boolean phase2completed() { return this.phase1completed() && (this.count[PLAYER_W] == 3 || this.count[PLAYER_B] == 3); }
+
     @Override
     public boolean shouldAvoidRepetitions() {
         return this.phase1completed();
@@ -260,16 +260,17 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
     @Override
     public List<BitBoardMove> getPossibleMoves() {
         List<BitBoardMove> moves = new ArrayList<>(3 * (BOARD_SIZE - this.count[PLAYER_W] - this.count[PLAYER_B]));
+        List<BitBoardMove> capturesMoves = new ArrayList<>(24);
 
         if (this.played[this.currentPlayer] < PIECES) { // Fase 1
             for (byte to = 0; to < BOARD_SIZE; to++) {
-                this.addMoves(moves, to);
+                this.addMoves(moves, capturesMoves, to);
             }
         } else if (this.count[this.currentPlayer] == 3) { // Fase 3
             for (byte from = 0; from < BOARD_SIZE; from++) {
                 if (((this.board[this.currentPlayer] >>> from) & 1) == 1) {
                     for (byte to = 0; to < BOARD_SIZE; to++) {
-                        this.addMoves(moves, from, to);
+                        this.addMoves(moves, capturesMoves, from, to);
                     }
                 }
             }
@@ -277,20 +278,22 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
             for (byte from = 0; from < BOARD_SIZE; from++) {
                 if (((this.board[this.currentPlayer] >>> from) & 1) == 1) {
                     for (byte to : MOVES[from]) {
-                        this.addMoves(moves, from, to);
+                        this.addMoves(moves, capturesMoves, from, to);
                     }
                 }
             }
         }
 
+        moves.addAll(0, capturesMoves);
+
         return moves;
     }
 
-    private void addMoves(List<BitBoardMove> moves, byte to) {
-        this.addMoves(moves, Byte.MAX_VALUE, to);
+    private void addMoves(List<BitBoardMove> moves, List<BitBoardMove> capturesMoves, byte to) {
+        this.addMoves(moves, capturesMoves, Byte.MAX_VALUE, to);
     }
 
-    private void addMoves(List<BitBoardMove> moves, byte from, byte to) {
+    private void addMoves(List<BitBoardMove> moves, List<BitBoardMove> capturesMoves, byte from, byte to) {
         int completeBoard = this.board[PLAYER_W] | this.board[PLAYER_B];
         if (((completeBoard >>> to) & 1) == 0) {
             if (this.willMill(this.currentPlayer, from, to)) {
@@ -298,7 +301,7 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
                 int opponentBoard = this.board[this.opponentPlayer];
                 for (byte remove = 0; remove < BOARD_SIZE; remove++) {
                     if (((opponentBoard >>> remove) & 1) == 1 && (onlyMills || !this.isMill(opponentBoard, remove))) {
-                        moves.add(0, new BitBoardMove(this.currentPlayer, from == Byte.MAX_VALUE ? Byte.MAX_VALUE : from, to, remove));
+                        capturesMoves.add(0, new BitBoardMove(this.currentPlayer, from == Byte.MAX_VALUE ? Byte.MAX_VALUE : from, to, remove));
                     }
                 }
             } else {
@@ -338,6 +341,35 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
     }
 
     @Override
+    public List<BitBoardMove> getPossibleQuiescenceMoves() {
+        if (this.phase1completed() && !this.phase2completed()) {
+            byte currentPlayer = this.currentPlayer;
+            byte opponentPlayer = this.opponentPlayer;
+            int reachablePositions = this.numberOfReachablePositions(currentPlayer);
+            int opponentReachablePositions = this.numberOfReachablePositions(opponentPlayer);
+
+            List<BitBoardMove> moves = this.getPossibleMoves();
+            if (reachablePositions > opponentReachablePositions) {
+                List<BitBoardMove> filteredMoves = new ArrayList<>();
+                for (BitBoardMove move : moves) {
+                    this.makeMove(move);
+
+                    if (this.numberOfReachablePositions(opponentPlayer) < opponentReachablePositions) {
+                        filteredMoves.add(move);
+                    }
+
+                    this.unmakeMove(move);
+                }
+                return filteredMoves;
+            }
+
+            return moves;
+        }
+
+        return super.getPossibleQuiescenceMoves();
+    }
+
+    @Override
     protected boolean isQuiet() {
         if (!this.phase1completed()) {
             boolean lastMoveBlockedMill = false;
@@ -351,6 +383,12 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
             }
 
             return !lastMoveBlockedMill || this.numberOf2PiecesConfiguration(this.currentPlayer) == 0;
+        } else if (!this.phase2completed()) {
+            int reachablePositions = this.numberOfReachablePositions(this.currentPlayer);
+            int opponentReachablePositions = this.numberOfReachablePositions(this.opponentPlayer);
+            int emptyPositions = (BOARD_SIZE - this.count[PLAYER_W] - this.count[PLAYER_B])/2;
+
+            return Math.min(reachablePositions, opponentReachablePositions) >= emptyPositions && Math.max(reachablePositions, opponentReachablePositions) >= emptyPositions;
         } else {
             return true;
         }
@@ -381,6 +419,7 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
         } else { // Fase 2
             return  43 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer]) +
                     10 * (this.numberOfPiecesBlocked(this.opponentPlayer) - this.numberOfPiecesBlocked(this.currentPlayer)) +
+                    12 * (this.numberOfUnblockableMorrises(this.currentPlayer) - this.numberOfUnblockableMorrises(this.opponentPlayer)) +
                     11 * (this.numberOfMorrises(this.currentPlayer) - this.numberOfMorrises(this.opponentPlayer)) +
                      8 * (this.numberOfDoubleMorrises(this.currentPlayer) - this.numberOfDoubleMorrises(this.opponentPlayer)) +
                          (this.numberOfReachablePositions(this.currentPlayer) - this.numberOfReachablePositions(this.opponentPlayer));
@@ -439,6 +478,37 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
         }
 
         return numberOfImpossibleMorrises;
+    }
+
+    private int numberOfUnblockableMorrises(byte player) {
+        int board = this.board[player];
+        int opponentBoard = this.board[1 - player];
+        int numberOfUnblockableMorrises = 0;
+
+        for (int mill : ALL_MILLS) {
+            if ((opponentBoard & mill) == 0 && Integer.bitCount((board & mill)) == 2) {
+                for (byte pos = 0; pos < 24; pos++) {
+                    if (((mill >>> pos) & 1)  == 1 && ((board >>> pos) & 1) == 0) {
+                        byte countPlayer = 0;
+                        byte countOpponent = 0;
+                        for (byte adjacentPosition : MOVES[pos]) {
+                            if (((board >>> adjacentPosition) & 1) == 1) {
+                                countPlayer++;
+                            } else if (((opponentBoard >>> adjacentPosition) & 1) == 1) {
+                                countOpponent++;
+                                break;
+                            }
+                        }
+                        if (countPlayer >= 3 && countOpponent == 0) {
+                            numberOfUnblockableMorrises++;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        return numberOfUnblockableMorrises;
     }
 
     private int numberOfMorrises(byte player) {
@@ -673,6 +743,8 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
         result += "Number of potential 3 pieces configurations player (B): " + this.numberOfPotential3PiecesConfiguration(PLAYER_B) + "\n";
         result += "Number of reachable positions player (W): " + this.numberOfReachablePositions(PLAYER_W) + "\n";
         result += "Number of reachable positions player (B): " + this.numberOfReachablePositions(PLAYER_B) + "\n";
+        result += "Number of unblockable morrises player (W): " + this.numberOfUnblockableMorrises(PLAYER_W) + "\n";
+        result += "Number of unblockable morrises player (B): " + this.numberOfUnblockableMorrises(PLAYER_B) + "\n";
         result += "\n";
 
         result += "Moves history: ";
