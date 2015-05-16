@@ -18,6 +18,7 @@ public class PhaseFinal {
 				, TryingToRemoveOwnCheckerException
 				, TryingToRemoveEmptyCheckerException
 				, TryingToRemoveCheckerInTripleException
+				, FromAndToAreNotConnectedException
 				{
 		
 		PhaseFinalAction currentAction = null;
@@ -39,12 +40,34 @@ public class PhaseFinal {
 		result.getBoard().put(currentAction.getTo(), checker);
 		result.getBoard().put(currentAction.getFrom(), State.Checker.EMPTY);
 
+		// if the move complete a mill, then an enemy checker is removed
+		if (Util.hasCompletedTriple(result, currentAction.getTo(), checker))
+			Util.removeOpponentChecker(result, checker, currentAction.getRemoveOpponentChecker());
 		
+		
+		
+		// REMOVED BECAUSE BUGGED...
 		// check if this move allows to remove an opponent checker
-		if (Util.hasCompletedTriple(result, currentAction.getTo(), checker)) {
+//		if (Util.hasCompletedTriple(result, currentAction.getTo(), checker)) {
+//			System.out.println("Player " + checker.toString() + " WIN!!!");
+//			System.exit(100);
+//		}
+		
+		
+		// from the wiki:
+		// "Vince il primo giocatore che lascia l'avversario con meno di tre pezzi in gioco o senza possibilità di muovere."
+		// condition "senza possibilità di muovere" will be captured by the timeout
+		// condition "con meno di tre pezzi" is captured here
+		int enemyCheckers;
+		if (checker == State.Checker.WHITE)
+			enemyCheckers = result.getBlackCheckersOnBoard();
+		else
+			enemyCheckers = result.getWhiteCheckersOnBoard();
+		if (enemyCheckers < 3) {
 			System.out.println("Player " + checker.toString() + " WIN!!!");
 			System.exit(100);
 		}
+		
 		return result;
 	}
 	
@@ -60,6 +83,7 @@ public class PhaseFinal {
 			, FromAndToAreEqualsException
 			, PositionNotEmptyException
 			, NullCheckerException
+			, FromAndToAreNotConnectedException
 			{
 		
 		// initial checks
@@ -95,6 +119,17 @@ public class PhaseFinal {
 			throw new WrongPositionException(to);
 		if (toChecker != State.Checker.EMPTY)
 			throw new PositionNotEmptyException(to);
+		
+		// we are in the FINAL phase, but only the player who has three checker can move them freely...
+		int numOfCheckers;
+		if (checker == State.Checker.WHITE)
+			numOfCheckers = currentState.getWhiteCheckersOnBoard();
+		else
+			numOfCheckers = currentState.getBlackCheckersOnBoard();
+		if (numOfCheckers > 3) {
+			if (!Util.areAdiacent(from, to))
+				throw new FromAndToAreNotConnectedException(action);
+		}
 	}
 	
 	

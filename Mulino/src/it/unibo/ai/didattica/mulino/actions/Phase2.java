@@ -1,7 +1,5 @@
 package it.unibo.ai.didattica.mulino.actions;
 
-import java.util.Arrays;
-
 import it.unibo.ai.didattica.mulino.domain.State;
 
 public class Phase2 {
@@ -45,8 +43,8 @@ public class Phase2 {
 			if (opponentCheckersOnBoard > 3)
 				Util.removeOpponentChecker(result, checker, currentAction.getRemoveOpponentChecker());
 			else {
-				System.out.println("Player " + checker.toString() + " WIN!!!");
-				System.exit(100);
+				System.out.println("Something deeply wrong happened: the Engine reports the game is in Phase 2, however there are only three (or less) checkers of a player...");
+				System.exit(-5);
 			}
 		}
 		
@@ -101,10 +99,14 @@ public class Phase2 {
 			throw new WrongPositionException(to);
 		if (to.equals(from))
 			throw new FromAndToAreEqualsException(action);
-		String[] hSet = Util.getHSet(from);
-		String[] vSet = Util.getVSet(from);
-		if (!Arrays.asList(hSet).contains(to) && !Arrays.asList(vSet).contains(to))
+		// Bug fixing: the current solution does not verify properly the concept of "adiacent" tiles
+		//String[] hSet = Util.getHSet(from);
+		//String[] vSet = Util.getVSet(from);
+		//if (!Arrays.asList(hSet).contains(to) && !Arrays.asList(vSet).contains(to))
+			//throw new FromAndToAreNotConnectedException(action);
+		if (!Util.areAdiacent(from, to))
 			throw new FromAndToAreNotConnectedException(action);
+		
 		State.Checker toChecker = currentState.getBoard().get(to);
 		if (toChecker == null)
 			throw new WrongPositionException(to);

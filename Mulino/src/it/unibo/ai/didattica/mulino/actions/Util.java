@@ -1,8 +1,48 @@
 package it.unibo.ai.didattica.mulino.actions;
 
+import java.util.Arrays;
+import java.util.HashMap;
+
 import it.unibo.ai.didattica.mulino.domain.State;
 
 public class Util {
+	
+	private static HashMap<String,String[]> adiacentTilesMap;
+	static {
+		adiacentTilesMap = new HashMap<String,String[]>();
+		adiacentTilesMap.put("a1", new String[]{"d1", "a4"});
+		adiacentTilesMap.put("d1", new String[]{"a1", "d2", "g1"});
+		adiacentTilesMap.put("g1", new String[]{"d1", "g4"});
+		
+		adiacentTilesMap.put("b2", new String[]{"b4","d2"});
+		adiacentTilesMap.put("d2", new String[]{"b2", "d3", "f2", "d1"});
+		adiacentTilesMap.put("f2", new String[]{"d2", "f4"});
+			
+		adiacentTilesMap.put("c3", new String[]{"c4", "d3"});
+		adiacentTilesMap.put("d3", new String[]{"c3", "d2", "e3"});
+		adiacentTilesMap.put("e3", new String[]{"d3", "e4"});
+		
+		adiacentTilesMap.put("a4", new String[]{"a1", "b4", "a7"});
+		adiacentTilesMap.put("b4", new String[]{"a4", "b6", "c4", "b2"});
+		adiacentTilesMap.put("c4", new String[]{"b4", "c5", "c3"});
+		
+		adiacentTilesMap.put("e4", new String[]{"e5", "f4", "e3"});
+		adiacentTilesMap.put("f4", new String[]{"e4", "f6", "g4", "f2"});
+		adiacentTilesMap.put("g4", new String[]{"f4", "g7", "g1"});
+		
+		adiacentTilesMap.put("c5", new String[]{"d5", "c4"});
+		adiacentTilesMap.put("d5", new String[]{"c5", "d6", "e5"});
+		adiacentTilesMap.put("e5", new String[]{"d5", "e4"});
+		
+		adiacentTilesMap.put("b6", new String[]{"d6", "b4"});
+		adiacentTilesMap.put("d6", new String[]{"b6", "d7", "f6", "d5"});
+		adiacentTilesMap.put("f6", new String[]{"d6", "f4"});
+		
+		adiacentTilesMap.put("a7",new String[]{"d7", "a4"});
+		adiacentTilesMap.put("d7", new String[]{"a7", "g7", "d6"});
+		adiacentTilesMap.put("g7", new String[]{"d7", "g4"});
+	}
+	
 	
 	/**
 	 * Given a position, it returns an array of three positions
@@ -85,8 +125,36 @@ public class Util {
 	
 	
 	/**
+	 * provides the set of adiacent tiles of a tile
+	 * @param aTile string-based position of the interested tile
+	 * @return the set of adiacent tiles
+	 * 
+	 */
+	public static String[] getAdiacentTiles(String aTile) throws WrongPositionException{
+		String[] result = Util.adiacentTilesMap.get(aTile);
+		if (result == null)
+			throw new WrongPositionException(aTile);
+		return result;
+	}
+	/**
+	 * return true if from and to are adiacent positions
+	 * @param from
+	 * @param to
+	 * @return
+	 * @throws WrongPositionException
+	 */
+	public static boolean areAdiacent(String from, String to) throws WrongPositionException {
+		String[] friends = Util.getAdiacentTiles(from);
+		if (Arrays.asList(friends).contains(to))
+			return true;
+		else
+			return false;
+	}
+	
+	
+	/**
 	 * Given a state, and the position where a checker has been put/move,
-	 * it returns true if the action generated a vertcial/horizontal triple
+	 * it returns true if the action generated a vertical/horizontal triple
 	 * @param newState
 	 * @param position
 	 * @param checker
@@ -177,4 +245,7 @@ public class Util {
 			if (opponent == State.Checker.BLACK)
 				newState.setBlackCheckersOnBoard(newState.getBlackCheckersOnBoard()-1);
 	}
+	
+	
+	
 }
