@@ -8,23 +8,30 @@ import java.util.*;
 public abstract class HeuristicMinimax<M extends InvertibleMove<M>, T extends Comparable<T>> extends Minimax<M> {
 
     private int maxDepth;
-    private Map<Integer, List<Move>> killerMoves = new HashMap<>();
+    private Map<Integer, List<M>> killerMoves = new HashMap<>();
     private TranspositionTable<T, M> transpositionTable = new TranspositionTable<>();
-    private int currentDepth;
     private int nodesCount;
     private int quiescenceNodesCount;
     private boolean useHeuristic;
     private boolean abort;
     protected List<M> movesHistory = new ArrayList<> ();
 
-    private final Comparator<Move> KillerComparator = new Comparator<Move>() {
+    private class MoveComparator<KillerMove extends Move> implements Comparator<KillerMove> {
+
+        private List<KillerMove> killerMoves = new ArrayList<>();
+
+        public MoveComparator(List<KillerMove> killerMoves) {
+            if (killerMoves != null) {
+                this.killerMoves = killerMoves;
+            }
+        }
+
         @Override
-        public int compare(Move o1, Move o2) {
-            List<Move> killerMoves = HeuristicMinimax.this.killerMoves.get(HeuristicMinimax.this.currentDepth);
-            boolean o1isKillerMove = killerMoves.contains(o1);
-            boolean o2isKillerMove = killerMoves.contains(o2);
+        public int compare(KillerMove o1, KillerMove o2) {
+            boolean o1isKillerMove = this.killerMoves.contains(o1);
+            boolean o2isKillerMove = this.killerMoves.contains(o2);
             if (o1isKillerMove && o2isKillerMove) {
-                return killerMoves.indexOf(o1) < killerMoves.indexOf(o2) ? -1 : 1;
+                return this.killerMoves.indexOf(o1) < this.killerMoves.indexOf(o2) ? -1 : 1;
             } else if (!o1isKillerMove && !o2isKillerMove) {
                 return 0;
             } else if (o1isKillerMove) {
@@ -33,7 +40,8 @@ public abstract class HeuristicMinimax<M extends InvertibleMove<M>, T extends Co
                 return 1;
             }
         }
-    };
+
+    }
 
     private static final class MoveWrapper<M extends Move> {
         public M move;
@@ -96,7 +104,7 @@ public abstract class HeuristicMinimax<M extends InvertibleMove<M>, T extends Co
          * Se abbiamo delle killer moves da prima
          * shiftiamo la depth per riutilizzarle.
          */
-        Map<Integer, List<Move>> killerMoves = new HashMap<>();
+        Map<Integer, List<M>> killerMoves = new HashMap<>();
         for (Integer key : this.killerMoves.keySet()) {
             if (key >= minDepth) {
                 killerMoves.put(key - minDepth, this.killerMoves.get(key));
@@ -108,7 +116,7 @@ public abstract class HeuristicMinimax<M extends InvertibleMove<M>, T extends Co
     }
 
     private List<M> sortMoves(List<M> moves, int depth) {
-        Collections.sort(moves, KillerComparator);
+        Collections.sort(moves, new MoveComparator<>(this.killerMoves.get(this.maxDepth - depth)));
 
         T hash = this.getTransposition();
         if (hash != null) {
@@ -167,7 +175,7 @@ public abstract class HeuristicMinimax<M extends InvertibleMove<M>, T extends Co
             }
         }
 
-        this.currentDepth = this.maxDepth - depth;
+        int currentDepth = this.maxDepth - depth;
 
         double a = alpha;
         double b = beta;
@@ -193,8 +201,8 @@ public abstract class HeuristicMinimax<M extends InvertibleMove<M>, T extends Co
             }
         }
 
-        if (this.killerMoves.get(this.currentDepth) == null) {
-            this.killerMoves.put(this.currentDepth, new ArrayList<Move>());
+        if (this.killerMoves.get(currentDepth) == null) {
+            this.killerMoves.put(currentDepth, new ArrayList<M>());
         }
 
         List<M> moves = sortMoves(getPossibleMoves(), depth);
@@ -218,14 +226,22 @@ public abstract class HeuristicMinimax<M extends InvertibleMove<M>, T extends Co
                 break;
             }
 
+            /*if (wrapper != null) {
+                System.out.println("[Best move is " + bestMove + ", Best score is " + a + "] [Current move is " + move +", Current score is " + score + "]");
+            }*/
+
             if (score > a) {
                 a = score;
                 bestMove = move;
 
-                List<Move> currentDepthKillerMoves = this.killerMoves.get(this.currentDepth);
+                /*if (wrapper != null) {
+                    System.out.println("[Best move is " + bestMove + ", Best score is " + a + "]");
+                }*/
+
+                List<M> currentDepthKillerMoves = this.killerMoves.get(currentDepth);
                 if (currentDepthKillerMoves == null) {
                     currentDepthKillerMoves = new ArrayList<>();
-                    this.killerMoves.put(this.currentDepth, currentDepthKillerMoves);
+                    this.killerMoves.put(currentDepth, currentDepthKillerMoves);
                 }
                 if (move != null && !currentDepthKillerMoves.contains(move)) {
                     if (currentDepthKillerMoves.size() >= 2) {
@@ -244,6 +260,7 @@ public abstract class HeuristicMinimax<M extends InvertibleMove<M>, T extends Co
             b = a + 1;
             first = false;
         }
+
         if (wrapper != null) {
             wrapper.move = bestMove;
         }

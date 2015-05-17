@@ -76,7 +76,7 @@ public class BitBoardMove implements MillMove<BitBoardMove> {
     }
 
     public String toString() {
-        return (this.player == BitBoardMinimax.PLAYER_W ? "W" : "B") + ":(" + this.from + ", " + this.to + ", " + this.remove + ") " + this.toStringMove();
+        return this.toStringMove();
     }
 
     @Override

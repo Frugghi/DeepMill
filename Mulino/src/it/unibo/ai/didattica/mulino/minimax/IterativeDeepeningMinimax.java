@@ -51,7 +51,7 @@ public abstract class IterativeDeepeningMinimax<M extends InvertibleMove<M>, T e
         long lastIteration;
 
         M bestMove = null;
-        for (this.depth = this.iterativeDeepeningIncrease(); this.depth != maxDepth && !this.shouldAbort(); this.depth += this.iterativeDeepeningIncrease()) {
+        for (this.depth = this.iterativeDeepeningIncrease(); this.depth != maxDepth && !this.shouldAbort() && this.depth < 50; this.depth += this.iterativeDeepeningIncrease()) {
             System.out.print("Depth " + this.depth);
 
             lastIteration = System.currentTimeMillis();

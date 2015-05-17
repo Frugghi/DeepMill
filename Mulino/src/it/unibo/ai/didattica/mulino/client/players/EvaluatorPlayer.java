@@ -29,6 +29,11 @@ public class EvaluatorPlayer<IA extends MillMinimax<M, ?, IA>, M extends MillMov
 
         System.out.println(ia.toString());
         System.out.println("Total score: " + ia.evaluate());
+        System.out.println("Possible moves: ");
+        for (M move : ia.getPossibleMoves()) {
+            System.out.println(move.toStringMove());
+        }
+        System.out.println();
     }
 
     @Override
