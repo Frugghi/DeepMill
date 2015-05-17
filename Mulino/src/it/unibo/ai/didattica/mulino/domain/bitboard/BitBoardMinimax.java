@@ -387,8 +387,11 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
             int reachablePositions = this.numberOfReachablePositions(this.currentPlayer);
             int opponentReachablePositions = this.numberOfReachablePositions(this.opponentPlayer);
             int emptyPositions = (BOARD_SIZE - this.count[PLAYER_W] - this.count[PLAYER_B])/2;
+            int blockedPieces = this.numberOfPiecesBlocked(this.currentPlayer);
+            int opponentBlockedPieces = this.numberOfPiecesBlocked(this.opponentPlayer);
 
-            return Math.min(reachablePositions, opponentReachablePositions) >= emptyPositions && Math.max(reachablePositions, opponentReachablePositions) >= emptyPositions;
+            return Math.min(this.count[this.currentPlayer] - blockedPieces, this.count[this.opponentPlayer] - opponentBlockedPieces) != 1 ||
+                    (Math.min(reachablePositions, opponentReachablePositions) >= emptyPositions && Math.max(reachablePositions, opponentReachablePositions) >= emptyPositions);
         } else { // Fase 3
             return true;
         }
@@ -405,12 +408,13 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
         }
 
         if (!this.phase1completed()) { // Fase 1
-            return  26 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer] - (this.played[this.currentPlayer] - this.played[this.opponentPlayer])) +
+            return  45 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer] - (this.played[this.currentPlayer] - this.played[this.opponentPlayer])) +
                          (this.numberOfPiecesBlocked(this.opponentPlayer) - this.numberOfPiecesBlocked(this.currentPlayer)) +
                      8 * (this.numberOfPotential3PiecesConfiguration(this.currentPlayer) - this.numberOfPotential3PiecesConfiguration(this.opponentPlayer)) +
                      9 * (this.numberOfMorrises(this.currentPlayer) - this.numberOfMorrises(this.opponentPlayer)) +
                     10 * (this.numberOf2PiecesConfiguration(this.currentPlayer) - this.numberOf2PiecesConfiguration(this.opponentPlayer)) +
-                     7 * (this.numberOf3PiecesConfiguration(this.currentPlayer) - this.numberOf3PiecesConfiguration(this.opponentPlayer));
+                     7 * (this.numberOf3PiecesConfiguration(this.currentPlayer) - this.numberOf3PiecesConfiguration(this.opponentPlayer)) +
+                  0.01 * (this.numberOfHypotheticallyMoves(this.currentPlayer) - this.numberOfHypotheticallyMoves(this.opponentPlayer));
         }  else if (this.count[PLAYER_B] > 3 && this.count[PLAYER_W] > 3) { // Fase 2
             return  43 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer]) +
                     10 * (this.numberOfPiecesBlocked(this.opponentPlayer) - this.numberOfPiecesBlocked(this.currentPlayer)) +
@@ -762,6 +766,8 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
         result += "Number of reachable positions player (B): " + this.numberOfReachablePositions(PLAYER_B) + "\n";
         result += "Number of unblockable morrises player (W): " + this.numberOfUnblockableMorrises(PLAYER_W) + "\n";
         result += "Number of unblockable morrises player (B): " + this.numberOfUnblockableMorrises(PLAYER_B) + "\n";
+        result += "Number of hypothetically moves player (W): " + this.numberOfHypotheticallyMoves(PLAYER_W) + "\n";
+        result += "Number of hypothetically moves player (B): " + this.numberOfHypotheticallyMoves(PLAYER_B) + "\n";
         result += "\n";
 
         result += "Moves history: ";
