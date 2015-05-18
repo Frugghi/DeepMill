@@ -406,19 +406,19 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
         } else if (this.isADraw()) {
             return 0;
         }
-
+        
         if (!this.phase1completed()) { // Fase 1
             return  45 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer] - (this.played[this.currentPlayer] - this.played[this.opponentPlayer])) +
-                         (this.numberOfPiecesBlocked(this.opponentPlayer) - this.numberOfPiecesBlocked(this.currentPlayer)) +
+                     2 * (this.numberOfPiecesBlocked(this.opponentPlayer) - this.numberOfPiecesBlocked(this.currentPlayer)) +
                      8 * (this.numberOfPotential3PiecesConfiguration(this.currentPlayer) - this.numberOfPotential3PiecesConfiguration(this.opponentPlayer)) +
                      9 * (this.numberOfMorrises(this.currentPlayer) - this.numberOfMorrises(this.opponentPlayer)) +
                     10 * (this.numberOf2PiecesConfiguration(this.currentPlayer) - this.numberOf2PiecesConfiguration(this.opponentPlayer)) +
                      7 * (this.numberOf3PiecesConfiguration(this.currentPlayer) - this.numberOf3PiecesConfiguration(this.opponentPlayer)) +
-                  0.01 * (this.numberOfHypotheticallyMoves(this.currentPlayer) - this.numberOfHypotheticallyMoves(this.opponentPlayer));
+                         (this.numberOfHypotheticallyMoves(this.currentPlayer) - this.numberOfHypotheticallyMoves(this.opponentPlayer));
         }  else if (this.count[PLAYER_B] > 3 && this.count[PLAYER_W] > 3) { // Fase 2
             return  43 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer]) +
                     10 * (this.numberOfPiecesBlocked(this.opponentPlayer) - this.numberOfPiecesBlocked(this.currentPlayer)) +
-                    12 * (this.numberOfUnblockableMorrises(this.currentPlayer) - this.numberOfUnblockableMorrises(this.opponentPlayer)) +
+                     8 * (this.numberOfUnblockableMorrises(this.currentPlayer) - this.numberOfUnblockableMorrises(this.opponentPlayer)) +
                     11 * (this.numberOfMorrises(this.currentPlayer) - this.numberOfMorrises(this.opponentPlayer)) +
                      8 * (this.numberOfDoubleMorrises(this.currentPlayer) - this.numberOfDoubleMorrises(this.opponentPlayer)) +
                          (this.numberOfReachablePositions(this.currentPlayer) - this.numberOfReachablePositions(this.opponentPlayer));
@@ -509,7 +509,7 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
         for (int mill : ALL_MILLS) {
             if ((opponentBoard & mill) == 0 && Integer.bitCount((board & mill)) == 2) {
                 for (byte pos = 0; pos < 24; pos++) {
-                    if (((mill >>> pos) & 1)  == 1 && ((board >>> pos) & 1) == 0) {
+                    if (((mill >>> pos) & 1) == 1 && ((board >>> pos) & 1) == 0) {
                         byte countPlayer = 0;
                         byte countOpponent = 0;
                         for (byte adjacentPosition : MOVES[pos]) {
@@ -520,7 +520,7 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
                                 break;
                             }
                         }
-                        if (countPlayer >= 1 && countOpponent == 0) {
+                        if (countPlayer >= 2 && countOpponent == 0) {
                             numberOfUnblockableMorrises++;
                         }
                         break;
