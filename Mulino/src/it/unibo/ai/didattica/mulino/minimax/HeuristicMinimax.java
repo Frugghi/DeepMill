@@ -180,7 +180,7 @@ public abstract class HeuristicMinimax<M extends InvertibleMove<M>, T extends Co
         double a = alpha;
         double b = beta;
 
-        T hash = this.getTransposition();
+        final T hash = this.getTransposition();
         if (hash != null && wrapper == null) {
             TranspositionTable.Entry<M> entry = this.transpositionTable.get(hash, depth);
             if (entry != null) {

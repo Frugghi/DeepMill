@@ -21,13 +21,7 @@ public class TranspositionTable<T extends Comparable<T>, M extends Move> {
         public int depth;
     }
 
-    private Map<T, Entry<M>> table = new LRUMap(TranspositionTable.MAX_SIZE);
-    /*private Map<T, Entry<M>> table = new LinkedHashMap<T, Entry<M>>(TranspositionTable.MAX_SIZE){
-        @Override
-        protected boolean removeEldestEntry(Map.Entry eldest) {
-            return this.size() > TranspositionTable.MAX_SIZE;
-        }
-    };*/
+    private Map<T, Entry<M>> table = new LRUMap<T, Entry<M>>(TranspositionTable.MAX_SIZE);
     private int lowerBoundHits = 0;
     private int upperBoundHits = 0;
     private int exactScoreHits = 0;
@@ -45,7 +39,7 @@ public class TranspositionTable<T extends Comparable<T>, M extends Move> {
         }
     }
 
-    public Entry<M> get(T hash, int depth) {
+    public Entry<M> get(final T hash, final int depth) {
         Entry<M> entry = this.table.get(hash);
         if (entry != null && entry.depth >= depth) {
             switch (entry.type) {
@@ -68,7 +62,7 @@ public class TranspositionTable<T extends Comparable<T>, M extends Move> {
         return null;
     }
 
-    public void put(T hash, Entry<M> entry) {
+    public void put(final T hash, final Entry<M> entry) {
         Entry<M> oldEntry = this.table.get(hash);
         if (oldEntry == null || oldEntry.depth <= entry.depth) {
             this.table.put(hash, entry);
