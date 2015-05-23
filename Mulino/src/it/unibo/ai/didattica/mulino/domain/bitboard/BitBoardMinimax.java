@@ -408,7 +408,7 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
         }
         
         if (!this.phase1completed()) { // Fase 1
-            return  45 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer] - (this.played[this.currentPlayer] - this.played[this.opponentPlayer])) +
+            return  24 * (this.count[this.currentPlayer] - this.count[this.opponentPlayer] - (this.played[this.currentPlayer] - this.played[this.opponentPlayer])) +
                      3 * (this.numberOfPiecesBlocked(this.opponentPlayer) - this.numberOfPiecesBlocked(this.currentPlayer)) +
                     11 * (this.numberOfPotential3PiecesConfiguration(this.currentPlayer) - this.numberOfPotential3PiecesConfiguration(this.opponentPlayer)) +
                      9 * (this.numberOfMorrises(this.currentPlayer) - this.numberOfMorrises(this.opponentPlayer)) +
