@@ -226,17 +226,17 @@ public abstract class HeuristicMinimax<M extends InvertibleMove<M>, T extends Co
                 break;
             }
 
-            if (wrapper != null) {
+            /*if (wrapper != null) {
                 System.out.println("[Best move is " + bestMove + ", Best score is " + a + "] [Current move is " + move +", Current score is " + score + "]");
-            }
+            }*/
 
             if (score > a) {
                 a = score;
                 bestMove = move;
 
-                if (wrapper != null) {
+                /*if (wrapper != null) {
                     System.out.println("[Best move is " + bestMove + ", Best score is " + a + "]");
-                }
+                }*/
 
                 List<M> currentDepthKillerMoves = this.killerMoves.get(currentDepth);
                 if (currentDepthKillerMoves == null) {
