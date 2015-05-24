@@ -120,7 +120,7 @@ public abstract class HeuristicMinimax<M extends InvertibleMove<M>, T extends Co
 
         T hash = this.getTransposition();
         if (hash != null) {
-            TranspositionTable.Entry<M> entry = this.transpositionTable.get(hash, depth);
+            TranspositionTable.Entry<M> entry = this.transpositionTable.get(hash, (byte)depth);
             if (entry != null) {
                 int index = moves.indexOf(entry.move);
 
@@ -182,7 +182,7 @@ public abstract class HeuristicMinimax<M extends InvertibleMove<M>, T extends Co
 
         final T hash = this.getTransposition();
         if (hash != null && wrapper == null) {
-            TranspositionTable.Entry<M> entry = this.transpositionTable.get(hash, depth);
+            TranspositionTable.Entry<M> entry = this.transpositionTable.get(hash, (byte)depth);
             if (entry != null) {
                 switch (entry.type) {
                     case LOWER_BOUND:
@@ -268,7 +268,7 @@ public abstract class HeuristicMinimax<M extends InvertibleMove<M>, T extends Co
         if (hash != null && !this.abort) {
             TranspositionTable.Entry<M> entry = new TranspositionTable.Entry<>();
             entry.move = bestMove;
-            entry.depth = depth;
+            entry.depth = (byte)depth;
             entry.score = a;
             entry.type = (a <= alpha ? TranspositionTable.EntryType.UPPER_BOUND :
                          (a >= beta  ? TranspositionTable.EntryType.LOWER_BOUND :

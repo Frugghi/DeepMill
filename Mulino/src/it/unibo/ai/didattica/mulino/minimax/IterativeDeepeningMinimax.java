@@ -2,14 +2,14 @@ package it.unibo.ai.didattica.mulino.minimax;
 
 public abstract class IterativeDeepeningMinimax<M extends InvertibleMove<M>, T extends Comparable<T>> extends HeuristicMinimax<M, T> {
 
-    protected int depth;
+    protected byte depth;
     private long timeoutTime = Long.MAX_VALUE;
 
     public IterativeDeepeningMinimax(Algorithm algo, boolean useHeuristic) {
         super(algo, useHeuristic);
     }
 
-    public int iterativeDeepeningIncrease() {
+    public byte iterativeDeepeningIncrease() {
         return 1;
     }
 

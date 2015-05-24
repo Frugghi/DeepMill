@@ -18,7 +18,7 @@ public class TranspositionTable<T extends Comparable<T>, M extends Move> {
         public double score;
         public M move;
         public EntryType type;
-        public int depth;
+        public byte depth;
     }
 
     private Map<T, Entry<M>> table = new LRUMap<T, Entry<M>>(TranspositionTable.MAX_SIZE);
@@ -39,7 +39,7 @@ public class TranspositionTable<T extends Comparable<T>, M extends Move> {
         }
     }
 
-    public Entry<M> get(final T hash, final int depth) {
+    public Entry<M> get(final T hash, final byte depth) {
         Entry<M> entry = this.table.get(hash);
         if (entry != null && entry.depth >= depth) {
             switch (entry.type) {
