@@ -75,8 +75,8 @@ public class GridMinimax extends MillMinimax<GridMove, Integer, GridMinimax> {
 
     private boolean hasWon(int player) {
         return played[FREE] == 0 && 
-                (count[3 - player] <= 2 ||                                  // L'avversario ha meno di 3 pezzi
-                numberOfPiecesBlocked(3 - player) == count[3 - player]);    // L'avversario non può muoversi
+                (count[3 - player] < 3 ||                                                                             // L'avversario ha meno di 3 pezzi
+                (this.currentPlayer == 3 - player && numberOfPiecesBlocked(3 - player) == count[3 - player])); // L'avversario non può muoversi
     }
 
     private void setGridPosition(int player, int x, int z) {

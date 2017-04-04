@@ -190,8 +190,8 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
 
     private boolean hasWon(byte player) {
         return this.phase1completed() &&
-                (this.count[1 - player] <= 2 ||                                        // L'avversario ha meno di 3 pezzi
-                numberOfPiecesBlocked((byte) (1 - player)) == this.count[1 - player]); // L'avversario non puo' muoversi
+                (this.count[1 - player] < 3 ||                                                                               // L'avversario ha meno di 3 pezzi
+                (this.currentPlayer == 1 - player && this.numberOfPiecesBlocked((byte) (1 - player)) == this.count[1 - player])); // L'avversario non puo' muoversi
     }
 
     private boolean isADraw() {
@@ -301,11 +301,11 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
                 int opponentBoard = this.board[this.opponentPlayer];
                 for (byte remove = 0; remove < BOARD_SIZE; remove++) {
                     if (((opponentBoard >>> remove) & 1) == 1 && (onlyMills || !this.isMill(opponentBoard, remove))) {
-                        capturesMoves.add(0, new BitBoardMove(this.currentPlayer, from == Byte.MAX_VALUE ? Byte.MAX_VALUE : from, to, remove));
+                        capturesMoves.add(0, new BitBoardMove(this.currentPlayer, from, to, remove));
                     }
                 }
             } else {
-                moves.add(new BitBoardMove(this.currentPlayer, from == Byte.MAX_VALUE ? Byte.MAX_VALUE : from, to));
+                moves.add(new BitBoardMove(this.currentPlayer, from, to));
             }
         }
     }
@@ -748,6 +748,12 @@ public class BitBoardMinimax extends MillMinimax<BitBoardMove, Long, BitBoardMin
         result += "Black Checkers On Board: " + this.count[PLAYER_B] + ";\n";
         result += "Current player: " + (this.currentPlayer == PLAYER_W ? "W" : "B") + ";\n";
         result += "Opponent player: " + (this.opponentPlayer == PLAYER_W ? "W" : "B") + ";\n";
+        result += "White player won: " + this.hasWon(PLAYER_W) + ";\n";
+        result += "Black player won: " + this.hasWon(PLAYER_B) + ";\n";
+        result += "Is draw: " + this.isADraw() + ";\n";
+        result += "Is over: " + this.isOver() + ";\n";
+        result += "Phase 1 completed: " + this.phase1completed() + ";\n";
+        result += "Phase 2 completed: " + this.phase2completed() + ";\n";
         result += "\n";
 
         result += "Number of morrises player (W): " + this.numberOfMorrises(PLAYER_W) + "\n";

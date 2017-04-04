@@ -35,7 +35,7 @@ public class IAPlayer<IA extends MillMinimax<M, ?, IA>, M extends MillMove<M>> e
         super.nextMove();
 
         IA state = ia.fromState(this.currentState);
-        if (debug) System.out.println("DEEPMILL DEBUG:\nOld state:\n" + ia.toString());
+        if (debug) System.out.println("DEEPMILL DEBUG:\nOld state:\n" + ia);
 
         for(M m : ia.getPossibleMoves()){
             ia.makeMove(m);
@@ -50,7 +50,7 @@ public class IAPlayer<IA extends MillMinimax<M, ?, IA>, M extends MillMove<M>> e
             ia = state;
         }
 
-        if (debug) System.out.println("DEEPMILL DEBUG:\nConverted state:\n" + ia.toString());
+        if (debug) System.out.println("DEEPMILL DEBUG:\nConverted state:\n" + ia);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class IAPlayer<IA extends MillMinimax<M, ?, IA>, M extends MillMove<M>> e
         M move = ia.getBestMove(depth, 1000 * maxTime);
         System.out.println("Time elapsed: " + (System.currentTimeMillis() - startTime) + "ms");
 
-        if (debug) System.out.println("DEEPMILL DEBUG: " + move.toString());
+        if (debug) System.out.println("DEEPMILL DEBUG: " + move);
         if (move == null) {
             actionString = "GGWP";
         } else {
@@ -69,7 +69,7 @@ public class IAPlayer<IA extends MillMinimax<M, ?, IA>, M extends MillMove<M>> e
         }
 
         System.out.println(actionString);
-        if (debug) System.out.println("DEEPMILL DEBUG: \n" + ia.toString());
+        if (debug) System.out.println("DEEPMILL DEBUG: \n" + ia);
 
         return actionString;
     }
