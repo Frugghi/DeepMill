@@ -1,8 +1,11 @@
 package it.unibo.ai.didattica.mulino.DeepMill.debug.fx;
 
+import com.sun.security.ntlm.Server;
+import it.unibo.ai.didattica.mulino.DeepMill.debug.DebugSecurityManager;
 import it.unibo.ai.didattica.mulino.DeepMill.debug.ProxyGUI;
 import it.unibo.ai.didattica.mulino.DeepMill.debug.StateUI;
 import it.unibo.ai.didattica.mulino.domain.State;
+import it.unibo.ai.didattica.mulino.engine.TCPMulino;
 import it.unibo.ai.didattica.mulino.gui.Background;
 import it.unibo.ai.didattica.mulino.gui.GUI;
 import javafx.application.Platform;
@@ -16,8 +19,11 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Circle;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -111,6 +117,7 @@ public class Engine implements Initializable, StateUI {
 
         State.Checker player = this.playerChoice.getSelectionModel().getSelectedItem().equals("White") ? State.Checker.WHITE : State.Checker.BLACK;
 
+        System.setSecurityManager(null);
         final it.unibo.ai.didattica.mulino.engine.Engine server = new it.unibo.ai.didattica.mulino.engine.Engine(60, 16);
         try {
             Field playerField = it.unibo.ai.didattica.mulino.engine.Engine.class.getDeclaredField("currentPlayer");
@@ -140,10 +147,27 @@ public class Engine implements Initializable, StateUI {
             @Override
             public void run() {
                 try {
+                    System.setSecurityManager(new DebugSecurityManager());
                     server.run();
+                } catch (SecurityException e) {
+                    System.out.println("The game has finished...");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
+                System.out.println("Closing the sockets...");
+                try {
+                    Field whiteSocketField = it.unibo.ai.didattica.mulino.engine.Engine.class.getDeclaredField("whiteSocket");
+                    whiteSocketField.setAccessible(true);
+                    closeSockets((TCPMulino)whiteSocketField.get(server));
+
+                    Field blackSocketField = it.unibo.ai.didattica.mulino.engine.Engine.class.getDeclaredField("blackSocket");
+                    blackSocketField.setAccessible(true);
+                    closeSockets((TCPMulino)blackSocketField.get(server));
+                } catch (NoSuchFieldException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
@@ -152,6 +176,34 @@ public class Engine implements Initializable, StateUI {
                 });
             }
         }.start();
+    }
+
+    private void closeSockets(TCPMulino playerSocket) throws NoSuchFieldException, IllegalAccessException {
+        Field serverSocketField = it.unibo.ai.didattica.mulino.engine.TCPMulino.class.getDeclaredField("serverSocket");
+        serverSocketField.setAccessible(true);
+
+        Field connectionSocketField = it.unibo.ai.didattica.mulino.engine.TCPMulino.class.getDeclaredField("connectionSocket");
+        connectionSocketField.setAccessible(true);
+
+        if (playerSocket != null) {
+            ServerSocket serverSocket = (ServerSocket)serverSocketField.get(playerSocket);
+            if (serverSocket != null) {
+                try {
+                    serverSocket.close();
+                } catch (Exception e) {
+
+                }
+            }
+
+            Socket connectionSocket = (Socket)connectionSocketField.get(playerSocket);
+            if (connectionSocket != null) {
+                try {
+                    connectionSocket.close();
+                } catch (Exception e) {
+
+                }
+            }
+        }
     }
 
     public void handleCircleClick(MouseEvent event) {

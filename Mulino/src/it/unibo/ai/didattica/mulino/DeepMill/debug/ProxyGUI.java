@@ -4,6 +4,7 @@ import it.unibo.ai.didattica.mulino.domain.State;
 import it.unibo.ai.didattica.mulino.gui.Background;
 import it.unibo.ai.didattica.mulino.gui.GUI;
 
+import javax.swing.*;
 import java.lang.reflect.Field;
 
 public class ProxyGUI extends GUI {
@@ -11,7 +12,7 @@ public class ProxyGUI extends GUI {
     private StateUI ui;
 
     public ProxyGUI(StateUI ui) {
-        this.ui = ui;
+        super();
 
         try {
             Field mainFrameField = it.unibo.ai.didattica.mulino.gui.GUI.class.getDeclaredField("mainFrame");
@@ -22,6 +23,8 @@ public class ProxyGUI extends GUI {
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
+
+        this.ui = ui;
     }
 
     @Override
