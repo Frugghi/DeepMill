@@ -1,7 +1,10 @@
 package it.unibo.ai.didattica.mulino.DeepMill.debug.fx;
 
+import it.unibo.ai.didattica.mulino.DeepMill.debug.ProxyGUI;
 import it.unibo.ai.didattica.mulino.DeepMill.debug.StateUI;
 import it.unibo.ai.didattica.mulino.domain.State;
+import it.unibo.ai.didattica.mulino.gui.Background;
+import it.unibo.ai.didattica.mulino.gui.GUI;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
@@ -14,6 +17,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Circle;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -107,8 +111,31 @@ public class Engine implements Initializable, StateUI {
 
         State.Checker player = this.playerChoice.getSelectionModel().getSelectedItem().equals("White") ? State.Checker.WHITE : State.Checker.BLACK;
 
-        // TODO: FIX THIS!
-        final it.unibo.ai.didattica.mulino.engine.Engine server = null;//new it.unibo.ai.didattica.mulino.engine.Engine(state, player, this);
+        final it.unibo.ai.didattica.mulino.engine.Engine server = new it.unibo.ai.didattica.mulino.engine.Engine(60, 16);
+        try {
+            Field playerField = it.unibo.ai.didattica.mulino.engine.Engine.class.getDeclaredField("currentPlayer");
+            playerField.setAccessible(true);
+            playerField.set(server, player);
+
+            Field stateField = it.unibo.ai.didattica.mulino.engine.Engine.class.getDeclaredField("currentState");
+            stateField.setAccessible(true);
+            stateField.set(server, state);
+
+            Field guiField = it.unibo.ai.didattica.mulino.engine.Engine.class.getDeclaredField("theGui");
+            guiField.setAccessible(true);
+
+            GUI theGui = (GUI)guiField.get(server);
+            Field mainFrameField = it.unibo.ai.didattica.mulino.gui.GUI.class.getDeclaredField("mainFrame");
+            mainFrameField.setAccessible(true);
+            Background mainFrame = (Background)mainFrameField.get(theGui);
+            mainFrame.setVisible(false);
+            mainFrame.dispose();
+
+            guiField.set(server, new ProxyGUI(this));
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
         new Thread(){
             @Override
             public void run() {
