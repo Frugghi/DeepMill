@@ -1,5 +1,8 @@
 language: java
 
+notifications:
+  email: false
+
 sudo: false
 
 addons:
