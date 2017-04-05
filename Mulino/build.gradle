@@ -11,6 +11,7 @@ repositories {
 
 group 'it.unibo.ai.didattica.mulino.DeepMill'
 version '1.0'
+mainClassName = 'it.unibo.ai.didattica.mulino.DeepMill.client.DeepMill'
 
 configurations {
     libraries
@@ -21,7 +22,8 @@ jar {
         from { configurations.libraries.collect { it.isDirectory() ? it : zipTree(it) } }
     }
     from sourceSets.main.output
-    archiveName = "DeepMill.jar"
+    archiveName = "DeepMill-java${JavaVersion.current()}.jar"
+    exclude(['it/unibo/ai/didattica/mulino/DeepMill/debug/**'])
     manifest {
         attributes 'Implementation-Title': 'DeepMill',
                    'Implementation-Version': version,
@@ -35,7 +37,7 @@ task engineJar(type: Jar) {
         from { configurations.libraries.collect { it.isDirectory() ? it : zipTree(it) } }
     }
     from sourceSets.main.output
-    archiveName = "DeepMill-Server.jar"
+    archiveName = "DeepMillServer-java${JavaVersion.current()}.jar"
     manifest {
         attributes 'Implementation-Title': 'DeepMill-Server',
                    'Implementation-Version': version,
@@ -106,4 +108,3 @@ task humanBlack(type: JavaExec) {
 
     args '--human', '--black'
 }
-
