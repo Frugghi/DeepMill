@@ -1,6 +1,5 @@
 package it.unibo.ai.didattica.mulino.DeepMill.debug.fx;
 
-import com.sun.security.ntlm.Server;
 import it.unibo.ai.didattica.mulino.DeepMill.debug.DebugSecurityManager;
 import it.unibo.ai.didattica.mulino.DeepMill.debug.ProxyGUI;
 import it.unibo.ai.didattica.mulino.DeepMill.debug.StateUI;
@@ -19,7 +18,6 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Circle;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.ServerSocket;

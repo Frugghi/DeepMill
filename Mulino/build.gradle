@@ -1,0 +1,109 @@
+
+plugins {
+    id 'idea'
+    id 'java'
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+}
+
+group 'it.unibo.ai.didattica.mulino.DeepMill'
+version '1.0'
+
+configurations {
+    libraries
+}
+
+jar {
+    doFirst {
+        from { configurations.libraries.collect { it.isDirectory() ? it : zipTree(it) } }
+    }
+    from sourceSets.main.output
+    archiveName = "DeepMill.jar"
+    manifest {
+        attributes 'Implementation-Title': 'DeepMill',
+                   'Implementation-Version': version,
+                   'Main-Class': 'it.unibo.ai.didattica.mulino.DeepMill.client.DeepMill',
+                   'Built-By': System.getProperty('user.name')
+    }
+}
+
+task engineJar(type: Jar) {
+    doFirst {
+        from { configurations.libraries.collect { it.isDirectory() ? it : zipTree(it) } }
+    }
+    from sourceSets.main.output
+    archiveName = "DeepMill-Server.jar"
+    manifest {
+        attributes 'Implementation-Title': 'DeepMill-Server',
+                   'Implementation-Version': version,
+                   'Main-Class': 'it.unibo.ai.didattica.mulino.DeepMill.debug.fx.Debug',
+                   'Built-By': System.getProperty('user.name')
+    }
+}
+
+task buildAllJars {
+    group = 'build'
+    dependsOn tasks.withType(Jar)
+}
+
+dependencies {
+    libraries files('libs/mulino-20170404.jar')
+    libraries group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+    configurations.compile.extendsFrom(configurations.libraries)
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+        resources {
+            srcDirs = ["src"]
+            includes = ["**/*.fxml"]
+        }
+    }
+}
+
+task engine(type: JavaExec) {
+    group = 'deepmill'
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'it.unibo.ai.didattica.mulino.DeepMill.debug.fx.Debug'
+}
+
+task aiWhite(type: JavaExec) {
+    group = 'deepmill'
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'it.unibo.ai.didattica.mulino.DeepMill.client.DeepMill'
+
+    args '--ia', '--white'
+}
+
+task aiBlack(type: JavaExec) {
+    group = 'deepmill'
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'it.unibo.ai.didattica.mulino.DeepMill.client.DeepMill'
+
+    args '--ia', '--black'
+}
+
+task humanWhite(type: JavaExec) {
+    group = 'deepmill'
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'it.unibo.ai.didattica.mulino.DeepMill.client.DeepMill'
+
+    args '--human', '--white'
+}
+
+task humanBlack(type: JavaExec) {
+    group = 'deepmill'
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'it.unibo.ai.didattica.mulino.DeepMill.client.DeepMill'
+
+    args '--human', '--black'
+}
+
