@@ -8,7 +8,7 @@ addons:
       - oracle-java8-installer
 
 install: true
-	  
+
 script:
   - jdk_switcher use oraclejdk8
   - gradle build
