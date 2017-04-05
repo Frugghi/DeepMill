@@ -1,0 +1,5 @@
+include 'DeepMill'
+
+if (JavaVersion.current() >= JavaVersion.VERSION_1_8) {
+    include 'DeepMillServer'
+}

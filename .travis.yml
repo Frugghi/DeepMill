@@ -8,19 +8,17 @@ addons:
       - oracle-java8-installer
 
 script:
-  - cd Mulino
   - jdk_switcher use oraclejdk8
   - gradle build
-  - gradle buildAllJars
+  - gradle :DeepMill:clean :DeepMillServer:clean
   - jdk_switcher use oraclejdk7
   - gradle build
-  - gradle buildAllJars
 
 deploy:
   provider: releases
   api_key: "$GITHUB_TOKEN"
   file_glob: true
-  file: Mulino/build/libs/*.jar
+  file: build/libs/*.jar
   skip_cleanup: true
   on:
     tags: true

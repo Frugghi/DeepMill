@@ -1,0 +1,57 @@
+
+plugins {
+    id 'idea'
+    id 'java'
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+}
+
+group 'it.unibo.ai.didattica.mulino.DeepMill'
+version '1.0'
+mainClassName = 'it.unibo.ai.didattica.mulino.DeepMill.debug.fx.Debug'
+
+configurations {
+    libraries
+}
+
+jar {
+    doFirst {
+        from { configurations.libraries.collect { it.isDirectory() ? it : zipTree(it) } }
+    }
+    from sourceSets.main.output
+    archiveName = "DeepMillServer-java${JavaVersion.current()}.jar"
+    manifest {
+        attributes 'Implementation-Title': 'DeepMillServer',
+                   'Implementation-Version': version,
+                   'Main-Class': 'it.unibo.ai.didattica.mulino.DeepMill.debug.fx.Debug',
+                   'Built-By': System.getProperty('user.name')
+    }
+}
+
+dependencies {
+    libraries files('../libs/mulino-20170404.jar')
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+    configurations.compile.extendsFrom(configurations.libraries)
+}
+
+sourceSets {
+    main {
+	    java {
+            srcDirs = ['src']
+        }
+		resources {
+            srcDirs = ['src']
+            includes = ["**/*.fxml"]
+        }
+	}
+}
+
+task engine(type: JavaExec) {
+    group = 'deepmill'
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'it.unibo.ai.didattica.mulino.DeepMill.debug.fx.Debug'
+}

@@ -1,0 +1,15 @@
+
+plugins {
+    id 'idea'
+    id 'java'
+}
+
+jar.enabled = false
+
+task copyJars(type: Copy) {
+    group 'build'
+    from subprojects.collect { it.tasks.withType(Jar) }
+    into "$buildDir/libs"
+}
+
+build.dependsOn copyJars
