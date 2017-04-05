@@ -32,7 +32,7 @@ jar {
 }
 
 dependencies {
-    libraries files('../libs/mulino-20170404.jar')
+    libraries project (':Mulino')
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
     configurations.compile.extendsFrom(configurations.libraries)

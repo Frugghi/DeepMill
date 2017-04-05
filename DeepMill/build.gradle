@@ -32,7 +32,7 @@ jar {
 }
 
 dependencies {
-    libraries files('../libs/mulino-20170404.jar')
+    libraries project (':Mulino')
     libraries group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 

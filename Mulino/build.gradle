@@ -1,0 +1,38 @@
+
+plugins {
+    id 'idea'
+    id 'java'
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+}
+
+group 'it.unibo.ai.didattica.mulino'
+version '1.0'
+mainClassName = 'it.unibo.ai.didattica.mulino.engine.Engine'
+
+
+jar {
+    from sourceSets.main.output
+    archiveName = "Mulino.jar"
+    manifest {
+        attributes 'Implementation-Title': 'Mulino',
+                   'Implementation-Version': version,
+                   'Main-Class': 'it.unibo.ai.didattica.mulino.engine.Engine',
+                   'Built-By': System.getProperty('user.name')
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+		resources {
+            srcDirs = ['src']
+            includes = ["**/*.jpg", "**/*.png"]
+        }
+    }
+}

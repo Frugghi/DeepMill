@@ -8,7 +8,7 @@ jar.enabled = false
 
 task copyJars(type: Copy) {
     group 'build'
-    from subprojects.collect { it.tasks.withType(Jar) }
+    from subprojects.findAll { project -> project.name != "Mulino"}.collect { it.tasks.withType(Jar) }
     into "$buildDir/libs"
 }
 
